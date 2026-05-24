@@ -2550,7 +2550,7 @@
    * ════════════════════════════════════════════════════════════════ */
   function loadData() {
     return new Promise((resolve, reject) => {
-      Papa.parse('violations.csv', {
+      Papa.parse('https://raedaldweik.github.io/report/violations.csv', {
         download: true,
         header: true,
         dynamicTyping: false,

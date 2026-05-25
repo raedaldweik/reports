@@ -1801,16 +1801,16 @@
 
   /* ─── Body + dashboard frame ─── */
   html[data-theme="dark"], html[data-theme="dark"] body {
-    background: #000;
+    background: #011b41;
     color: #fff;
     font-family: 'Manrope', sans-serif;
   }
   html[data-theme="dark"] body { display: flex; align-items: center; justify-content: center; }
 
   html[data-theme="dark"] .dashboard {
-    width: min(100vw, calc(100vh * 16 / 9));
-    height: min(100vh, calc(100vw * 9 / 16));
-    aspect-ratio: 16 / 9;
+    width: 100vw;
+    height: 100vh;
+    aspect-ratio: auto;
     box-shadow: none;
     background: radial-gradient(ellipse 80% 60% at 50% 35%, #023068 0%, #011b41 55%, #000a1f 100%);
   }

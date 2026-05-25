@@ -1,14 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
-<title>Performance Dashboard</title>
+<title>Performance Dashboard — Dark</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.css" rel="stylesheet">
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script>
+  // Apply saved theme inline before stylesheet renders — prevents flash
+  (function() {
+    try {
+      var t = localStorage.getItem('rta-dashboard-theme');
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    } catch (e) {}
+  })();
+</script>
 <style>
   /* ════════════════════════════════════════════════════════════════════
    *  ✦  RTA · PERFORMANCE  ·  LUXURY LIGHT  ✦
@@ -362,8 +371,68 @@
     padding: 1.4cqw 1.8cqw 0;
   }
   .gov-logo { height: 8cqw; width: auto; object-fit: contain; display: block; filter: drop-shadow(0 1px 2px rgba(15, 23, 42, 0.08)); }
+  /* Show the correct government logo per theme; hide the other */
+  .gov-logo-dark { display: none; }
+  html[data-theme="dark"] .gov-logo-light { display: none; }
+  html[data-theme="dark"] .gov-logo-dark  { display: block; }
   .rta-logo-block { display: flex; flex-direction: column; align-items: flex-end; gap: 0.35cqw; }
   .rta-logo { height: 6cqw; width: auto; object-fit: contain; display: block; filter: drop-shadow(0 1px 2px rgba(15, 23, 42, 0.08)); }
+
+  /* ─── Theme toggle button — sits above the RTA logo ─── */
+  .theme-toggle {
+    width: 2.2cqw; height: 2.2cqw;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(247, 243, 236, 0.7));
+    border: 1px solid rgba(15, 23, 42, 0.10);
+    color: var(--ink-2);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow:
+      0 1px 2px rgba(15, 23, 42, 0.06),
+      0 4px 12px rgba(15, 23, 42, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    flex-shrink: 0;
+    overflow: hidden;
+    position: relative;
+  }
+  .theme-toggle:hover {
+    background: linear-gradient(180deg, #fff, #f6f3ec);
+    transform: rotate(15deg) scale(1.05);
+    box-shadow:
+      0 2px 4px rgba(15, 23, 42, 0.08),
+      0 8px 20px rgba(15, 23, 42, 0.10),
+      inset 0 1px 0 rgba(255, 255, 255, 1);
+  }
+  .theme-toggle .theme-icon {
+    width: 1.05cqw; height: 1.05cqw;
+    transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.34, 1.4, 0.64, 1);
+    position: absolute;
+  }
+  .theme-toggle .theme-icon-sun  { opacity: 0; transform: rotate(-90deg) scale(0.4); }
+  .theme-toggle .theme-icon-moon { opacity: 1; transform: rotate(0)      scale(1);   }
+  html[data-theme="dark"] .theme-toggle .theme-icon-sun  { opacity: 1; transform: rotate(0)     scale(1);   }
+  html[data-theme="dark"] .theme-toggle .theme-icon-moon { opacity: 0; transform: rotate(90deg) scale(0.4); }
+  html[data-theme="dark"] .theme-toggle {
+    background: linear-gradient(180deg, rgba(2, 131, 155, 0.25), rgba(2, 66, 107, 0.35));
+    border: 1px solid rgba(120, 220, 250, 0.30);
+    color: #ffe8b8;
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.4),
+      0 0 0.8cqw rgba(255, 232, 184, 0.20),
+      inset 0 1px 0 rgba(120, 220, 250, 0.20);
+  }
+  html[data-theme="dark"] .theme-toggle:hover {
+    background: linear-gradient(180deg, rgba(2, 131, 155, 0.35), rgba(2, 66, 107, 0.45));
+    border-color: rgba(255, 232, 184, 0.5);
+    color: #ffd680;
+    box-shadow:
+      0 2px 6px rgba(0, 0, 0, 0.4),
+      0 0 1cqw rgba(255, 232, 184, 0.35),
+      inset 0 1px 0 rgba(120, 220, 250, 0.30);
+  }
+  /* In dark, logos may need slight tweak to read on dark background */
+  html[data-theme="dark"] .rta-logo { filter: drop-shadow(0 0 0.5cqw rgba(196, 32, 42, 0.35)); }
   .title-block { display: flex; flex-direction: column; gap: 0.7cqw; min-width: 0; }
   .title-row { display: flex; align-items: center; gap: 1.5cqw; width: 100%; }
   .title {
@@ -1521,11 +1590,11 @@
 
   .panel-map .map-badge {
     position: absolute;
-    top: 14px; left: 14px;
+    top: 12px; left: 12px;
     z-index: 5;
-    display: flex; align-items: center; gap: 11px;
-    padding: 10px 14px 10px 10px;
-    border-radius: 10px;
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 11px 7px 8px;
+    border-radius: 8px;
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(248, 250, 252, 0.85) 100%);
     border: 1px solid rgba(255, 255, 255, 0.8);
     box-shadow:
@@ -1536,34 +1605,36 @@
     -webkit-backdrop-filter: blur(20px) saturate(160%);
   }
   .panel-map .map-badge .map-icon {
-    width: 32px; height: 32px;
-    border-radius: 8px;
+    width: 22px; height: 22px;
+    border-radius: 6px;
     display: grid; place-items: center;
     background: linear-gradient(135deg, #38bdf8, #0284c7);
     color: #ffffff;
     box-shadow: 0 2px 6px rgba(56, 189, 248, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
   }
-  .panel-map .map-badge .map-icon svg { width: 18px; height: 18px; stroke-width: 1.8; }
+  .panel-map .map-badge .map-icon svg { width: 13px; height: 13px; stroke-width: 1.8; }
   .panel-map .map-badge .map-t2 {
-    font-size: 14px; font-weight: 700;
+    font-size: 11.5px; font-weight: 700;
     color: var(--ink-1); line-height: 1.1;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.005em;
+    white-space: nowrap;
   }
   .panel-map .map-badge .map-filters-active {
-    font-size: 10px; font-weight: 700;
+    font-size: 9px; font-weight: 700;
     color: var(--rta-red);
-    letter-spacing: 0.05em;
-    margin-top: 2px;
+    letter-spacing: 0.04em;
+    margin-top: 1px;
     display: none;
   }
   .panel-map .map-badge .map-filters-active.visible { display: block; }
 
+  /* Legend sits directly underneath the badge, same column, compact */
   .panel-map .map-legend {
     position: absolute;
-    top: 60px; right: 14px;
+    top: 50px; left: 12px;
     z-index: 5;
-    padding: 12px 14px 13px;
-    border-radius: 10px;
+    padding: 7px 10px 8px;
+    border-radius: 8px;
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(248, 250, 252, 0.85) 100%);
     border: 1px solid rgba(255, 255, 255, 0.8);
     box-shadow:
@@ -1572,26 +1643,26 @@
       inset 0 1px 0 rgba(255, 255, 255, 1);
     backdrop-filter: blur(20px) saturate(160%);
     -webkit-backdrop-filter: blur(20px) saturate(160%);
-    min-width: 165px;
+    min-width: 142px;
   }
   .panel-map .map-legend-title {
-    font-size: 9.5px; font-weight: 800;
-    letter-spacing: 0.18em; text-transform: uppercase;
+    font-size: 8.5px; font-weight: 800;
+    letter-spacing: 0.14em; text-transform: uppercase;
     color: var(--ink-4);
-    padding-bottom: 8px; margin-bottom: 8px;
-    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+    padding-bottom: 5px; margin-bottom: 5px;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.07);
   }
   .panel-map .map-legend-row {
-    display: flex; align-items: center; gap: 9px;
-    font-size: 12px; font-weight: 600;
+    display: flex; align-items: center; gap: 7px;
+    font-size: 10.5px; font-weight: 600;
     color: var(--ink-1);
-    padding: 4px 0;
+    padding: 2px 0;
   }
   .panel-map .map-legend-dot {
-    width: 11px; height: 11px;
+    width: 9px; height: 9px;
     border-radius: 50%; flex-shrink: 0;
     border: 1.5px solid #fff;
-    box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08), 0 0 8px currentColor;
+    box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08), 0 0 6px currentColor;
   }
   .panel-map .map-legend-dot.high { background: #ef4444; color: #ef4444; }
   .panel-map .map-legend-dot.mid  { background: #f59e0b; color: #f59e0b; }
@@ -1599,19 +1670,19 @@
   .panel-map .map-legend-count {
     color: var(--ink-4);
     margin-left: auto;
-    font-size: 11px; font-weight: 700;
+    font-size: 9.5px; font-weight: 700;
     font-feature-settings: 'tnum' 1;
   }
 
   .panel-map .map-recenter {
     position: absolute;
-    top: 16px; right: 14px;
+    top: 12px; right: 12px;
     z-index: 6;
-    padding: 8px 14px;
-    border-radius: 8px;
+    padding: 6px 11px;
+    border-radius: 7px;
     font-family: inherit;
-    font-size: 10px; font-weight: 800;
-    letter-spacing: 0.16em; text-transform: uppercase;
+    font-size: 9px; font-weight: 800;
+    letter-spacing: 0.14em; text-transform: uppercase;
     color: var(--ink-1);
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.88) 100%);
     border: 1px solid rgba(15, 23, 42, 0.08);
@@ -1710,6 +1781,450 @@
   .panel-map .mapboxgl-ctrl-icon { filter: none !important; opacity: 0.7 !important; }
   .panel-map .mapboxgl-ctrl-group button + button { border-top: 1px solid rgba(15, 23, 42, 0.08) !important; }
 
+  /* ═══════════════════════════════════════════════════════════════════
+   *  ✦  DARK THEME — restore original RTA visuals  ✦
+   *  Only visual properties are overridden. All structure/functionality
+   *  from the light version stays identical.
+   * ═══════════════════════════════════════════════════════════════════ */
+
+  html[data-theme="dark"] {
+    --bg:          #011b41;
+    --teal:        #02839b;
+    --grey:        #656565;
+    --green-dark:  #006055;
+    --blue-mid:    #02426b;
+    --red:         #800411;
+    --red-bright:  #c4202a;
+    --beige:       #b3ad9a;
+    --purple:      #3d2764;
+  }
+
+  /* ─── Body + dashboard frame ─── */
+  html[data-theme="dark"], html[data-theme="dark"] body {
+    background: #000;
+    color: #fff;
+    font-family: 'Manrope', sans-serif;
+  }
+  html[data-theme="dark"] body { display: flex; align-items: center; justify-content: center; }
+
+  html[data-theme="dark"] .dashboard {
+    width: min(100vw, calc(100vh * 16 / 9));
+    height: min(100vh, calc(100vw * 9 / 16));
+    aspect-ratio: 16 / 9;
+    box-shadow: none;
+    background: radial-gradient(ellipse 80% 60% at 50% 35%, #023068 0%, #011b41 55%, #000a1f 100%);
+  }
+  html[data-theme="dark"] .dashboard::before {
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    background-size: 32px 32px;
+    opacity: 1;
+    mix-blend-mode: normal;
+  }
+  html[data-theme="dark"] .dashboard::after {
+    background:
+      radial-gradient(ellipse 55% 50% at 82% 18%, rgba(2, 131, 155, 0.25) 0%, transparent 65%),
+      radial-gradient(ellipse 35% 32% at 6% 12%, rgba(120, 200, 240, 0.10) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 45% at 92% 88%, rgba(255, 175, 100, 0.10) 0%, transparent 65%),
+      radial-gradient(ellipse 50% 55% at 5% 90%, rgba(75, 50, 140, 0.20) 0%, transparent 65%),
+      radial-gradient(ellipse 25% 35% at 96% 50%, rgba(100, 200, 240, 0.10) 0%, transparent 70%);
+  }
+
+  /* Bokeh — original vibrant colors */
+  html[data-theme="dark"] .bokeh-dot { mix-blend-mode: normal; }
+  html[data-theme="dark"] .mega-teal { background: radial-gradient(circle, rgba(2, 131, 155, 0.55) 0%, rgba(2, 131, 155, 0.18) 30%, transparent 65%); filter: blur(2cqw); }
+  html[data-theme="dark"] .mega-cyan { background: radial-gradient(circle, rgba(100, 215, 250, 0.45) 0%, rgba(100, 215, 250, 0.12) 30%, transparent 65%); filter: blur(2.2cqw); }
+  html[data-theme="dark"] .mega-purple { background: radial-gradient(circle, rgba(130, 90, 210, 0.48) 0%, rgba(130, 90, 210, 0.12) 30%, transparent 65%); filter: blur(1.8cqw); }
+  html[data-theme="dark"] .mega-amber { background: radial-gradient(circle, rgba(255, 180, 110, 0.38) 0%, rgba(255, 180, 110, 0.10) 30%, transparent 65%); filter: blur(1.8cqw); }
+  html[data-theme="dark"] .teal-blob { background: radial-gradient(circle, rgba(2, 131, 155, 0.55) 0%, rgba(2, 131, 155, 0.14) 45%, transparent 75%); filter: blur(0.9cqw); }
+  html[data-theme="dark"] .cyan-blob { background: radial-gradient(circle, rgba(120, 220, 250, 0.45) 0%, rgba(120, 220, 250, 0.12) 45%, transparent 75%); filter: blur(0.85cqw); }
+  html[data-theme="dark"] .amber-blob { background: radial-gradient(circle, rgba(255, 200, 140, 0.50) 0%, rgba(255, 200, 140, 0.12) 45%, transparent 75%); filter: blur(0.7cqw); }
+  html[data-theme="dark"] .purple-blob { background: radial-gradient(circle, rgba(150, 110, 230, 0.45) 0%, rgba(150, 110, 230, 0.10) 45%, transparent 75%); filter: blur(0.9cqw); }
+
+  /* ─── Header ─── */
+  html[data-theme="dark"] .title { color: #fff; font-weight: 400; font-size: 1.75cqw; }
+  html[data-theme="dark"] .red-line {
+    background: linear-gradient(90deg, var(--red-bright) 0%, var(--red) 55%, rgba(128, 4, 17, 0.4) 85%, transparent 100%);
+    box-shadow: 0 0 0.25cqw rgba(196, 32, 42, 0.18);
+  }
+
+  /* ─── Filter bar (in header) ─── */
+  html[data-theme="dark"] .fb-time { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); }
+  html[data-theme="dark"] .fb-time-pill { color: rgba(255, 255, 255, 0.72); }
+  html[data-theme="dark"] .fb-time-pill:hover { color: #fff; }
+  html[data-theme="dark"] .fb-time-pill.active {
+    background: linear-gradient(180deg, rgba(2, 131, 155, 0.7), rgba(2, 66, 107, 0.85));
+    color: #fff;
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.3),
+      0 2px 6px rgba(2, 131, 155, 0.35),
+      inset 0 1px 0 rgba(120, 220, 250, 0.30);
+  }
+  html[data-theme="dark"] .fb-divider { background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.18) 50%, transparent 100%); }
+  html[data-theme="dark"] .fb-search input, html[data-theme="dark"] .fb-select {
+    background: rgba(2, 66, 107, 0.40);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #fff;
+    box-shadow: none;
+  }
+  html[data-theme="dark"] .fb-search input::placeholder { color: rgba(255, 255, 255, 0.4); }
+  html[data-theme="dark"] .fb-search input:focus, html[data-theme="dark"] .fb-select:focus {
+    border-color: rgba(92, 198, 232, 0.45);
+    box-shadow: 0 0 0.7cqw rgba(92, 198, 232, 0.15);
+  }
+  html[data-theme="dark"] .fb-search svg { color: rgba(255, 255, 255, 0.5); }
+  html[data-theme="dark"] .fb-select option { background: #011b41; color: #fff; }
+  html[data-theme="dark"] .fb-select-wrap::after { border-top-color: rgba(255, 255, 255, 0.6); }
+  html[data-theme="dark"] .fb-reset {
+    background: rgba(2, 66, 107, 0.40);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.7);
+  }
+  html[data-theme="dark"] .fb-reset:hover {
+    background: rgba(196, 32, 42, 0.20);
+    border-color: rgba(196, 32, 42, 0.4);
+    color: #ffb8bd;
+    box-shadow: none;
+  }
+
+  /* ─── PANELS — exact original style, no liquid glass ─── */
+  html[data-theme="dark"] .panel {
+    background: linear-gradient(180deg, rgba(2, 66, 107, 0.28) 0%, rgba(1, 27, 65, 0.55) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+    padding: 0.6cqw 0.75cqw;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  html[data-theme="dark"] .panel::before, html[data-theme="dark"] .panel::after { content: none; }
+
+  html[data-theme="dark"] .panel-title {
+    font-size: 0.72cqw; font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding-left: 0.5cqw;
+    border-left: 3px solid var(--red-bright);
+    line-height: 1.25;
+    box-shadow: none;
+  }
+  html[data-theme="dark"] .panel-sublabel {
+    font-size: 0.58cqw; font-weight: 700;
+    color: rgba(255, 255, 255, 0.95);
+    letter-spacing: 0.18em; text-transform: uppercase;
+  }
+  html[data-theme="dark"] .panel-action {
+    font-size: 0.65cqw; font-weight: 600;
+    color: #5cc6e8;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    border-radius: 0;
+  }
+  html[data-theme="dark"] .panel-action:hover { color: #8ddbf0; background: transparent; border: 0; box-shadow: none; }
+
+  html[data-theme="dark"] .panel-map {
+    padding: 0;
+    background: linear-gradient(180deg, rgba(1, 14, 38, 0.65) 0%, rgba(0, 8, 24, 0.7) 100%);
+  }
+
+  /* ─── KPI strip — original dividers + icon colors ─── */
+  html[data-theme="dark"] .kpi-strip-item + .kpi-strip-item::before, html[data-theme="dark"] .kpi-strip-item { border-color: rgba(255, 255, 255, 0.06); }
+  html[data-theme="dark"] .kpi-strip-value {
+    color: #fff;
+    font-size: 1.55cqw;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-shadow: none;
+  }
+  html[data-theme="dark"] .kpi-strip-label { color: rgba(255, 255, 255, 0.95); }
+
+  /* Restore original KPI icon style — currentColor + drop-shadow (NOT gradient pills) */
+  html[data-theme="dark"] .kpi-strip-icon {
+    width: 2.8cqw; height: 2.8cqw;
+    background: transparent;
+    border: 0; border-radius: 0;
+    padding: 0;
+    stroke-width: 1.5;
+    filter: drop-shadow(0 0 0.35cqw currentColor);
+    box-shadow: none;
+  }
+  html[data-theme="dark"] .kpi-strip-icon.tone-cyan { color: #5cc6e8; }
+  html[data-theme="dark"] .kpi-strip-icon.tone-amber { color: #ebbf6a; }
+  html[data-theme="dark"] .kpi-strip-icon.tone-green { color: #6ddc8a; }
+  html[data-theme="dark"] .kpi-strip-icon.tone-teal { color: #4ecdc4; }
+  html[data-theme="dark"] .kpi-strip-icon.tone-blue { color: #6da3e0; }
+  html[data-theme="dark"] .kpi-strip-icon.tone-red { color: #e87878; }
+  html[data-theme="dark"] .kpi-strip-icon.tone-violet { color: #b794f4; }
+  html[data-theme="dark"] .kpi-strip-icon.tone-orange { color: #fb923c; }
+
+  html[data-theme="dark"] .kpi-strip-trend.trend-up { color: #6ddc8a; background: transparent; }
+  html[data-theme="dark"] .kpi-strip-trend.trend-down { color: #f08585; background: transparent; }
+  html[data-theme="dark"] .kpi-strip-trend.trend-flat { color: #f0b864; background: transparent; }
+
+  /* ─── Donuts (Risk / Status) ─── */
+  html[data-theme="dark"] .risk-center-val {
+    font-size: 1.5cqw;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 0 0.5cqw rgba(255, 255, 255, 0.25), 0 1px 0 rgba(0,0,0,0.5);
+  }
+  html[data-theme="dark"] .risk-center-suffix { color: rgba(255, 255, 255, 0.55); }
+  html[data-theme="dark"] .risk-center-lbl { color: rgba(255, 255, 255, 0.95); }
+  html[data-theme="dark"] .risk-trend { color: #ebbf6a; background: transparent; padding-bottom: 0.4cqw; }
+  html[data-theme="dark"] .risk-legend-name { color: rgba(255, 255, 255, 0.95); }
+  html[data-theme="dark"] .risk-legend-val { color: #fff; }
+  html[data-theme="dark"] .risk-legend-dot.low, html[data-theme="dark"] .risk-legend-dot.active { background: #6ddc8a; color: #6ddc8a; box-shadow: 0 0 0.4cqw rgba(110, 230, 140, 0.7); }
+  html[data-theme="dark"] .risk-legend-dot.mid, html[data-theme="dark"] .risk-legend-dot.investigation { background: #ebbf6a; color: #ebbf6a; box-shadow: 0 0 0.4cqw rgba(235, 191, 106, 0.6); }
+  html[data-theme="dark"] .risk-legend-dot.high, html[data-theme="dark"] .risk-legend-dot.suspended { background: #f08585; color: #f08585; box-shadow: 0 0 0.4cqw rgba(232, 120, 120, 0.6); }
+
+  /* ─── Charts ─── */
+  html[data-theme="dark"] .day-legend-item { color: rgba(255,255,255,0.95); }
+  html[data-theme="dark"] .day-legend-dot.low { background: #6ddc8a; box-shadow: 0 0 0.4cqw rgba(110, 230, 140, 0.7); }
+  html[data-theme="dark"] .day-legend-dot.mid { background: #ebbf6a; box-shadow: 0 0 0.4cqw rgba(235, 191, 106, 0.6); }
+  html[data-theme="dark"] .day-legend-dot.high { background: #f08585; box-shadow: 0 0 0.4cqw rgba(232, 120, 120, 0.6); }
+
+  html[data-theme="dark"] .v3d-grid-line { stroke: rgba(255, 255, 255, 0.08); }
+  html[data-theme="dark"] .v3d-axis-label { fill: rgba(255, 255, 255, 0.95); }
+  html[data-theme="dark"] .v3d-y-label { fill: rgba(255, 255, 255, 0.55); }
+  html[data-theme="dark"] .v3d-bar-total {
+    fill: #fff;
+    font-size: 15px;
+    font-weight: 800;
+    stroke: rgba(0, 10, 30, 0.85);
+    stroke-width: 3px;
+  }
+  html[data-theme="dark"] .v3d-bar-group:hover .v3d-bar-total { fill: #5cc6e8; }
+
+  /* Chart hover tooltip — dark glass */
+  html[data-theme="dark"] .v3d-tooltip {
+    background: linear-gradient(180deg, rgba(2, 66, 107, 0.95) 0%, rgba(1, 27, 65, 0.97) 100%);
+    border: 1px solid rgba(120, 220, 250, 0.30);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  }
+  html[data-theme="dark"] .v3d-tooltip-title { color: #fff; border-bottom-color: rgba(255, 255, 255, 0.08); }
+  html[data-theme="dark"] .v3d-tooltip-row { color: rgba(255, 255, 255, 0.85); }
+  html[data-theme="dark"] .v3d-tooltip-label { color: rgba(255, 255, 255, 0.65); }
+  html[data-theme="dark"] .v3d-tooltip-val { color: #fff; }
+  html[data-theme="dark"] .v3d-tooltip-total { color: #fff; border-top-color: rgba(255, 255, 255, 0.08); }
+
+  /* ─── Risk Briefing ─── */
+  html[data-theme="dark"] .brief-header {
+    background: linear-gradient(135deg, rgba(196, 32, 42, 0.22), rgba(80, 10, 20, 0.12));
+    border: 1px solid rgba(196, 32, 42, 0.3);
+    box-shadow: none;
+  }
+  html[data-theme="dark"] .brief-header-icon {
+    background: radial-gradient(circle at 30% 30%, rgba(255, 184, 189, 0.55), rgba(150, 30, 40, 0.6));
+    border: 1px solid rgba(255, 184, 189, 0.45);
+    box-shadow: 0 0 0.5cqw rgba(196, 32, 42, 0.5);
+  }
+  html[data-theme="dark"] .brief-header-title { color: #fff; }
+  html[data-theme="dark"] .brief-header-period { color: rgba(255,255,255,0.7); }
+  html[data-theme="dark"] .brief-pulse {
+    padding: 0.28cqw 0.6cqw;
+    background: rgba(232, 120, 120, 0.18);
+    border: 1px solid rgba(232, 120, 120, 0.4);
+    color: #f08585;
+    box-shadow: none;
+  }
+  html[data-theme="dark"] .brief-block {
+    background: linear-gradient(180deg, rgba(2, 66, 107, 0.22) 0%, rgba(1, 27, 65, 0.30) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: none;
+  }
+  html[data-theme="dark"] .brief-block-icon { color: #f08585; filter: drop-shadow(0 0 0.25cqw rgba(240, 133, 133, 0.6)); }
+  html[data-theme="dark"] .brief-block-title { color: #ffb8bd; }
+  html[data-theme="dark"] .brief-block-text { color: #fff; }
+  html[data-theme="dark"] .brief-block-text strong { color: #fff; }
+  html[data-theme="dark"] .brief-block-text .pos { color: #6ddc8a; }
+  html[data-theme="dark"] .brief-block-text .neg { color: #f08585; }
+  html[data-theme="dark"] .brief-block-text .warn { color: #ebbf6a; }
+  html[data-theme="dark"] .brief-block-text .acc { color: #5cc6e8; }
+
+  /* ─── Driver table ─── */
+  html[data-theme="dark"] .dt-head { color: rgba(255, 255, 255, 0.95); border-bottom-color: rgba(255, 255, 255, 0.06); }
+  html[data-theme="dark"] .dt-sort:hover { color: #fff; }
+  html[data-theme="dark"] .dt-sort.sort-asc, html[data-theme="dark"] .dt-sort.sort-desc { color: #5cc6e8; }
+  html[data-theme="dark"] .dt-sort.sort-asc  .dt-sort-caret::before { border-bottom-color: #5cc6e8; }
+  html[data-theme="dark"] .dt-sort.sort-desc .dt-sort-caret::after { border-top-color: #5cc6e8; }
+  html[data-theme="dark"] .dt-row {
+    background: linear-gradient(90deg, rgba(2, 66, 107, 0.16) 0%, rgba(2, 66, 107, 0.04) 100%);
+    border: 0;
+    border-left: 2px solid transparent;
+    border-radius: 3px;
+    box-shadow: none;
+    transform: none;
+  }
+  html[data-theme="dark"] .dt-row:hover {
+    background: linear-gradient(90deg, rgba(2, 66, 107, 0.30) 0%, rgba(2, 66, 107, 0.10) 100%);
+    border-left-color: #5cc6e8;
+    box-shadow: none;
+    transform: none;
+  }
+  html[data-theme="dark"] .dt-name { color: #fff; }
+  html[data-theme="dark"] .dt-cat { color: rgba(255, 255, 255, 0.85); }
+  html[data-theme="dark"] .dt-co { color: rgba(255, 255, 255, 0.7); }
+  html[data-theme="dark"] .dt-avatar {
+    background: linear-gradient(135deg, rgba(92, 198, 232, 0.30), rgba(2, 66, 107, 0.45));
+    border: 1px solid rgba(92, 198, 232, 0.35);
+    color: #c8e8f5;
+    box-shadow: 0 0 0.35cqw rgba(92, 198, 232, 0.2);
+  }
+  html[data-theme="dark"] .dt-rscore.score-critical { color: #e87878; text-shadow: 0 0 0.4cqw rgba(232, 120, 120, 0.45); }
+  html[data-theme="dark"] .dt-rscore.score-high { color: #fb923c; text-shadow: 0 0 0.4cqw rgba(251, 146, 60, 0.4); }
+  html[data-theme="dark"] .dt-rscore.score-mid { color: #ebbf6a; text-shadow: 0 0 0.4cqw rgba(235, 191, 106, 0.4); }
+  html[data-theme="dark"] .dt-rscore.score-low { color: #6ddc8a; text-shadow: 0 0 0.4cqw rgba(110, 230, 140, 0.45); }
+  html[data-theme="dark"] .dt-viol { color: #fff; }
+  html[data-theme="dark"] .dt-status.status-active { background: rgba(110, 230, 140, 0.12); border: 1px solid rgba(110, 230, 140, 0.30); color: #6ddc8a; }
+  html[data-theme="dark"] .dt-status.status-investigation { background: rgba(235, 191, 106, 0.12); border: 1px solid rgba(235, 191, 106, 0.30); color: #ebbf6a; }
+  html[data-theme="dark"] .dt-status.status-suspended { background: rgba(232, 120, 120, 0.12); border: 1px solid rgba(232, 120, 120, 0.30); color: #e87878; }
+
+  /* ─── Modals ─── */
+  html[data-theme="dark"] .modal-backdrop { background: rgba(0, 5, 18, 0.65); }
+  html[data-theme="dark"] .modal {
+    background: linear-gradient(180deg, rgba(2, 66, 107, 0.65) 0%, rgba(1, 27, 65, 0.85) 100%);
+    border: 1px solid rgba(92, 198, 232, 0.25);
+    box-shadow: 0 2cqw 4cqw rgba(0, 0, 0, 0.6), inset 0 0 2cqw rgba(92, 198, 232, 0.05);
+  }
+  html[data-theme="dark"] .modal-head { background: linear-gradient(90deg, rgba(196, 32, 42, 0.12) 0%, transparent 60%); border-bottom-color: rgba(255, 255, 255, 0.06); }
+  html[data-theme="dark"] .modal-avatar {
+    background: linear-gradient(135deg, rgba(92, 198, 232, 0.40), rgba(2, 66, 107, 0.65));
+    border: 1px solid rgba(92, 198, 232, 0.5);
+    color: #fff;
+  }
+  html[data-theme="dark"] .modal-id-name { color: #fff; }
+  html[data-theme="dark"] .modal-id-sub { color: rgba(255, 255, 255, 0.7); }
+  html[data-theme="dark"] .modal-close {
+    background: rgba(196, 32, 42, 0.10);
+    border: 1px solid rgba(196, 32, 42, 0.30);
+    color: #ffb8bd;
+  }
+  html[data-theme="dark"] .modal-close:hover { background: rgba(196, 32, 42, 0.30); color: #fff; }
+
+  html[data-theme="dark"] .modal-gauge-card, html[data-theme="dark"] .modal-stat-card, html[data-theme="dark"] .modal-emp-card {
+    background: linear-gradient(180deg, rgba(2, 66, 107, 0.45) 0%, rgba(1, 27, 65, 0.55) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: none;
+  }
+  html[data-theme="dark"] .modal-card-title { color: rgba(255, 255, 255, 0.95); border-left-color: var(--red-bright); }
+  html[data-theme="dark"] .modal-stat-lbl { color: rgba(255, 255, 255, 0.95); }
+  html[data-theme="dark"] .modal-gauge-num.score-critical { color: #ffd5d5; }
+  html[data-theme="dark"] .modal-gauge-num.score-high { color: #ffe0c2; }
+  html[data-theme="dark"] .modal-gauge-num.score-mid { color: #fff0c2; }
+  html[data-theme="dark"] .modal-gauge-num.score-low { color: #d6f5dd; }
+  html[data-theme="dark"] .modal-gauge-label.score-critical { color: #e87878; }
+  html[data-theme="dark"] .modal-gauge-label.score-high { color: #fb923c; }
+  html[data-theme="dark"] .modal-gauge-label.score-mid { color: #ebbf6a; }
+  html[data-theme="dark"] .modal-gauge-label.score-low { color: #6ddc8a; }
+  html[data-theme="dark"] .modal-gauge-scale { color: rgba(255, 255, 255, 0.5); }
+  html[data-theme="dark"] .modal-stat-status.status-active { background: rgba(110, 230, 140, 0.15); border: 1px solid rgba(110, 230, 140, 0.40); color: #6ddc8a; }
+  html[data-theme="dark"] .modal-stat-status.status-investigation { background: rgba(235, 191, 106, 0.15); border: 1px solid rgba(235, 191, 106, 0.40); color: #ebbf6a; }
+  html[data-theme="dark"] .modal-stat-status.status-suspended { background: rgba(232, 120, 120, 0.15); border: 1px solid rgba(232, 120, 120, 0.40); color: #e87878; }
+  html[data-theme="dark"] .modal-viol-big { color: #fff; text-shadow: 0 0 0.5cqw rgba(240, 133, 133, 0.35); }
+  html[data-theme="dark"] .modal-viol-sub { color: rgba(255, 255, 255, 0.6); }
+  html[data-theme="dark"] .modal-emp-key { color: rgba(255, 255, 255, 0.6); }
+  html[data-theme="dark"] .modal-emp-val { color: #fff; }
+  html[data-theme="dark"] .modal-emp-row { border-bottom-color: rgba(255, 255, 255, 0.05); }
+
+  /* List modal toolbar */
+  html[data-theme="dark"] .list-toolbar { border-bottom-color: rgba(255, 255, 255, 0.06); }
+  html[data-theme="dark"] .list-search input, html[data-theme="dark"] .list-filter select {
+    background: rgba(2, 66, 107, 0.40);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #fff;
+    box-shadow: none;
+  }
+  html[data-theme="dark"] .list-search input::placeholder { color: rgba(255, 255, 255, 0.4); }
+  html[data-theme="dark"] .list-search input:focus, html[data-theme="dark"] .list-filter select:focus {
+    border-color: rgba(92, 198, 232, 0.45);
+    box-shadow: 0 0 0.7cqw rgba(92, 198, 232, 0.15);
+  }
+  html[data-theme="dark"] .list-search svg { color: rgba(255, 255, 255, 0.5); }
+  html[data-theme="dark"] .list-filter::after { border-top-color: rgba(255, 255, 255, 0.6); }
+  html[data-theme="dark"] .list-filter select option { background: #011b41; color: #fff; }
+  html[data-theme="dark"] .list-filter-label { color: rgba(255, 255, 255, 0.45); background: linear-gradient(180deg, transparent 45%, rgba(1, 27, 65, 0.85) 45%); }
+  html[data-theme="dark"] .list-clear {
+    background: rgba(2, 66, 107, 0.40);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.7);
+  }
+  html[data-theme="dark"] .list-clear:hover { background: rgba(196, 32, 42, 0.15); border-color: rgba(196, 32, 42, 0.35); color: #ffb8bd; }
+  html[data-theme="dark"] .list-head {
+    background: linear-gradient(180deg, rgba(2, 66, 107, 0.55) 0%, rgba(1, 27, 65, 0.75) 100%);
+    color: rgba(255, 255, 255, 0.85);
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+  }
+  html[data-theme="dark"] .list-footer { border-top-color: rgba(255, 255, 255, 0.06); color: rgba(255, 255, 255, 0.7); }
+  html[data-theme="dark"] .list-count strong { color: #fff; }
+
+  /* ─── Map UI overlays — dark glass like original ─── */
+  html[data-theme="dark"] .panel-map .map-badge {
+    background: linear-gradient(180deg, rgba(2, 66, 107, 0.65) 0%, rgba(1, 27, 65, 0.85) 100%);
+    border: 1px solid rgba(120, 220, 250, 0.15);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  }
+  html[data-theme="dark"] .panel-map .map-badge .map-t2 { color: #fff; }
+  html[data-theme="dark"] .panel-map .map-badge .map-filters-active { color: #5cc6e8; }
+  html[data-theme="dark"] .panel-map .map-badge .map-icon {
+    background: rgba(120, 220, 250, 0.12);
+    border: 1px solid rgba(120, 220, 250, 0.22);
+    color: #5cc6e8;
+    box-shadow: none;
+  }
+  html[data-theme="dark"] .panel-map .map-legend {
+    background: linear-gradient(180deg, rgba(2, 66, 107, 0.7) 0%, rgba(1, 27, 65, 0.85) 100%);
+    border: 1px solid rgba(120, 220, 250, 0.18);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  }
+  html[data-theme="dark"] .panel-map .map-legend-title { color: rgba(255, 255, 255, 0.6); border-bottom-color: rgba(255, 255, 255, 0.08); }
+  html[data-theme="dark"] .panel-map .map-legend-row { color: #fff; }
+  html[data-theme="dark"] .panel-map .map-legend-count { color: rgba(255, 255, 255, 0.55); }
+  html[data-theme="dark"] .panel-map .map-legend-dot.high { background: #f87171; color: #f87171; }
+  html[data-theme="dark"] .panel-map .map-legend-dot.mid { background: #fbbf24; color: #fbbf24; }
+  html[data-theme="dark"] .panel-map .map-legend-dot.low { background: #22d39c; color: #22d39c; }
+  html[data-theme="dark"] .panel-map .map-recenter {
+    background: linear-gradient(180deg, rgba(2, 66, 107, 0.7) 0%, rgba(1, 27, 65, 0.85) 100%);
+    border: 1px solid rgba(120, 220, 250, 0.25);
+    color: #7adcfa;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  }
+  html[data-theme="dark"] .panel-map .map-recenter:hover {
+    background: rgba(120, 220, 250, 0.18);
+    color: #fff;
+    border-color: rgba(120, 220, 250, 0.5);
+    box-shadow: none;
+  }
+  html[data-theme="dark"] .panel-map .map-tooltip {
+    background: linear-gradient(180deg, rgba(2, 66, 107, 0.92) 0%, rgba(1, 27, 65, 0.96) 100%);
+    border: 1px solid rgba(120, 220, 250, 0.30);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+    color: #fff;
+  }
+  html[data-theme="dark"] .panel-map .map-tooltip-name { color: #fff; }
+  html[data-theme="dark"] .panel-map .map-tooltip-lbl { color: rgba(255, 255, 255, 0.6); }
+  html[data-theme="dark"] .panel-map .map-tooltip-val { color: #fff; }
+  html[data-theme="dark"] .panel-map .map-tooltip-tier.high { background: rgba(232, 120, 120, 0.18); border: 1px solid rgba(232, 120, 120, 0.4); color: #e87878; }
+  html[data-theme="dark"] .panel-map .map-tooltip-tier.mid { background: rgba(235, 191, 106, 0.18); border: 1px solid rgba(235, 191, 106, 0.4); color: #ebbf6a; }
+  html[data-theme="dark"] .panel-map .map-tooltip-tier.low { background: rgba(110, 230, 140, 0.18); border: 1px solid rgba(110, 230, 140, 0.4); color: #6ddc8a; }
+  html[data-theme="dark"] .panel-map .map-loading {
+    background: rgba(1, 27, 65, 0.90);
+    border: 1px solid rgba(120, 220, 250, 0.18);
+    color: rgba(255, 255, 255, 0.85);
+  }
+  html[data-theme="dark"] .panel-map .mapboxgl-ctrl-group {
+    background: rgba(2, 66, 107, 0.75);
+    border: 1px solid rgba(120, 220, 250, 0.18);
+  }
+  html[data-theme="dark"] .panel-map .mapboxgl-ctrl-group button:hover { background-color: rgba(120, 220, 250, 0.12); }
+  html[data-theme="dark"] .panel-map .mapboxgl-ctrl-icon { filter: invert(1) brightness(1.5); opacity: 0.7; }
+  html[data-theme="dark"] .panel-map .mapboxgl-ctrl-group button + button { border-top: 1px solid rgba(120, 220, 250, 0.15); }
+
+
 </style>
 </head>
 <body>
@@ -1740,7 +2255,8 @@
     </div>
 
     <header class="header">
-      <img class="gov-logo" src="https://raedaldweik.github.io/reports/government_black.png" alt="Government of Dubai">
+      <img class="gov-logo gov-logo-light" src="https://raedaldweik.github.io/reports/government_black.png" alt="Government of Dubai">
+      <img class="gov-logo gov-logo-dark" src="https://raedaldweik.github.io/reports/government.png" alt="Government of Dubai">
       <div class="title-block">
         <div class="title-row">
           <h1 class="title">Performance Dashboard</h1>
@@ -1823,6 +2339,18 @@
         </div>
       </div>
       <div class="rta-logo-block">
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme">
+          <svg class="theme-icon theme-icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2"/><path d="M12 20v2"/>
+            <path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/>
+            <path d="M2 12h2"/><path d="M20 12h2"/>
+            <path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>
+          </svg>
+          <svg class="theme-icon theme-icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
         <img class="rta-logo" src="https://raedaldweik.github.io/reports/RTA_Dubai_logo.png" alt="RTA">
       </div>
     </header>
@@ -2200,21 +2728,50 @@
     const tilt = opts.tilt || 0.42;
     const depth = opts.depth || 13;
     const startAngle = -Math.PI / 2;
-    const total = data.reduce((s, d) => s + d.value, 0);
+    const activeKey = opts.activeKey || null;
+    const onClick = opts.onClick || null;
+
+    // Filter out zero / near-zero segments so SVG arcs never degenerate
+    const positive = data.filter(d => d.value > 0.01);
+    const total = positive.reduce((s, d) => s + d.value, 0);
 
     const svgNS = 'http://www.w3.org/2000/svg';
     const svg = document.createElementNS(svgNS, 'svg');
     svg.setAttribute('viewBox', `0 0 ${VB.w} ${VB.h}`);
     svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
 
+    function pt(angle, r, yOffset = 0) {
+      return [cx + r * Math.cos(angle), cy + r * Math.sin(angle) * tilt + yOffset];
+    }
+
+    // EMPTY STATE — render a faint placeholder ring (no data)
+    if (positive.length === 0 || total <= 0) {
+      const ringPath = `M ${cx - rOuter} ${cy}
+          A ${rOuter} ${rOuter * tilt} 0 1 1 ${cx + rOuter} ${cy}
+          A ${rOuter} ${rOuter * tilt} 0 1 1 ${cx - rOuter} ${cy}
+          M ${cx - rInner} ${cy}
+          A ${rInner} ${rInner * tilt} 0 1 0 ${cx + rInner} ${cy}
+          A ${rInner} ${rInner * tilt} 0 1 0 ${cx - rInner} ${cy} Z`;
+      const ring = document.createElementNS(svgNS, 'path');
+      ring.setAttribute('d', ringPath);
+      ring.setAttribute('fill', 'rgba(15, 23, 42, 0.06)');
+      ring.setAttribute('fill-rule', 'evenodd');
+      svg.appendChild(ring);
+      const centerOverlay = mountEl.querySelector('.eco-center-overlay, .risk-center-overlay');
+      mountEl.innerHTML = '';
+      mountEl.appendChild(svg);
+      if (centerOverlay) mountEl.appendChild(centerOverlay);
+      return;
+    }
+
     const defs = document.createElementNS(svgNS, 'defs');
     defs.innerHTML = `
       <radialGradient id="donut-shadow-grad-${opts.id}" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#0a1628" stop-opacity="0.30"/>
-        <stop offset="60%" stop-color="#0a1628" stop-opacity="0.12"/>
-        <stop offset="100%" stop-color="#0a1628" stop-opacity="0"/>
+        <stop offset="0%" stop-color="#000000" stop-opacity="0.65"/>
+        <stop offset="60%" stop-color="#000000" stop-opacity="0.22"/>
+        <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
       </radialGradient>
-      ${data.map((d, i) => `
+      ${positive.map((d, i) => `
         <radialGradient id="donut-top-grad-${opts.id}-${i}" cx="35%" cy="25%" r="80%">
           <stop offset="0%" stop-color="${d.color[0]}"/>
           <stop offset="55%" stop-color="${d.color[1]}"/>
@@ -2243,14 +2800,14 @@
     shadow.setAttribute('opacity', '0.5');
     svg.appendChild(shadow);
 
-    function pt(angle, r, yOffset = 0) {
-      return [cx + r * Math.cos(angle), cy + r * Math.sin(angle) * tilt + yOffset];
-    }
-
+    // Build segment angle ranges. If a single segment takes the full ring,
+    // its span is clamped just shy of 2π so the SVG arc doesn't collapse.
     let acc = startAngle;
-    const segments = data.map(d => {
+    const segments = positive.map(d => {
       const start = acc;
-      const span = (d.value / total) * Math.PI * 2;
+      let span = (d.value / total) * Math.PI * 2;
+      // For single full-circle segments, clamp slightly under 2π
+      if (positive.length === 1) span = Math.PI * 2 - 0.0001;
       const end = start + span;
       acc = end;
       return { ...d, start, end, midAngle: (start + end) / 2 };
@@ -2277,9 +2834,9 @@
     inner.setAttribute('rx', rInner);
     inner.setAttribute('ry', rInner * tilt);
     inner.setAttribute('fill', 'none');
-    inner.setAttribute('stroke', '#0a1628');
+    inner.setAttribute('stroke', '#000000');
     inner.setAttribute('stroke-width', '3');
-    inner.setAttribute('stroke-opacity', '0.18');
+    inner.setAttribute('stroke-opacity', '0.35');
     inner.setAttribute('filter', 'blur(0.8px)');
     svg.appendChild(inner);
 
@@ -2289,8 +2846,20 @@
       g.style.animationDelay = `${0.15 + i * 0.13}s`;
       g.style.color = seg.color[1];
 
+      // Active filter feedback: dim non-active segments
+      const isDimmed = activeKey && seg.key && seg.key !== activeKey;
+      const isActive = activeKey && seg.key === activeKey;
+      if (isDimmed) g.style.opacity = '0.35';
+      if (isActive) g.style.filter = 'brightness(1.15) saturate(1.15) drop-shadow(0 0 6px currentColor)';
+
       const top = document.createElementNS(svgNS, 'path');
-      top.setAttribute('d', buildTopFacePath(seg.start, seg.end, rOuter, rInner));
+      // For single full-ring case, draw using two semicircles for clean rendering
+      if (positive.length === 1) {
+        top.setAttribute('d', buildFullRingTopPath(rOuter, rInner));
+        top.setAttribute('fill-rule', 'evenodd');
+      } else {
+        top.setAttribute('d', buildTopFacePath(seg.start, seg.end, rOuter, rInner));
+      }
       top.setAttribute('fill', `url(#donut-top-grad-${opts.id}-${i})`);
       top.setAttribute('class', 'd3d-top');
       top.setAttribute('stroke', seg.color[2]);
@@ -2307,9 +2876,26 @@
         s.style.pointerEvents = 'none';
         g.appendChild(s);
       }
+
+      // Click handler for filtering
+      if (onClick && seg.key) {
+        g.style.cursor = 'pointer';
+        g.addEventListener('click', () => onClick(seg.key, isActive));
+      }
       svg.appendChild(g);
     });
 
+    function buildFullRingTopPath(rO, rI) {
+      // Two semicircle arcs each for outer and inner — never degenerates
+      const oL = pt(Math.PI, rO), oR = pt(0, rO);
+      const iL = pt(Math.PI, rI), iR = pt(0, rI);
+      return `M ${oL[0]} ${oL[1]}
+              A ${rO} ${rO * tilt} 0 1 1 ${oR[0]} ${oR[1]}
+              A ${rO} ${rO * tilt} 0 1 1 ${oL[0]} ${oL[1]}
+              M ${iL[0]} ${iL[1]}
+              A ${rI} ${rI * tilt} 0 1 0 ${iR[0]} ${iR[1]}
+              A ${rI} ${rI * tilt} 0 1 0 ${iL[0]} ${iL[1]} Z`;
+    }
     function buildTopFacePath(a1, a2, rO, rI) {
       const [p1x, p1y] = pt(a1, rO);
       const [p2x, p2y] = pt(a2, rO);
@@ -2353,13 +2939,13 @@
   // Global dataset — populated by loadData()
   let ALL_ROWS = [];
 
-  // ─── Color palettes for chart series (4-stop for 3D shading) ───
+  // ─── Color palettes for chart series — DARK THEME (vibrant) ───
   const PALETTES = {
-    low:      ['#c5ecd6', '#7bc99b', '#2d9d6a', '#0e6b46'],
-    moderate: ['#fde6c5', '#f0b96b', '#b8862e', '#7a571a'],
-    high:     ['#fbcfd9', '#e89aaa', '#b91c47', '#7f1c33'],
-    teal:     ['#c8e4ee', '#7bbace', '#0e7490', '#0a4f63'],
-    slate:    ['#f1f4f9', '#dde4ed', '#aab5c5', '#7d8a9e']
+    low:      ['#a8f5b8', '#6ddc8a', '#3a8e5a', '#1f5a36'],
+    moderate: ['#ffe1a8', '#ebbf6a', '#b8862e', '#7a571a'],
+    high:     ['#ffb8b8', '#f08585', '#b03c3c', '#6f1f1f'],
+    teal:     ['#b5dfff', '#5cc6e8', '#2d80a8', '#1a4d66'],
+    slate:    ['#3a5a7c', '#1e3a5c', '#0d1f3a', '#06122a']
   };
 
   // ─── Per-period config — drives the date filter and labels ───
@@ -2392,6 +2978,7 @@
     const risk = FILTER_STATE.risk;
     const status = FILTER_STATE.status;
     const zone = FILTER_STATE.zone;
+    const sev = FILTER_STATE.severity;
 
     return ALL_ROWS.filter(r => {
       const ts = r._ts;
@@ -2400,6 +2987,7 @@
       if (status && r.driver_status !== status) return false;
       if (risk && riskTier(r.driver_risk_score) !== risk) return false;
       if (zone && r.zone !== zone) return false;
+      if (sev && r.severity !== sev) return false;
       if (q && !(r._search.includes(q))) return false;
       return true;
     });
@@ -2457,9 +3045,9 @@
     return {
       times: dayKeys,
       series: [
-        { name: 'Low',      cls: 'low',  colors: PALETTES.low,      values: buckets.map(b => b.low) },
-        { name: 'Moderate', cls: 'mid',  colors: PALETTES.moderate, values: buckets.map(b => b.moderate) },
-        { name: 'High',     cls: 'high', colors: PALETTES.high,     values: buckets.map(b => b.high) }
+        { name: 'Low',      key: 'low',      cls: 'low',  colors: PALETTES.low,      values: buckets.map(b => b.low) },
+        { name: 'Moderate', key: 'moderate', cls: 'mid',  colors: PALETTES.moderate, values: buckets.map(b => b.moderate) },
+        { name: 'High',     key: 'high',     cls: 'high', colors: PALETTES.high,     values: buckets.map(b => b.high) }
       ]
     };
   }
@@ -2632,12 +3220,122 @@
     document.getElementById('mapRecenterBtn').classList.add('visible');
   }
 
+  // Map style URLs — different style per theme
+  const MAP_STYLES = {
+    light: 'mapbox://styles/raeddweik/cmpjd3783006901s2d7hi5ttp',
+    dark:  'mapbox://styles/raeddweik/cmm1dtmsg004e01qwat7lapj2'
+  };
+
+  function getCurrentMapStyle() {
+    const theme = document.documentElement.getAttribute('data-theme') || 'light';
+    return MAP_STYLES[theme] || MAP_STYLES.light;
+  }
+
+  // Builds source + layers + interactions on top of whatever style is loaded.
+  // Called on every 'style.load' so it survives setStyle() theme swaps.
+  function addMapLayersAndInteractions() {
+    // Source already exists if this style.load is a re-load — re-create to be safe
+    if (mapInstance.getSource('violations')) {
+      // setStyle() removes sources too in v3, but guard anyway
+      try { mapInstance.removeSource('violations'); } catch(e) {}
+    }
+    mapInstance.addSource('violations', {
+      type: 'geojson',
+      data: { type: 'FeatureCollection', features: [] },
+      cluster: true,
+      clusterMaxZoom: 14,
+      clusterRadius: 55,
+      clusterProperties: {
+        'high_count': ['+', ['case', ['==', ['get', 'severity'], 'high'], 1, 0]]
+      }
+    });
+
+    // CLUSTER CIRCLES — bright colors, slim stroke, no glow halo
+    mapInstance.addLayer({
+      id: 'clusters',
+      type: 'circle',
+      source: 'violations',
+      filter: ['has', 'point_count'],
+      paint: {
+        'circle-color': [
+          'step',
+          ['/', ['get', 'high_count'], ['max', ['get', 'point_count'], 1]],
+          '#22d39c',
+          0.10, '#fbbf24',
+          0.25, '#f87171'
+        ],
+        'circle-radius': [
+          'step',
+          ['get', 'point_count'],
+          16, 50, 22, 150, 30, 400, 40
+        ],
+        'circle-stroke-color': '#ffffff',
+        'circle-stroke-width': 3,
+        'circle-stroke-opacity': 1,
+        'circle-opacity': 1,
+        'circle-emissive-strength': 1
+      }
+    });
+
+    // CLUSTER COUNT LABEL — strong black halo
+    mapInstance.addLayer({
+      id: 'cluster-count',
+      type: 'symbol',
+      source: 'violations',
+      filter: ['has', 'point_count'],
+      layout: {
+        'text-field': '{point_count_abbreviated}',
+        'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+        'text-size': [
+          'step', ['get', 'point_count'],
+          12, 50, 13, 150, 14, 400, 16
+        ]
+      },
+      paint: {
+        'text-color': '#ffffff',
+        'text-halo-color': 'rgba(0,0,0,0.6)',
+        'text-halo-width': 1.5,
+        'text-emissive-strength': 1
+      }
+    });
+
+    // UNCLUSTERED INDIVIDUAL POINTS
+    mapInstance.addLayer({
+      id: 'unclustered-point',
+      type: 'circle',
+      source: 'violations',
+      filter: ['!', ['has', 'point_count']],
+      paint: {
+        'circle-color': [
+          'match', ['get', 'severity'],
+          'high',     '#f87171',
+          'moderate', '#fbbf24',
+          'low',      '#22d39c',
+          '#22d39c'
+        ],
+        'circle-radius': [
+          'interpolate', ['linear'], ['zoom'],
+          10, 4, 14, 6, 17, 9
+        ],
+        'circle-stroke-color': '#ffffff',
+        'circle-stroke-width': 1.5,
+        'circle-opacity': 1,
+        'circle-emissive-strength': 1
+      }
+    });
+
+    setupMapInteractions();
+    mapReady = true;
+    document.getElementById('mapLoading').classList.add('hidden');
+    updateMapDots();
+  }
+
   function initMap() {
     mapboxgl.accessToken = "pk.eyJ1IjoicmFlZGR3ZWlrIiwiYSI6ImNtMTZqZGtpeTBta2cydnM4NjBkenhsMG8ifQ.r3ufHWJMoGh_DCH3XDhDAg";
 
     mapInstance = new mapboxgl.Map({
       container: 'map',
-      style: 'mapbox://styles/raeddweik/cmpjd3783006901s2d7hi5ttp',
+      style: getCurrentMapStyle(),
       center: MAP_HOME_VIEW.center,
       zoom: MAP_HOME_VIEW.zoom,
       pitch: MAP_HOME_VIEW.pitch,
@@ -2648,7 +3346,6 @@
     mapInstance.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), 'bottom-right');
 
     document.getElementById('mapRecenterBtn').addEventListener('click', () => {
-      // Re-center clears zone filter too — natural reset
       FILTER_STATE.zone = '';
       document.getElementById('fb-zone').value = '';
       mapInstance.flyTo({ ...MAP_HOME_VIEW, speed: 1.2, curve: 1.4, essential: true });
@@ -2656,130 +3353,10 @@
       recomputeAll();
     });
 
-    mapInstance.on('load', () => {
-      // CLUSTERED source — auto-aggregates points by spatial proximity
-      // clusterProperties: 'high_count' = sum of severity==high features in cluster
-      mapInstance.addSource('violations', {
-        type: 'geojson',
-        data: { type: 'FeatureCollection', features: [] },
-        cluster: true,
-        clusterMaxZoom: 14,
-        clusterRadius: 55,
-        clusterProperties: {
-          'high_count': ['+', ['case', ['==', ['get', 'severity'], 'high'], 1, 0]]
-        }
-      });
-
-      // CLUSTER CIRCLES — color by % high-severity, size by total count
-      mapInstance.addLayer({
-        id: 'clusters',
-        type: 'circle',
-        source: 'violations',
-        filter: ['has', 'point_count'],
-        paint: {
-          'circle-color': [
-            'step',
-            ['/', ['get', 'high_count'], ['max', ['get', 'point_count'], 1]],
-            '#10b981',           // base: < 10% high  → green
-            0.10, '#f59e0b',     // 10%-25% high     → amber
-            0.25, '#ef4444'      // 25%+ high         → red
-          ],
-          'circle-radius': [
-            'step',
-            ['get', 'point_count'],
-            16,
-             50, 22,
-            150, 30,
-            400, 40
-          ],
-          'circle-stroke-color': '#ffffff',
-          'circle-stroke-width': 2.5,
-          'circle-stroke-opacity': 0.9,
-          'circle-opacity': 0.88
-        }
-      });
-
-      // CLUSTER GLOW HALO — soft outer ring
-      mapInstance.addLayer({
-        id: 'clusters-glow',
-        type: 'circle',
-        source: 'violations',
-        filter: ['has', 'point_count'],
-        paint: {
-          'circle-color': [
-            'step',
-            ['/', ['get', 'high_count'], ['max', ['get', 'point_count'], 1]],
-            '#10b981',
-            0.10, '#f59e0b',
-            0.25, '#ef4444'
-          ],
-          'circle-radius': [
-            'step',
-            ['get', 'point_count'],
-            26,
-             50, 34,
-            150, 44,
-            400, 56
-          ],
-          'circle-opacity': 0.18,
-          'circle-blur': 0.8
-        }
-      }, 'clusters'); // place beneath the main cluster
-
-      // CLUSTER COUNT LABEL
-      mapInstance.addLayer({
-        id: 'cluster-count',
-        type: 'symbol',
-        source: 'violations',
-        filter: ['has', 'point_count'],
-        layout: {
-          'text-field': '{point_count_abbreviated}',
-          'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-          'text-size': [
-            'step', ['get', 'point_count'],
-            12,
-             50, 13,
-            150, 14,
-            400, 16
-          ]
-        },
-        paint: {
-          'text-color': '#ffffff',
-          'text-halo-color': 'rgba(0,0,0,0.35)',
-          'text-halo-width': 1
-        }
-      });
-
-      // UNCLUSTERED INDIVIDUAL POINTS (when zoomed past clusterMaxZoom)
-      mapInstance.addLayer({
-        id: 'unclustered-point',
-        type: 'circle',
-        source: 'violations',
-        filter: ['!', ['has', 'point_count']],
-        paint: {
-          'circle-color': [
-            'match', ['get', 'severity'],
-            'high',     '#ef4444',
-            'moderate', '#f59e0b',
-            'low',      '#10b981',
-            '#10b981'
-          ],
-          'circle-radius': [
-            'interpolate', ['linear'], ['zoom'],
-            10, 4,
-            14, 6,
-            17, 9
-          ],
-          'circle-stroke-color': '#ffffff',
-          'circle-stroke-width': 1.5,
-          'circle-opacity': 0.9
-        }
-      });
-
-      setupMapInteractions();
-      mapReady = true;
-      document.getElementById('mapLoading').classList.add('hidden');
-      updateMapDots();
+    // Each time the style (re)loads — initial load or theme switch — rebuild layers.
+    mapInstance.on('style.load', () => {
+      mapReady = false;
+      addMapLayersAndInteractions();
     });
   }
 
@@ -2944,19 +3521,46 @@
     }
     const statusMount = document.getElementById('status-donut-mount');
     if (statusMount) {
-      render3DDonut(statusMount, scaledStatusData(), { id: 'status', viewBox: { w: 200, h: 130 }, cx: 100, cy: 58, rOuter: 82, rInner: 48, tilt: 0.42, depth: 17 });
+      // Update center value to reflect filtered total
+      const sVal = statusMount.querySelector('.risk-center-val');
+      if (sVal) {
+        const tot = getFilteredDrivers().length;
+        sVal.textContent = tot >= 1000 ? (tot / 1000).toFixed(1) + 'K' : String(tot);
+      }
+      render3DDonut(statusMount, scaledStatusData(), {
+        id: 'status', viewBox: { w: 200, h: 130 }, cx: 100, cy: 58, rOuter: 82, rInner: 48, tilt: 0.42, depth: 17,
+        activeKey: FILTER_STATE.status,
+        onClick: (key, isActive) => {
+          FILTER_STATE.status = isActive ? '' : key;
+          document.getElementById('fb-status').value = FILTER_STATE.status;
+          recomputeAll();
+        }
+      });
     }
 
     // Charts — clear then re-render
     const daysMount = document.getElementById('day-chart-mount');
     if (daysMount) {
       daysMount.innerHTML = '';
-      render3DStackedBars(daysMount, scaledDaysData());
+      render3DStackedBars(daysMount, scaledDaysData(), {
+        activeKey: FILTER_STATE.severity,
+        onSegmentClick: (sevKey, isActive) => {
+          FILTER_STATE.severity = isActive ? '' : sevKey;
+          recomputeAll();
+        }
+      });
     }
     const catMount = document.getElementById('cat-chart-mount');
     if (catMount) {
       catMount.innerHTML = '';
-      render3DBars(catMount, scaledCatData());
+      render3DBars(catMount, scaledCatData(), {
+        activeKey: FILTER_STATE.category,
+        onBarClick: (catKey, isActive) => {
+          FILTER_STATE.category = isActive ? '' : catKey;
+          document.getElementById('fb-category').value = FILTER_STATE.category;
+          recomputeAll();
+        }
+      });
     }
 
     // Brief
@@ -3011,7 +3615,9 @@
   /* ════════════════════════════════════════════════════════════════
    *  3D STACKED BARS — Violations by Day
    * ════════════════════════════════════════════════════════════════ */
-  function render3DStackedBars(mount, data) {
+  function render3DStackedBars(mount, data, opts = {}) {
+    const activeKey = opts.activeKey || '';
+    const onSegmentClick = opts.onSegmentClick || null;
     const VB = { w: 700, h: 230 };
     const padL = 30, padR = 14, padT = 30, padB = 38;
     const chartW = VB.w - padL - padR;
@@ -3033,9 +3639,9 @@
 
     let defsHTML = `
       <radialGradient id="v3d-shadow-g" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#0a1628" stop-opacity="0.30"/>
-        <stop offset="60%" stop-color="#0a1628" stop-opacity="0.10"/>
-        <stop offset="100%" stop-color="#0a1628" stop-opacity="0"/>
+        <stop offset="0%" stop-color="#000000" stop-opacity="0.65"/>
+        <stop offset="60%" stop-color="#000000" stop-opacity="0.22"/>
+        <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
       </radialGradient>
       <linearGradient id="v3d-sheen-g" x1="0%" y1="0%" x2="0%" y2="100%">
         <stop offset="0%" stop-color="#ffffff" stop-opacity="0.7"/>
@@ -3106,6 +3712,21 @@
         const yTop = yBottom - h;
         const isTopOfStack = (si === data.series.length - 1);
 
+        // Each severity segment gets its own sub-group so it's individually clickable
+        const segGroup = document.createElementNS(svgNS, 'g');
+        segGroup.setAttribute('class', 'v3d-stack-seg');
+        const isDimmed = activeKey && s.key && s.key !== activeKey;
+        const isActive = activeKey && s.key === activeKey;
+        if (isDimmed) segGroup.setAttribute('opacity', '0.30');
+        if (isActive) segGroup.setAttribute('style', 'filter: brightness(1.12) saturate(1.18) drop-shadow(0 0 5px ' + s.colors[1] + ');');
+        if (onSegmentClick && s.key) {
+          segGroup.style.cursor = 'pointer';
+          segGroup.addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            onSegmentClick(s.key, isActive);
+          });
+        }
+
         const sidePts = [
           [x + barW,         yBottom],
           [x + barW + ISO_X, yBottom - ISO_Y],
@@ -3118,7 +3739,7 @@
         side.setAttribute('stroke', s.colors[3]);
         side.setAttribute('stroke-width', '0.3');
         side.setAttribute('stroke-opacity', '0.45');
-        g.appendChild(side);
+        segGroup.appendChild(side);
 
         const front = document.createElementNS(svgNS, 'rect');
         front.setAttribute('x', x);
@@ -3129,7 +3750,7 @@
         front.setAttribute('stroke', s.colors[2]);
         front.setAttribute('stroke-width', '0.3');
         front.setAttribute('stroke-opacity', '0.4');
-        g.appendChild(front);
+        segGroup.appendChild(front);
 
         const sheen = document.createElementNS(svgNS, 'rect');
         sheen.setAttribute('x', x);
@@ -3138,7 +3759,9 @@
         sheen.setAttribute('height', h);
         sheen.setAttribute('fill', 'url(#v3d-sheen-g)');
         sheen.setAttribute('opacity', '0.6');
-        g.appendChild(sheen);
+        segGroup.appendChild(sheen);
+
+        g.appendChild(segGroup);
 
         if (isTopOfStack) {
           const topPts = [
@@ -3153,7 +3776,7 @@
           top.setAttribute('stroke', s.colors[2]);
           top.setAttribute('stroke-width', '0.3');
           top.setAttribute('stroke-opacity', '0.45');
-          g.appendChild(top);
+          segGroup.appendChild(top);
         }
 
         yBottom = yTop;
@@ -3230,7 +3853,9 @@
   /* ════════════════════════════════════════════════════════════════
    *  3D BARS — single-series (Violations by Category)
    * ════════════════════════════════════════════════════════════════ */
-  function render3DBars(mount, data) {
+  function render3DBars(mount, data, opts = {}) {
+    const activeKey = opts.activeKey || '';
+    const onBarClick = opts.onBarClick || null;
     const VB = { w: 600, h: 230 };
     const padL = 18, padR = 18, padT = 30, padB = 38;
     const chartW = VB.w - padL - padR;
@@ -3254,9 +3879,9 @@
     const s = data.series[0];
     const defsHTML = `
       <radialGradient id="catbar-shadow" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#0a1628" stop-opacity="0.30"/>
-        <stop offset="60%" stop-color="#0a1628" stop-opacity="0.10"/>
-        <stop offset="100%" stop-color="#0a1628" stop-opacity="0"/>
+        <stop offset="0%" stop-color="#000000" stop-opacity="0.65"/>
+        <stop offset="60%" stop-color="#000000" stop-opacity="0.22"/>
+        <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
       </radialGradient>
       <linearGradient id="catbar-sheen" x1="0%" y1="0%" x2="0%" y2="100%">
         <stop offset="0%" stop-color="#ffffff" stop-opacity="0.7"/>
@@ -3307,6 +3932,20 @@
       g.setAttribute('class', 'v3d-stack-group v3d-bar-group');
       g.style.animationDelay = `${0.2 + ci * 0.07}s`;
       g.setAttribute('style', g.getAttribute('style') + `; transform-box: fill-box; transform-origin: 50% ${baseY}px;`);
+
+      // Active state + click handler for category filtering
+      const catKey = (data.categoryKeys && data.categoryKeys[ci]) || data.categories[ci];
+      const isDimmed = activeKey && catKey !== activeKey;
+      const isActive = activeKey && catKey === activeKey;
+      if (isDimmed) g.setAttribute('opacity', '0.30');
+      if (isActive) g.setAttribute('style', g.getAttribute('style') + `; filter: brightness(1.12) saturate(1.18) drop-shadow(0 0 6px ${s.color[1]});`);
+      if (onBarClick) {
+        g.style.cursor = 'pointer';
+        g.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          onBarClick(catKey, isActive);
+        });
+      }
 
       const shadow = document.createElementNS(svgNS, 'ellipse');
       shadow.setAttribute('cx', barX + BAR_W/2 + ISO_X/2);
@@ -3441,10 +4080,10 @@
    * ════════════════════════════════════════════════════════════════ */
   function renderRiskGauge(mount, value, rclass) {
     const palettes = {
-      low:      { fill: ['#c5ecd6', '#7bc99b', '#2d9d6a'], glow: '#7bc99b', dot: '#047857' },
-      mid:      { fill: ['#fde6c5', '#f0b96b', '#b8862e'], glow: '#f0b96b', dot: '#b45309' },
-      high:     { fill: ['#fcdab5', '#f1a160', '#c2410c'], glow: '#f1a160', dot: '#c2410c' },
-      critical: { fill: ['#fbcfd9', '#e89aaa', '#b91c47'], glow: '#e89aaa', dot: '#b91c47' }
+      low:      { fill: ['#a8f5b8', '#6ddc8a', '#3a8e5a'], glow: '#6ddc8a', dot: '#6ddc8a' },
+      mid:      { fill: ['#ffe1a8', '#ebbf6a', '#b8862e'], glow: '#ebbf6a', dot: '#ebbf6a' },
+      high:     { fill: ['#ffd0a8', '#fb923c', '#b06024'], glow: '#fb923c', dot: '#fb923c' },
+      critical: { fill: ['#ffb8b8', '#e87878', '#b03c3c'], glow: '#e87878', dot: '#e87878' }
     };
     const pal = palettes[rclass] || palettes.mid;
 
@@ -3465,8 +4104,8 @@
     const defs = document.createElementNS(svgNS, 'defs');
     defs.innerHTML = `
       <linearGradient id="rg-track" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#e3e8f0" stop-opacity="0.9"/>
-        <stop offset="100%" stop-color="#cbd5e1" stop-opacity="0.9"/>
+        <stop offset="0%" stop-color="#1e3a5c" stop-opacity="0.7"/>
+        <stop offset="100%" stop-color="#0d1f3a" stop-opacity="0.9"/>
       </linearGradient>
       <linearGradient id="rg-fill" x1="0%" y1="0%" x2="100%" y2="0%">
         <stop offset="0%" stop-color="${pal.fill[2]}"/>
@@ -3550,7 +4189,8 @@
     category: '',
     risk: '',
     status: '',
-    zone: ''
+    zone: '',
+    severity: ''
   };
 
   // Sort state (default: risk score descending — most concerning first)
@@ -3833,7 +4473,47 @@
   /* ════════════════════════════════════════════════════════════════
    *  BOOT — load CSV first, then render
    * ════════════════════════════════════════════════════════════════ */
+  /* ════════════════════════════════════════════════════════════════
+   *  THEME MANAGEMENT — light (default) / dark, persisted to localStorage
+   * ════════════════════════════════════════════════════════════════ */
+  const THEME_KEY = 'rta-dashboard-theme';
+
+  function getStoredTheme() {
+    try { return localStorage.getItem(THEME_KEY) || 'light'; }
+    catch (e) { return 'light'; }
+  }
+  function storeTheme(theme) {
+    try { localStorage.setItem(THEME_KEY, theme); } catch (e) {}
+  }
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    storeTheme(theme);
+    // If map is initialized, swap its style — layers re-attach via style.load handler
+    if (mapInstance) {
+      try { mapInstance.setStyle(getCurrentMapStyle()); } catch (e) {}
+    }
+  }
+
+  function initThemeToggle() {
+    // Apply saved theme before first paint to avoid flash
+    const saved = getStoredTheme();
+    document.documentElement.setAttribute('data-theme', saved);
+
+    const btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+    });
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+   *  BOOT — load CSV first, then render
+   * ════════════════════════════════════════════════════════════════ */
   document.addEventListener('DOMContentLoaded', async () => {
+    initThemeToggle();
     initDriverModal();
     initSortHandlers();
     initGlobalFilters();

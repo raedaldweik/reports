@@ -455,11 +455,12 @@
   .dashboard-body {
     position: relative; z-index: 1; flex: 1; min-height: 0;
     display: grid;
-    grid-template-columns: 0.85fr 1.5fr 1fr;
-    grid-template-rows: 1.55fr 2.55fr;
+    grid-template-columns: 1.95fr 1fr;
+    grid-template-rows: 0.55fr 1fr 2fr;
     grid-template-areas:
-      "kpis    chart    donut"
-      "table   table    table";
+      "kpis   kpis"
+      "table  donut"
+      "table  chart";
     gap: 0.6cqw;
     padding: 0.6cqw 1.5cqw 1.2cqw;
   }
@@ -596,7 +597,7 @@
    * ════════════════════════════════════════════════════════════════ */
   .kpi-strip {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     align-items: center;
     flex: 0 0 auto;
     padding-top: 0;
@@ -1997,29 +1998,30 @@
   /* ════════════════════════════════════════════════════════════════
    *  TRIAGE DASHBOARD — 2-column KPI grid + alerts table
    * ════════════════════════════════════════════════════════════════ */
-  /* KPI grid: 6 KPIs in 2 columns × 3 rows */
+  /* KPI grid: 6 KPIs in one row */
   .kpi-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.4cqw 0.6cqw;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.4cqw;
     flex: 1;
-    padding: 0.4cqw 0.3cqw 0;
-    align-content: center;
+    padding: 0.35cqw 0.3cqw 0;
+    align-items: center;
   }
   .kpi-grid-item {
     display: flex; align-items: center; gap: 0.55cqw;
-    padding: 0.35cqw 0.5cqw;
+    padding: 0.3cqw 0.45cqw;
     border-radius: 0.5cqw;
     background: rgba(255, 255, 255, 0.30);
     border: 1px solid rgba(255, 255, 255, 0.45);
     box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.7);
     transition: transform 0.18s ease;
+    min-width: 0;
   }
   .kpi-grid-item:hover { transform: translateY(-1px); }
   .kpi-grid-item .kpi-strip-icon {
-    width: 1.85cqw; height: 1.85cqw;
+    width: 1.75cqw; height: 1.75cqw;
     flex-shrink: 0;
-    padding: 0.42cqw;
+    padding: 0.4cqw;
     border-radius: 0.45cqw;
     color: #fff;
     stroke-width: 2;
@@ -2032,8 +2034,9 @@
   .kpi-grid-item .kpi-strip-icon.tone-amber  { --ic-from: #fbbf24; --ic-to: #b45309; --ic-glow: rgba(180, 83, 9, 0.28); }
   .kpi-grid-item .kpi-strip-icon.tone-green  { --ic-from: #34d399; --ic-to: #047857; --ic-glow: rgba(4, 120, 87, 0.28); }
   .kpi-grid-item .kpi-strip-icon.tone-red    { --ic-from: #f87171; --ic-to: #b91c2c; --ic-glow: rgba(185, 28, 44, 0.28); }
-  .kpi-grid-item .kpi-strip-value { font-size: 1.25cqw; line-height: 1; letter-spacing: -0.02em; }
-  .kpi-grid-item .kpi-strip-label { font-size: 0.6cqw; margin-top: 0.15cqw; }
+  .kpi-grid-item .kpi-strip-content { min-width: 0; flex: 1; }
+  .kpi-grid-item .kpi-strip-value { font-size: 1.15cqw; line-height: 1; letter-spacing: -0.02em; white-space: nowrap; }
+  .kpi-grid-item .kpi-strip-label { font-size: 0.55cqw; margin-top: 0.15cqw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
   /* Category donut legend dots */
   .risk-legend-dot.cat-taxi   { background: #5cc6e8; color: #5cc6e8; }
@@ -2042,16 +2045,60 @@
   .risk-legend-dot.cat-limo   { background: #b87edd; color: #b87edd; }
   .risk-legend-dot.cat-marine { background: #5cc6e8; color: #5cc6e8; opacity: 0.65; }
   .risk-legend-dot.cat-hourly { background: #f08585; color: #f08585; }
-  .cat-legend-grid {
+
+  /* Category Distribution panel: donut on left (hero), legend grid on right (3 cols × 2 rows) */
+  .panel-donut .risk-body {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.4cqw;
+    padding: 0.3cqw 0.2cqw 0.2cqw;
+  }
+  .panel-donut .risk-donut-mount {
+    flex: 1.6;
+    height: 100%;
+  }
+  .cat-legend-side {
+    flex: 1;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    gap: 0.35cqw 0.5cqw;
-    width: 100%;
-    padding: 0 0.4cqw 0.2cqw;
+    grid-auto-rows: min-content;
+    align-content: center;
+    gap: 0.3cqw 0.35cqw;
+    padding: 0.2cqw 0.2cqw;
+    min-width: 0;
   }
-  .cat-legend-grid .risk-legend-row { gap: 0.3cqw; }
-  .cat-legend-grid .risk-legend-name { font-size: 0.52cqw; letter-spacing: 0.04em; }
-  .cat-legend-grid .risk-legend-val { font-size: 0.68cqw; }
+  .cat-legend-side .risk-legend-row {
+    display: grid;
+    grid-template-columns: 0.45cqw 1fr;
+    align-items: center;
+    gap: 0.3cqw;
+    padding: 0;
+    min-width: 0;
+  }
+  .cat-legend-side .risk-legend-dot {
+    width: 0.42cqw; height: 0.42cqw;
+    border-radius: 50%;
+  }
+  .cat-legend-side .risk-legend-text {
+    display: flex; flex-direction: column;
+    min-width: 0;
+  }
+  .cat-legend-side .risk-legend-name {
+    font-size: 0.5cqw; font-weight: 600;
+    color: var(--ink-3);
+    letter-spacing: 0.02em;
+    line-height: 1.15;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .cat-legend-side .risk-legend-val {
+    font-size: 0.65cqw; font-weight: 700;
+    color: var(--ink-1);
+    font-feature-settings: 'tnum' 1;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+  }
+  html[data-theme="dark"] .cat-legend-side .risk-legend-name { color: rgba(255, 255, 255, 0.7); }
+  html[data-theme="dark"] .cat-legend-side .risk-legend-val  { color: #fff; }
 
   /* Triage alerts table */
   .trg-wrap {
@@ -2063,7 +2110,7 @@
   }
   .trg-head {
     display: grid;
-    grid-template-columns: 1.55fr 0.85fr 1fr 1.3fr 0.85fr 1.3fr 0.7fr 1.05fr 1.5fr;
+    grid-template-columns: 1.55fr 0.7fr 0.85fr 1fr 1.3fr 0.85fr 1.2fr 0.6fr 0.9fr 1.2fr;
     gap: 0.5cqw;
     padding: 0.3cqw 0.55cqw;
     font-size: 0.5cqw; font-weight: 700;
@@ -2082,7 +2129,7 @@
   .trg-rows { display: flex; flex-direction: column; gap: 0.32cqw; }
   .trg-row {
     display: grid;
-    grid-template-columns: 1.55fr 0.85fr 1fr 1.3fr 0.85fr 1.3fr 0.7fr 1.05fr 1.5fr;
+    grid-template-columns: 1.55fr 0.7fr 0.85fr 1fr 1.3fr 0.85fr 1.2fr 0.6fr 0.9fr 1.2fr;
     align-items: center;
     gap: 0.5cqw;
     padding: 0.45cqw 0.55cqw;
@@ -2263,16 +2310,16 @@
 
   /* ─── Body + dashboard frame ─── */
   html[data-theme="dark"], html[data-theme="dark"] body {
-    background: #000;
+    background: #011b41;
     color: #fff;
     font-family: 'Manrope', sans-serif;
   }
   html[data-theme="dark"] body { display: flex; align-items: center; justify-content: center; }
 
   html[data-theme="dark"] .dashboard {
-    width: min(100vw, calc(100vh * 16 / 9));
-    height: min(100vh, calc(100vw * 9 / 16));
-    aspect-ratio: 16 / 9;
+    width: 100vw;
+    height: 100vh;
+    aspect-ratio: auto;
     box-shadow: none;
     background: radial-gradient(ellipse 80% 60% at 50% 35%, #023068 0%, #011b41 55%, #000a1f 100%);
   }
@@ -2800,6 +2847,179 @@
     border-color: rgba(235, 191, 106, 0.4);
   }
 
+  /* ════════════════════════════════════════════════════════════════
+   *  MANUAL ACTIONS DROPDOWN (FIXED positioning)
+   * ════════════════════════════════════════════════════════════════ */
+  .ma-wrap { position: relative; min-width: 0; }
+  .ma-trigger {
+    width: 100%;
+    display: flex; align-items: center; gap: 0.4cqw;
+    padding: 0.42cqw 0.55cqw;
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.65cqw; font-weight: 600;
+    color: var(--ink-3);
+    text-align: left;
+    transition: all 0.2s ease;
+    min-width: 0;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  }
+  .ma-trigger:hover { border-color: rgba(185, 28, 44, 0.30); color: var(--ink-1); }
+  .ma-trigger.open  { border-color: rgba(185, 28, 44, 0.45); box-shadow: 0 0 0 2px rgba(185, 28, 44, 0.10); }
+  .ma-trigger.selected { color: var(--ink-1); }
+  .ma-trigger.selected.cat-false      { border-color: rgba(185, 28, 71, 0.45); }
+  .ma-trigger.selected.cat-valid      { border-color: rgba(180, 83, 9, 0.45); }
+  .ma-trigger.selected.cat-escalation { border-color: rgba(14, 116, 144, 0.45); }
+  .ma-trigger-dot {
+    width: 0.5cqw; height: 0.5cqw; border-radius: 50%;
+    flex-shrink: 0; background: rgba(15, 23, 42, 0.20);
+  }
+  .ma-trigger.selected.cat-false      .ma-trigger-dot { background: var(--crit); box-shadow: 0 0 0.35cqw var(--crit); }
+  .ma-trigger.selected.cat-valid      .ma-trigger-dot { background: var(--mid);  box-shadow: 0 0 0.35cqw var(--mid); }
+  .ma-trigger.selected.cat-escalation .ma-trigger-dot { background: var(--cool); box-shadow: 0 0 0.35cqw var(--cool); }
+  .ma-trigger-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ma-trigger-caret { width: 0.75cqw; height: 0.75cqw; flex-shrink: 0; color: var(--ink-4); transition: transform 0.2s ease; }
+  .ma-trigger.open .ma-trigger-caret { transform: rotate(180deg); color: var(--rta-red); }
+
+  /* Row left-border accent when an action is selected */
+  .trg-row.has-action.cat-false      { border-left: 2px solid var(--crit); }
+  .trg-row.has-action.cat-valid      { border-left: 2px solid var(--mid); }
+  .trg-row.has-action.cat-escalation { border-left: 2px solid var(--cool); }
+
+  /* Menu — FIXED positioned, appended to body */
+  .ma-menu {
+    position: fixed;
+    width: 320px;
+    max-height: 420px;
+    overflow-y: auto;
+    background: linear-gradient(180deg, #ffffff 0%, #fbf9f5 100%);
+    border: 1px solid var(--hairline);
+    border-radius: 6px;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.18), 0 4px 12px rgba(15, 23, 42, 0.08);
+    z-index: 9999;
+    padding: 6px 0;
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    font-family: 'Manrope', sans-serif;
+  }
+  .ma-menu.open { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .ma-menu::-webkit-scrollbar { width: 6px; }
+  .ma-menu::-webkit-scrollbar-thumb { background: var(--ink-6); border-radius: 3px; }
+
+  .ma-category {
+    padding: 8px 14px 5px;
+    font-size: 11px; font-weight: 800;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    display: flex; align-items: center; gap: 9px;
+    border-left: 3px solid;
+    margin: 4px 0 2px;
+  }
+  .ma-cat-bar {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: currentColor; box-shadow: 0 0 6px currentColor;
+  }
+  .ma-category.cat-false      { color: var(--crit); border-left-color: var(--crit); background: linear-gradient(90deg, rgba(185, 28, 71, 0.08), transparent 80%); }
+  .ma-category.cat-valid      { color: var(--mid);  border-left-color: var(--mid);  background: linear-gradient(90deg, rgba(180, 83, 9, 0.08), transparent 80%); }
+  .ma-category.cat-escalation { color: var(--cool); border-left-color: var(--cool); background: linear-gradient(90deg, rgba(14, 116, 144, 0.08), transparent 80%); }
+
+  .ma-subsection {
+    padding: 5px 14px 2px 28px;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--ink-4);
+    display: flex; align-items: center; gap: 7px;
+  }
+  .ma-subsection::before { content: ''; width: 11px; height: 1px; background: rgba(15, 23, 42, 0.15); }
+
+  .ma-option {
+    display: flex; align-items: flex-start; gap: 8px;
+    padding: 8px 14px 8px 32px;
+    font-size: 12.5px; font-weight: 500;
+    color: var(--ink-2);
+    cursor: pointer; transition: all 0.15s ease;
+    position: relative;
+    line-height: 1.35;
+  }
+  .ma-option.in-subsection { padding-left: 46px; }
+  .ma-option::before {
+    content: '';
+    position: absolute;
+    left: 19px; top: 12px;
+    width: 7px; height: 7px;
+    border-left: 1px solid rgba(15, 23, 42, 0.18);
+    border-bottom: 1px solid rgba(15, 23, 42, 0.18);
+    border-radius: 0 0 0 2px;
+  }
+  .ma-option.in-subsection::before { left: 33px; }
+  .ma-option:hover { color: var(--ink-1); }
+  .ma-option.cat-false:hover      { background: linear-gradient(90deg, rgba(185, 28, 71, 0.10), transparent 80%); }
+  .ma-option.cat-valid:hover      { background: linear-gradient(90deg, rgba(180, 83, 9, 0.10), transparent 80%); }
+  .ma-option.cat-escalation:hover { background: linear-gradient(90deg, rgba(14, 116, 144, 0.10), transparent 80%); }
+
+  .ma-option.selected {
+    color: var(--ink-1);
+    background: linear-gradient(90deg, rgba(185, 28, 44, 0.10), transparent 80%);
+    font-weight: 600;
+  }
+  .ma-option.selected::after {
+    content: '';
+    position: absolute;
+    right: 14px; top: 50%; transform: translateY(-50%);
+    width: 14px; height: 14px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b91c2c' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12l5 5l10 -10'/></svg>");
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+  .ma-option-label { flex: 1; min-width: 0; }
+
+  /* Dark theme overrides for Manual Actions */
+  html[data-theme="dark"] .ma-trigger {
+    background: linear-gradient(180deg, rgba(2, 66, 107, 0.55), rgba(1, 27, 65, 0.7));
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.75);
+    box-shadow: none;
+  }
+  html[data-theme="dark"] .ma-trigger:hover { border-color: rgba(92, 198, 232, 0.4); color: #fff; }
+  html[data-theme="dark"] .ma-trigger.open { border-color: rgba(92, 198, 232, 0.6); box-shadow: 0 0 0.7cqw rgba(92, 198, 232, 0.20); }
+  html[data-theme="dark"] .ma-trigger.selected { color: #fff; }
+  html[data-theme="dark"] .ma-trigger.selected.cat-false      { border-color: rgba(232, 120, 120, 0.5); }
+  html[data-theme="dark"] .ma-trigger.selected.cat-valid      { border-color: rgba(235, 191, 106, 0.5); }
+  html[data-theme="dark"] .ma-trigger.selected.cat-escalation { border-color: rgba(92, 198, 232, 0.5); }
+  html[data-theme="dark"] .ma-trigger-dot { background: rgba(255, 255, 255, 0.2); }
+  html[data-theme="dark"] .ma-trigger.selected.cat-false      .ma-trigger-dot { background: #f08585; box-shadow: 0 0 0.4cqw #f08585; }
+  html[data-theme="dark"] .ma-trigger.selected.cat-valid      .ma-trigger-dot { background: #ebbf6a; box-shadow: 0 0 0.4cqw #ebbf6a; }
+  html[data-theme="dark"] .ma-trigger.selected.cat-escalation .ma-trigger-dot { background: #5cc6e8; box-shadow: 0 0 0.4cqw #5cc6e8; }
+  html[data-theme="dark"] .ma-trigger-caret { color: rgba(255, 255, 255, 0.5); }
+  html[data-theme="dark"] .ma-trigger.open .ma-trigger-caret { color: #5cc6e8; }
+  html[data-theme="dark"] .trg-row.has-action.cat-false      { border-left-color: #f08585; }
+  html[data-theme="dark"] .trg-row.has-action.cat-valid      { border-left-color: #ebbf6a; }
+  html[data-theme="dark"] .trg-row.has-action.cat-escalation { border-left-color: #5cc6e8; }
+  html[data-theme="dark"] .ma-menu {
+    background: linear-gradient(180deg, rgba(15, 30, 60, 0.98), rgba(5, 15, 38, 0.99));
+    border: 1px solid rgba(92, 198, 232, 0.35);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75);
+  }
+  html[data-theme="dark"] .ma-menu::-webkit-scrollbar-thumb { background: rgba(92, 198, 232, 0.35); }
+  html[data-theme="dark"] .ma-category.cat-false { color: #f08585; border-left-color: #f08585; background: linear-gradient(90deg, rgba(232, 120, 120, 0.12), transparent 80%); }
+  html[data-theme="dark"] .ma-category.cat-valid { color: #ebbf6a; border-left-color: #ebbf6a; background: linear-gradient(90deg, rgba(235, 191, 106, 0.12), transparent 80%); }
+  html[data-theme="dark"] .ma-category.cat-escalation { color: #5cc6e8; border-left-color: #5cc6e8; background: linear-gradient(90deg, rgba(92, 198, 232, 0.12), transparent 80%); }
+  html[data-theme="dark"] .ma-subsection { color: rgba(235, 191, 106, 0.8); }
+  html[data-theme="dark"] .ma-subsection::before { background: rgba(235, 191, 106, 0.45); }
+  html[data-theme="dark"] .ma-option { color: rgba(255, 255, 255, 0.85); }
+  html[data-theme="dark"] .ma-option::before { border-left-color: rgba(255, 255, 255, 0.22); border-bottom-color: rgba(255, 255, 255, 0.22); }
+  html[data-theme="dark"] .ma-option:hover { color: #fff; }
+  html[data-theme="dark"] .ma-option.cat-false:hover      { background: linear-gradient(90deg, rgba(232, 120, 120, 0.16), transparent 80%); }
+  html[data-theme="dark"] .ma-option.cat-valid:hover      { background: linear-gradient(90deg, rgba(235, 191, 106, 0.16), transparent 80%); }
+  html[data-theme="dark"] .ma-option.cat-escalation:hover { background: linear-gradient(90deg, rgba(92, 198, 232, 0.16), transparent 80%); }
+  html[data-theme="dark"] .ma-option.selected { color: #fff; background: linear-gradient(90deg, rgba(92, 198, 232, 0.18), transparent 80%); }
+  html[data-theme="dark"] .ma-option.selected::after {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235cc6e8' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12l5 5l10 -10'/></svg>");
+  }
 </style>
 </head>
 <body>
@@ -2831,7 +3051,7 @@
 
     <header class="header">
       <img class="gov-logo gov-logo-light" src="https://raedaldweik.github.io/reports/government_black.png" alt="Government of Dubai">
-      <img class="gov-logo gov-logo-dark" src="images/government.png" alt="Government of Dubai">
+      <img class="gov-logo gov-logo-dark" src="https://raedaldweik.github.io/reports/government.png" alt="Government of Dubai">
       <div class="title-block">
         <div class="title-row">
           <h1 class="title">Alerts Triage Dashboard</h1>
@@ -2926,7 +3146,7 @@
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
           </svg>
         </button>
-        <img class="rta-logo" src="images/RTA_Dubai_logo.png" alt="RTA">
+        <img class="rta-logo" src="https://raedaldweik.github.io/reports/RTA_Dubai_logo.png" alt="RTA">
       </div>
     </header>
 
@@ -3023,7 +3243,7 @@
               <div class="risk-center-lbl">Total alerts</div>
             </div>
           </div>
-          <div class="risk-legend cat-legend-grid">
+          <div class="risk-legend cat-legend-side">
             <div class="risk-legend-row"><span class="risk-legend-dot cat-taxi"></span><div class="risk-legend-text"><span class="risk-legend-name">Taxi</span><span class="risk-legend-val" id="leg-cat-taxi">—</span></div></div>
             <div class="risk-legend-row"><span class="risk-legend-dot cat-bus"></span><div class="risk-legend-text"><span class="risk-legend-name">Pub. Bus</span><span class="risk-legend-val" id="leg-cat-bus">—</span></div></div>
             <div class="risk-legend-row"><span class="risk-legend-dot cat-school"></span><div class="risk-legend-text"><span class="risk-legend-name">School</span><span class="risk-legend-val" id="leg-cat-school">—</span></div></div>
@@ -3046,6 +3266,7 @@
             <div>Severity</div>
             <div>Vehicle</div>
             <div>Driver</div>
+            <div>Manual Actions</div>
             <div>Time</div>
             <div>Location</div>
             <div>Speed</div>
@@ -3550,6 +3771,51 @@
     stafteesh: 'Stafteesh', fined: 'Fined', escalated: 'Escalated', closed: 'Closed'
   };
 
+  /* ════════════════════════════════════════════════════════════════
+   *  MANUAL ACTIONS TREE
+   * ════════════════════════════════════════════════════════════════ */
+  const ACTIONS = [
+    {
+      type:'category', cat:'false', label:'False Alert',
+      options: [
+        { id:'f1', cat:'false', label:'Close (no Investigation)',     fullLabel:'Close alert without sending to Investigation Office', resultingState:'closed' },
+        { id:'f2', cat:'false', label:'Close & send to Investigation', fullLabel:'Close alert & send to Investigation Office',          resultingState:'closed' }
+      ]
+    },
+    {
+      type:'category', cat:'valid', label:'Valid Alert',
+      subsections: [
+        { label:'No Fine', options: [
+          { id:'v1', cat:'valid', label:'No fine (no Investigation)',     fullLabel:'No fine required without sending to Investigation Office', resultingState:'acknowledged' },
+          { id:'v2', cat:'valid', label:'No fine & send to Investigation',fullLabel:'No fine required & send to Investigation Office',          resultingState:'investigation' }
+        ]},
+        { label:'S-Taftesh', options: [
+          { id:'v3', cat:'valid', label:'S-Taftesh (no Investigation)',     fullLabel:'Send to S-Taftesh without sending to Investigation Office', resultingState:'stafteesh' },
+          { id:'v4', cat:'valid', label:'S-Taftesh & send to Investigation', fullLabel:'Send to S-Taftesh & send to Investigation Office',        resultingState:'stafteesh' }
+        ]},
+        { label:'Fine', options: [
+          { id:'v5', cat:'valid', label:'Issue fine (no Investigation)',     fullLabel:'Issue fine manually through Staftesh without sending to Investigation Office', resultingState:'fined' },
+          { id:'v6', cat:'valid', label:'Issue fine & send to Investigation',fullLabel:'Issue fine manually through Staftesh & send to Investigation Office',         resultingState:'fined' }
+        ]}
+      ]
+    },
+    {
+      type:'category', cat:'escalation', label:'Escalation',
+      options: [
+        { id:'e1', cat:'escalation', label:'Send to Supervisor', fullLabel:'Escalate to Supervisor for review', resultingState:'escalated' }
+      ]
+    }
+  ];
+
+  const OPTIONS_BY_ID = {};
+  ACTIONS.forEach(cat => {
+    if (cat.options) cat.options.forEach(o => OPTIONS_BY_ID[o.id] = o);
+    if (cat.subsections) cat.subsections.forEach(s => s.options.forEach(o => OPTIONS_BY_ID[o.id] = o));
+  });
+
+  // Per-alert manual action overrides: alert_id -> { actionId, state }
+  const ROW_STATE = {};
+
   const FILTER_STATE = {
     period: 'week',
     search: '',
@@ -3577,7 +3843,10 @@
     return ALL_ROWS.filter(r => {
       if (r._ts < minTime) return false;
       if (cat && r.category !== cat) return false;
-      if (state && r.state !== state) return false;
+      if (state) {
+        const eff = (ROW_STATE[r.alert_id]?.state) || r.state;
+        if (eff !== state) return false;
+      }
       if (zone && r.zone !== zone) return false;
       if (sev && r.severity !== sev) return false;
       if (atype && r.alert_type !== atype) return false;
@@ -3588,7 +3857,7 @@
 
   function loadData() {
     return new Promise((resolve, reject) => {
-      Papa.parse('triage_alerts.csv', {
+      Papa.parse('https://raedaldweik.github.io/reports/triage_alerts.csv', {
         download: true,
         header: true,
         dynamicTyping: false,
@@ -3755,6 +4024,117 @@
     renderAlertsTable();
   }
 
+  /* ════════════════════════════════════════════════════════════════
+   *  MANUAL ACTIONS DROPDOWN — single menu in body, FIXED positioned
+   * ════════════════════════════════════════════════════════════════ */
+  let MENU_EL = null;
+  let CURRENT_TRIGGER = null;
+  let CURRENT_ROW = null;
+
+  function buildMenuHTML() {
+    let html = '';
+    ACTIONS.forEach(cat => {
+      html += `<div class="ma-category cat-${cat.cat}"><span class="ma-cat-bar"></span>${cat.label}</div>`;
+      if (cat.options) {
+        cat.options.forEach(o => {
+          html += `<div class="ma-option cat-${o.cat}" data-opt-id="${o.id}" title="${o.fullLabel}"><span class="ma-option-label">${o.label}</span></div>`;
+        });
+      }
+      if (cat.subsections) {
+        cat.subsections.forEach(sub => {
+          html += `<div class="ma-subsection">${sub.label}</div>`;
+          sub.options.forEach(o => {
+            html += `<div class="ma-option in-subsection cat-${o.cat}" data-opt-id="${o.id}" title="${o.fullLabel}"><span class="ma-option-label">${o.label}</span></div>`;
+          });
+        });
+      }
+    });
+    return html;
+  }
+
+  function ensureMenu() {
+    if (MENU_EL) return MENU_EL;
+    MENU_EL = document.createElement('div');
+    MENU_EL.className = 'ma-menu';
+    MENU_EL.innerHTML = buildMenuHTML();
+    document.body.appendChild(MENU_EL);
+    MENU_EL.addEventListener('click', (e) => {
+      const opt = e.target.closest('.ma-option');
+      if (!opt) return;
+      e.stopPropagation();
+      const id = opt.dataset.optId;
+      const action = OPTIONS_BY_ID[id];
+      if (!action || !CURRENT_ROW || !CURRENT_TRIGGER) { closeMenu(); return; }
+      const alertId = CURRENT_ROW.dataset.alertId;
+      ROW_STATE[alertId] = { actionId: id, state: action.resultingState };
+      closeMenu();
+      renderAlertsTable();
+    });
+    return MENU_EL;
+  }
+
+  function highlightSelected(menu, actionId) {
+    menu.querySelectorAll('.ma-option.selected').forEach(o => o.classList.remove('selected'));
+    if (actionId) {
+      const sel = menu.querySelector(`.ma-option[data-opt-id="${actionId}"]`);
+      if (sel) sel.classList.add('selected');
+    }
+  }
+
+  function positionMenu(trigger, menu) {
+    const tr = trigger.getBoundingClientRect();
+    const menuH = menu.offsetHeight || 380;
+    const menuW = menu.offsetWidth || 320;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const gap = 6;
+    const spaceBelow = vh - tr.bottom;
+    const spaceAbove = tr.top;
+    let top;
+    if (spaceBelow >= menuH + gap) top = tr.bottom + gap;
+    else if (spaceAbove >= menuH + gap) top = tr.top - menuH - gap;
+    else if (spaceBelow >= spaceAbove) { top = tr.bottom + gap; menu.style.maxHeight = (vh - top - 12) + 'px'; }
+    else { top = 12; menu.style.maxHeight = (tr.top - 18) + 'px'; }
+    let left = tr.left;
+    if (left + menuW > vw - 10) left = Math.max(10, vw - menuW - 10);
+    menu.style.top = top + 'px';
+    menu.style.left = left + 'px';
+  }
+
+  function toggleMenu(trigger, row) {
+    const menu = ensureMenu();
+    if (CURRENT_TRIGGER === trigger && menu.classList.contains('open')) { closeMenu(); return; }
+    closeMenu();
+    CURRENT_TRIGGER = trigger;
+    CURRENT_ROW = row;
+    trigger.classList.add('open');
+    const existing = ROW_STATE[row.dataset.alertId];
+    highlightSelected(menu, existing?.actionId);
+    menu.style.maxHeight = '420px';
+    menu.classList.add('open');
+    requestAnimationFrame(() => positionMenu(trigger, menu));
+  }
+
+  function closeMenu() {
+    if (MENU_EL) MENU_EL.classList.remove('open');
+    if (CURRENT_TRIGGER) CURRENT_TRIGGER.classList.remove('open');
+    CURRENT_TRIGGER = null;
+    CURRENT_ROW = null;
+  }
+
+  function initDropdownGlobalHandlers() {
+    document.addEventListener('click', (e) => {
+      if (!CURRENT_TRIGGER) return;
+      if (MENU_EL && MENU_EL.contains(e.target)) return;
+      if (CURRENT_TRIGGER.contains(e.target)) return;
+      closeMenu();
+    });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
+    const scroll = document.querySelector('.trg-scroll');
+    if (scroll) scroll.addEventListener('scroll', closeMenu);
+    window.addEventListener('resize', closeMenu);
+  }
+
   function renderAlertsTable() {
     const mount = document.getElementById('trg-rows-mount');
     if (!mount) return;
@@ -3773,11 +4153,18 @@
     }
 
     mount.innerHTML = visible.map(r => {
+      const override = ROW_STATE[r.alert_id];
+      const effectiveState = override?.state || r.state;
+      const selectedAction = override?.actionId ? OPTIONS_BY_ID[override.actionId] : null;
+      const rowCatClass = selectedAction ? `has-action cat-${selectedAction.cat}` : '';
+      const triggerCatClass = selectedAction ? `selected cat-${selectedAction.cat}` : '';
+      const triggerLabel = selectedAction ? selectedAction.label : 'Select action…';
+
       const speedDisplay = (r.speed_kmh != null && !isNaN(r.speed_kmh))
         ? `<span class="trg-speed ${r.speed_kmh >= 100 ? 'bad' : r.speed_kmh >= 80 ? 'warn' : ''}">${r.speed_kmh}</span>`
         : `<span class="trg-speed-na">—</span>`;
       return `
-        <div class="trg-row ${r.duplicated === 'yes' ? 'dup' : ''}">
+        <div class="trg-row ${r.duplicated === 'yes' ? 'dup' : ''} ${rowCatClass}" data-alert-id="${r.alert_id}">
           <div class="trg-alert-cell">
             <div class="trg-alert-type">${r.alert_label}${r.duplicated === 'yes' ? '<span class="trg-dup-flag">DUP</span>' : ''}</div>
             <div class="trg-alert-src">${r.source}</div>
@@ -3788,6 +4175,13 @@
             <div class="trg-driver-avatar">${r.driver_initials}</div>
             <div class="trg-driver-name">${r.driver_name}</div>
           </div>
+          <div class="ma-wrap">
+            <button class="ma-trigger ${triggerCatClass}" data-ma-trigger>
+              <span class="ma-trigger-dot"></span>
+              <span class="ma-trigger-label">${triggerLabel}</span>
+              <svg class="ma-trigger-caret" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6l6 -6"/></svg>
+            </button>
+          </div>
           <div class="trg-time">
             <div class="trg-time-rel">${formatRelTime(r._ts)}</div>
             <div class="trg-time-abs">${formatAbsTime(r._ts)}</div>
@@ -3797,11 +4191,20 @@
             <div class="trg-loc-zone">${r.zone}</div>
           </div>
           <div>${speedDisplay}</div>
-          <div><span class="trg-state ${r.state}"><span class="trg-state-dot"></span>${STATE_LABELS[r.state] || r.state}</span></div>
+          <div><span class="trg-state ${effectiveState}"><span class="trg-state-dot"></span>${STATE_LABELS[effectiveState] || effectiveState}</span></div>
           <div class="trg-ai">${r.ai_recommendation}</div>
         </div>
       `;
     }).join('');
+
+    // Wire dropdown triggers
+    mount.querySelectorAll('[data-ma-trigger]').forEach(trigger => {
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const row = trigger.closest('.trg-row');
+        toggleMenu(trigger, row);
+      });
+    });
   }
 
   /* ════════════════════════════════════════════════════════════════
@@ -3911,6 +4314,7 @@
   document.addEventListener('DOMContentLoaded', async () => {
     initThemeToggle();
     initGlobalFilters();
+    initDropdownGlobalHandlers();
 
     try {
       await loadData();

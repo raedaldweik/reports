@@ -455,12 +455,12 @@
   .dashboard-body {
     position: relative; z-index: 1; flex: 1; min-height: 0;
     display: grid;
-    grid-template-columns: 1.55fr 1fr 1.15fr;
-    grid-template-rows: 0.55fr 1.55fr 1.55fr;
+    grid-template-columns: 1.95fr 1fr;
+    grid-template-rows: 0.55fr 1fr 2fr;
     grid-template-areas:
-      "kpis  kpis  wi"
-      "work  rate  wi"
-      "tbl   tbl   wi";
+      "kpis  rate"
+      "tbl   rate"
+      "tbl   work";
     gap: 0.6cqw;
     padding: 0.6cqw 1.5cqw 1.2cqw;
   }
@@ -468,7 +468,6 @@
   .panel-workload { grid-area: work; }
   .panel-rating   { grid-area: rate; }
   .panel-staff    { grid-area: tbl; }
-  .panel-wi       { grid-area: wi; }
 
   /* ════════════════════════════════════════════════════════════════
    *  PANELS — liquid glass surfaces
@@ -2177,16 +2176,16 @@
 
   /* ─── Body + dashboard frame ─── */
   html[data-theme="dark"], html[data-theme="dark"] body {
-    background: #000;
+    background: #011b41;
     color: #fff;
     font-family: 'Manrope', sans-serif;
   }
   html[data-theme="dark"] body { display: flex; align-items: center; justify-content: center; }
 
   html[data-theme="dark"] .dashboard {
-    width: min(100vw, calc(100vh * 16 / 9));
-    height: min(100vh, calc(100vw * 9 / 16));
-    aspect-ratio: 16 / 9;
+    width: 100vw;
+    height: 100vh;
+    aspect-ratio: auto;
     box-shadow: none;
     background: radial-gradient(ellipse 80% 60% at 50% 35%, #023068 0%, #011b41 55%, #000a1f 100%);
   }
@@ -2716,7 +2715,7 @@
 
     <header class="header">
       <img class="gov-logo gov-logo-light" src="https://raedaldweik.github.io/reports/government_black.png" alt="Government of Dubai">
-      <img class="gov-logo gov-logo-dark" src="images/government.png" alt="Government of Dubai">
+      <img class="gov-logo gov-logo-dark" src="https://raedaldweik.github.io/reports/government.png" alt="Government of Dubai">
       <div class="title-block">
         <div class="title-row">
           <h1 class="title">Staff Performance Dashboard</h1>
@@ -2811,7 +2810,7 @@
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
           </svg>
         </button>
-        <img class="rta-logo" src="images/RTA_Dubai_logo.png" alt="RTA">
+        <img class="rta-logo" src="https://raedaldweik.github.io/reports/RTA_Dubai_logo.png" alt="RTA">
       </div>
     </header>
 
@@ -2935,13 +2934,6 @@
       </section>
 
       <!-- ===== WORKFORCE INTELLIGENCE BRIEF ===== -->
-      <section class="panel panel-wi">
-        <div class="panel-header">
-          <div class="panel-title">Workforce Intelligence</div>
-        </div>
-        <div class="brief-body" id="brief-body"></div>
-      </section>
-
     </main>
 
   </div>
@@ -3498,7 +3490,7 @@
 
   function loadData() {
     return new Promise((resolve, reject) => {
-      Papa.parse('alerts.csv', {
+      Papa.parse('https://raedaldweik.github.io/reports/alerts.csv', {
         download: true,
         header: true,
         dynamicTyping: false,
@@ -3579,8 +3571,8 @@
   // Workload chart — top operators by resolved count, stacked: resolved + breaches
   function scaledWorkloadData() {
     const ops = getOperatorMetrics();
-    // Sort by total descending, take top 8
-    const top = [...ops].sort((a, b) => b.total - a.total).slice(0, 8);
+    // Sort by total descending, take top 6
+    const top = [...ops].sort((a, b) => b.total - a.total).slice(0, 6);
     return {
       categories: top.map(o => o.initials),
       categoryKeys: top.map(o => o.id),

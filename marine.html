@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marine Overview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f5f8;
+    --card: #ffffff;
+    --border: #ecedf1;
+    --ink-1: #1c2740;
+    --ink-2: #4a5468;
+    --muted: #98a1b3;
+    --faint: #c2c8d4;
+    --red: #ed4956;
+    --red-soft: #fdeef0;
+    --red-bd: #f6d6da;
+    --amber: #f5a524;
+    --amber-soft: #fff7ea;
+    --amber-bd: #f6e6c8;
+    --blue: #3e8ef7;
+    --blue-soft: #eef5fe;
+    --blue-bd: #d4e6fb;
+    --green: #22b573;
+    --shadow: 0 1px 2px rgba(20,28,46,.04), 0 4px 14px rgba(20,28,46,.05);
+    --r: 16px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: var(--ink-1);
+    -webkit-font-smoothing: antialiased;
+  }
+  .app { max-width: 1320px; margin: 0 auto; }
+
+  /* ─────────── TOP BAR ─────────── */
+  .topbar {
+    height: 60px;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center;
+    padding: 0 26px;
+    gap: 20px;
+  }
+  .topbar .crumb { font-size: 14px; color: var(--ink-2); font-weight: 500; }
+  .topbar .search {
+    margin-left: auto;
+    width: 280px; height: 38px;
+    background: #f4f5f8; border: 1px solid var(--border);
+    border-radius: 10px;
+    display: flex; align-items: center; gap: 8px; padding: 0 13px;
+    color: var(--muted); font-size: 13.5px;
+  }
+  .topbar .search svg { width: 16px; height: 16px; stroke: var(--muted); }
+  .topbar .ico { width: 18px; height: 18px; stroke: #6b7488; fill: none; stroke-width: 1.8; }
+  .topbar .user { display: flex; align-items: center; gap: 9px; margin-left: 6px; }
+  .topbar .avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover;
+    background: linear-gradient(135deg,#9fb4d4,#6b82a8); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:13px; }
+  .topbar .uname { font-size: 13px; font-weight: 700; color: var(--ink-1); line-height: 1.2; }
+  .topbar .urole { font-size: 11.5px; color: var(--muted); }
+  .topbar .chev { width: 15px; height: 15px; stroke: var(--muted); }
+
+  /* ─────────── PAGE ─────────── */
+  .page { padding: 24px 26px 40px; }
+  .page-head { display: flex; align-items: flex-start; margin-bottom: 20px; }
+  .page-title { font-size: 23px; font-weight: 800; letter-spacing: -.4px; }
+  .page-sub { font-size: 13px; color: var(--muted); margin-top: 3px; }
+  .date-btn {
+    margin-left: auto;
+    height: 38px; padding: 0 15px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--ink-2); font-weight: 500; cursor: pointer;
+  }
+  .date-btn svg { width: 16px; height: 16px; stroke: var(--muted); fill: none; stroke-width: 1.8; }
+
+  /* ─────────── CARDS / GRID ─────────── */
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--r); box-shadow: var(--shadow);
+  }
+  .grid { display: grid; gap: 16px; }
+
+  /* KPI strip */
+  .kpis { grid-template-columns: repeat(6, 1fr); margin-bottom: 16px; }
+  .kpi { padding: 16px 17px; display: flex; align-items: center; gap: 13px; min-height: 84px; }
+  .kpi-ico { width: 42px; height: 42px; border-radius: 11px; background: var(--blue-soft);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .kpi-ico svg { width: 21px; height: 21px; stroke: var(--blue); fill: none; stroke-width: 1.8; }
+  .kpi-num { font-size: 25px; font-weight: 800; letter-spacing: -.5px; line-height: 1; }
+  .kpi-lbl { font-size: 12px; color: var(--muted); margin-top: 5px; font-weight: 500; }
+
+  .kpi.sev { flex-direction: column; align-items: flex-start; justify-content: center; gap: 0; }
+  .kpi.sev .sev-top { display: flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
+  .kpi.sev .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .kpi.sev .sev-num { font-size: 25px; font-weight: 800; margin-top: 9px; letter-spacing: -.5px; }
+  .kpi.red   { background: var(--red-soft);   border-color: var(--red-bd); }
+  .kpi.amber { background: var(--amber-soft); border-color: var(--amber-bd); }
+  .kpi.blue  { background: var(--blue-soft);  border-color: var(--blue-bd); }
+  .kpi.red   .dot { background: var(--red); }   .kpi.red   .sev-num { color: var(--red); }
+  .kpi.amber .dot { background: var(--amber); } .kpi.amber .sev-num { color: var(--amber); }
+  .kpi.blue  .dot { background: var(--blue); }  .kpi.blue  .sev-num { color: var(--blue); }
+
+  /* Panel header */
+  .ph { display: flex; align-items: flex-start; padding: 17px 19px 0; }
+  .ph-title { font-size: 15.5px; font-weight: 700; }
+  .ph-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .ph-act { margin-left: auto; color: var(--faint); cursor: pointer; }
+  .ph-act svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+
+  /* row layouts */
+  .row { margin-bottom: 16px; }
+  .r-60-40 { grid-template-columns: 1.5fr 1fr; }
+  .r-33-66 { grid-template-columns: 1fr 2fr; }
+  .r-map   { grid-template-columns: 1.3fr 1fr 1fr; }
+
+  /* Legend */
+  .legend { display: flex; gap: 16px; font-size: 11.5px; color: var(--muted); }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .legend i { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+
+  /* Area chart */
+  .chart-wrap { padding: 8px 14px 14px; position: relative; }
+  .chart-wrap svg { width: 100%; height: auto; display: block; }
+  .tip {
+    position: absolute; left: 22%; top: 22%;
+    background: #fff; border: 1px solid var(--border); border-radius: 9px;
+    box-shadow: 0 6px 20px rgba(20,28,46,.12); padding: 9px 11px; font-size: 11px; min-width: 110px;
+  }
+  .tip .tip-h { font-weight: 700; font-size: 11.5px; margin-bottom: 6px; color: var(--ink-1); }
+  .tip .tip-r { display: flex; align-items: center; gap: 6px; color: var(--ink-2); margin: 2px 0; }
+  .tip .tip-r i { width: 9px; height: 9px; border-radius: 2px; }
+  .tip .tip-r b { margin-left: auto; font-weight: 700; }
+
+  /* Horizontal volume bars */
+  .vbars { padding: 14px 19px 16px; }
+  .vbar { margin: 13px 0; }
+  .vbar-top { display: flex; justify-content: space-between; font-size: 12.5px; margin-bottom: 6px; }
+  .vbar-top .vb-name { color: var(--ink-2); font-weight: 500; }
+  .vbar-top .vb-val { color: var(--ink-1); font-weight: 700; }
+  .vbar-track { height: 7px; background: #eef0f4; border-radius: 4px; overflow: hidden; }
+  .vbar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg,#5aa0f8,#3e8ef7); }
+
+  /* Stacked vehicle bars */
+  .svbars { padding: 16px 19px; }
+  .svbar { display: grid; grid-template-columns: 48px 1fr 28px; align-items: center; gap: 12px; margin: 13px 0; }
+  .svbar .sv-lbl { font-size: 11px; color: var(--muted); font-weight: 600; line-height: 1.15; }
+  .svbar .sv-track { height: 11px; background: #eef0f4; border-radius: 6px; overflow: hidden; display: flex; }
+  .svbar .sv-track span { height: 100%; display: block; }
+  .svbar .sv-val { font-size: 13px; font-weight: 700; text-align: right; }
+  .seg-red { background: #ed4956; } .seg-amber { background: #f5a524; } .seg-blue { background: #3e8ef7; }
+
+  /* Table */
+  table { width: 100%; border-collapse: collapse; }
+  .tbl-wrap { padding: 6px 8px 12px; }
+  thead th { font-size: 10.5px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted);
+    font-weight: 600; text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--border); }
+  tbody td { font-size: 12.5px; color: var(--ink-2); padding: 14px 12px; border-bottom: 1px solid #f1f2f5; }
+  tbody tr:last-child td { border-bottom: none; }
+  td .t-strong { color: var(--ink-1); font-weight: 600; }
+  .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600;
+    padding: 3px 9px; border-radius: 20px; background: var(--red-soft); color: var(--red); }
+  .pill .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .tsub { color: var(--muted); font-size: 11px; }
+  .tfoot { display: flex; align-items: center; padding: 14px 20px; }
+  .tfoot .info { font-size: 12px; color: var(--muted); }
+  .pager { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 12px; }
+  .pager button { border: 1px solid var(--border); background: #fff; border-radius: 7px; padding: 5px 11px;
+    color: var(--ink-2); cursor: pointer; font: inherit; font-size: 12px; }
+  .pager .pg { width: 28px; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center; }
+  .pager .pg.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+
+  /* Map */
+  .map-wrap { padding: 12px; }
+  .map-box { position: relative; height: 270px; border-radius: 11px; overflow: hidden; border: 1px solid var(--border); }
+  .map-box iframe { width: 100%; height: 100%; border: 0; filter: saturate(.92); }
+  .map-pin { position: absolute; width: 13px; height: 13px; border-radius: 50%; background: #f5722b;
+    border: 2.5px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.3); transform: translate(-50%,-50%); }
+  .map-shield { position: absolute; background: #2e7d32; color: #fff; font-size: 9px; font-weight: 700;
+    padding: 1px 5px; border-radius: 3px; transform: translate(-50%,-50%); box-shadow: 0 1px 3px rgba(0,0,0,.3); }
+
+  /* Locations list */
+  .locs { padding: 6px 8px 10px; }
+  .loc { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-bottom: 1px solid #f1f2f5; }
+  .loc:last-child { border-bottom: none; }
+  .loc .rank { width: 22px; font-size: 13px; font-weight: 700; color: var(--muted); }
+  .loc .lname { font-size: 13px; font-weight: 600; color: var(--ink-1); }
+  .loc .lsev { font-size: 11px; color: var(--red); font-weight: 600; margin-top: 2px; }
+  .loc .lval { margin-left: auto; text-align: right; }
+  .loc .lnum { font-size: 14px; font-weight: 800; }
+  .loc .lunit { font-size: 9.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .loc-badge { font-size: 11px; color: var(--muted); }
+
+  /* Resolution donut */
+  .res { padding: 20px; display: flex; flex-direction: column; align-items: center; }
+  .res-donut { position: relative; width: 150px; height: 150px; }
+  .res-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .res-pct { font-size: 30px; font-weight: 800; color: var(--red); }
+  .res-pl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  .res-stats { display: flex; gap: 34px; margin-top: 20px; }
+  .res-stat { text-align: center; }
+  .res-stat .rs-num { font-size: 19px; font-weight: 800; }
+  .res-stat .rs-num.green { color: var(--green); }
+  .res-stat .rs-num.red { color: var(--red); }
+  .res-stat .rs-lbl { font-size: 10.5px; color: var(--muted); margin-top: 3px; }
+</style>
+</head>
+<body>
+  <div class="app">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <span class="crumb">Alerts</span>
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        Search...
+      </div>
+      <div class="user">
+        <div class="avatar">ME</div>
+        <div>
+          <div class="uname">Mana El Mansori</div>
+          <div class="urole">Supervisor</div>
+        </div>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+    </header>
+
+    <div class="page">
+
+      <!-- HEADING -->
+      <div class="page-head">
+        <div>
+          <div class="page-title">Marine Overview</div>
+          <div class="page-sub">Overview of fleet alerts, violations, and resolution status.</div>
+        </div>
+        <button class="date-btn">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          Pick a date
+          <svg viewBox="0 0 24 24" style="width:14px"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+      </div>
+
+      <!-- KPIs -->
+      <div class="grid kpis">
+        <div class="card kpi">
+          <div class="kpi-ico"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
+          <div><div class="kpi-num">642</div><div class="kpi-lbl">New Alerts</div></div>
+        </div>
+        <div class="card kpi">
+          <div class="kpi-ico"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
+          <div><div class="kpi-num">88</div><div class="kpi-lbl">Pending Alerts</div></div>
+        </div>
+        <div class="card kpi">
+          <div class="kpi-ico"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
+          <div><div class="kpi-num">97</div><div class="kpi-lbl">Resolved Alerts</div></div>
+        </div>
+        <div class="card kpi sev red">
+          <div class="sev-top"><span class="dot"></span>SLA Breached</div>
+          <div class="sev-num">41</div>
+        </div>
+        <div class="card kpi sev amber">
+          <div class="sev-top"><span class="dot"></span>Medium Severity</div>
+          <div class="sev-num">110</div>
+        </div>
+        <div class="card kpi sev blue">
+          <div class="sev-top"><span class="dot"></span>Minor Severity</div>
+          <div class="sev-num">6</div>
+        </div>
+      </div>
+
+      <!-- VIOLATIONS SUMMARY ROW -->
+      <div class="grid row r-60-40">
+        <!-- Area chart -->
+        <div class="card">
+          <div class="ph">
+            <div><div class="ph-title">Violations Summary</div><div class="ph-sub">Top alert types by volume</div></div>
+            <div class="legend" style="margin-left:auto;margin-top:4px">
+              <span><i style="background:#3e8ef7"></i>Legend</span>
+              <span><i style="background:#f5a524"></i>Legend</span>
+              <span><i style="background:#ed4956"></i>Legend</span>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <svg viewBox="0 0 640 300" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="gA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f5a524" stop-opacity=".35"/><stop offset="1" stop-color="#f5a524" stop-opacity="0"/></linearGradient>
+                <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ed4956" stop-opacity=".28"/><stop offset="1" stop-color="#ed4956" stop-opacity="0"/></linearGradient>
+                <linearGradient id="gC" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3e8ef7" stop-opacity=".22"/><stop offset="1" stop-color="#3e8ef7" stop-opacity="0"/></linearGradient>
+              </defs>
+              <!-- gridlines -->
+              <g stroke="#eef0f4" stroke-width="1">
+                <line x1="40" y1="20"  x2="630" y2="20"/>
+                <line x1="40" y1="74"  x2="630" y2="74"/>
+                <line x1="40" y1="128" x2="630" y2="128"/>
+                <line x1="40" y1="182" x2="630" y2="182"/>
+                <line x1="40" y1="236" x2="630" y2="236"/>
+                <line x1="40" y1="262" x2="630" y2="262"/>
+              </g>
+              <!-- y labels -->
+              <g fill="#aeb6c4" font-size="10" font-family="Inter" text-anchor="end">
+                <text x="34" y="24">1000.00</text><text x="34" y="78">800.00</text>
+                <text x="34" y="132">600.00</text><text x="34" y="186">400.00</text>
+                <text x="34" y="240">200.00</text><text x="34" y="266">0</text>
+              </g>
+              <!-- x labels -->
+              <g fill="#aeb6c4" font-size="10" font-family="Inter" text-anchor="middle">
+                <text x="65" y="282">1</text><text x="116" y="282">2</text><text x="167" y="282">3</text>
+                <text x="218" y="282">4</text><text x="269" y="282">5</text><text x="320" y="282">6</text>
+                <text x="371" y="282">7</text><text x="422" y="282">8</text><text x="473" y="282">9</text>
+                <text x="524" y="282">10</text><text x="575" y="282">11</text><text x="620" y="282">12</text>
+                <text x="50" y="298" fill="#c2c8d4" text-anchor="start">Y-axis Label (Unit)</text>
+              </g>
+              <!-- area C (blue, lowest) -->
+              <path fill="url(#gC)" stroke="none" d="M65,210 C100,150 130,165 167,150 C200,138 235,175 269,158 C300,142 350,170 371,150 C420,128 460,165 473,150 C520,135 560,150 620,140 L620,262 L65,262 Z"/>
+              <path fill="none" stroke="#3e8ef7" stroke-width="2" d="M65,210 C100,150 130,165 167,150 C200,138 235,175 269,158 C300,142 350,170 371,150 C420,128 460,165 473,150 C520,135 560,150 620,140"/>
+              <!-- area B (red, middle) -->
+              <path fill="url(#gB)" stroke="none" d="M65,150 C100,95 135,110 167,128 C205,150 235,120 269,150 C305,182 345,130 371,150 C405,176 455,120 473,150 C515,205 560,150 620,165 L620,262 L65,262 Z"/>
+              <path fill="none" stroke="#ed4956" stroke-width="2" d="M65,150 C100,95 135,110 167,128 C205,150 235,120 269,150 C305,182 345,130 371,150 C405,176 455,120 473,150 C515,205 560,150 620,165"/>
+              <!-- area A (amber, top peaks) -->
+              <path fill="url(#gA)" stroke="none" d="M65,120 C100,40 135,55 167,90 C205,130 235,60 269,75 C305,90 345,45 371,80 C410,120 450,40 473,70 C520,108 560,60 620,55 L620,262 L65,262 Z"/>
+              <path fill="none" stroke="#f5a524" stroke-width="2" d="M65,120 C100,40 135,55 167,90 C205,130 235,60 269,75 C305,90 345,45 371,80 C410,120 450,40 473,70 C520,108 560,60 620,55"/>
+              <!-- marker line at x=4 -->
+              <line x1="218" y1="20" x2="218" y2="262" stroke="#cbd2dd" stroke-width="1" stroke-dasharray="3 3"/>
+              <circle cx="218" cy="75" r="3.5" fill="#f5a524"/>
+              <circle cx="218" cy="150" r="3.5" fill="#ed4956"/>
+              <circle cx="218" cy="158" r="3.5" fill="#3e8ef7"/>
+            </svg>
+            <div class="tip">
+              <div class="tip-h">2020/04</div>
+              <div class="tip-r"><i style="background:#f5a524"></i>Legend <b>980.00</b></div>
+              <div class="tip-r"><i style="background:#ed4956"></i>Legend <b>640.00</b></div>
+              <div class="tip-r"><i style="background:#3e8ef7"></i>Legend <b>390.00</b></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Volume bars -->
+        <div class="card">
+          <div class="ph">
+            <div><div class="ph-title">Violations Summary</div><div class="ph-sub">Top alert types by volume</div></div>
+            <div class="ph-act"><svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg></div>
+          </div>
+          <div class="vbars">
+            <div class="vbar"><div class="vbar-top"><span class="vb-name">PTSM - Vehicle empty while Idling</span><span class="vb-val">568</span></div><div class="vbar-track"><div class="vbar-fill" style="width:47%"></div></div></div>
+            <div class="vbar"><div class="vbar-top"><span class="vb-name">PTSM - Black trip (Inside Dubai)</span><span class="vb-val">580</span></div><div class="vbar-track"><div class="vbar-fill" style="width:48%"></div></div></div>
+            <div class="vbar"><div class="vbar-top"><span class="vb-name">PTSM - Internal Cam Disconnection</span><span class="vb-val">120</span></div><div class="vbar-track"><div class="vbar-fill" style="width:13%"></div></div></div>
+            <div class="vbar"><div class="vbar-top"><span class="vb-name">PTSM - Eating &amp; Drinking</span><span class="vb-val">45</span></div><div class="vbar-track"><div class="vbar-fill" style="width:7%"></div></div></div>
+            <div class="vbar"><div class="vbar-top"><span class="vb-name">PTSM - Driver Sleeping (MNVR)</span><span class="vb-val">22</span></div><div class="vbar-track"><div class="vbar-fill" style="width:5%"></div></div></div>
+            <div class="vbar"><div class="vbar-top"><span class="vb-name">PTSM - Drive Opposite Direction</span><span class="vb-val">15</span></div><div class="vbar-track"><div class="vbar-fill" style="width:4%"></div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VEHICLE VIOLATIONS + RECENT ALERTS -->
+      <div class="grid row r-33-66">
+        <div class="card">
+          <div class="ph"><div class="ph-title">Top Vehicle Violations</div><div class="ph-act" style="color:#ed4956">•••</div></div>
+          <div class="svbars">
+            <div class="svbar"><div class="sv-lbl">MR 583</div><div class="sv-track"><span class="seg-red" style="width:46%"></span><span class="seg-amber" style="width:30%"></span><span class="seg-blue" style="width:24%"></span></div><div class="sv-val">28</div></div>
+            <div class="svbar"><div class="sv-lbl">MR 349</div><div class="sv-track"><span class="seg-red" style="width:40%"></span><span class="seg-amber" style="width:28%"></span><span class="seg-blue" style="width:14%"></span></div><div class="sv-val">22</div></div>
+            <div class="svbar"><div class="sv-lbl">MR0661</div><div class="sv-track"><span class="seg-red" style="width:34%"></span><span class="seg-amber" style="width:18%"></span><span class="seg-blue" style="width:12%"></span></div><div class="sv-val">18</div></div>
+            <div class="svbar"><div class="sv-lbl">MR 644</div><div class="sv-track"><span class="seg-red" style="width:26%"></span><span class="seg-amber" style="width:14%"></span><span class="seg-blue" style="width:10%"></span></div><div class="sv-val">14</div></div>
+            <div class="svbar"><div class="sv-lbl">MR0019</div><div class="sv-track"><span class="seg-red" style="width:22%"></span><span class="seg-amber" style="width:12%"></span><span class="seg-blue" style="width:8%"></span></div><div class="sv-val">12</div></div>
+            <div class="svbar"><div class="sv-lbl">MR 447</div><div class="sv-track"><span class="seg-red" style="width:16%"></span><span class="seg-amber" style="width:10%"></span><span class="seg-blue" style="width:6%"></span></div><div class="sv-val">9</div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="ph">
+            <div class="ph-title">Recent Alerts Incidents</div>
+            <div class="search" style="margin-left:auto;width:200px;margin-top:-2px">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>Search...
+            </div>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr>
+                <th>Alert Category &amp; Type</th><th>Duplication</th><th>Vehicle</th><th>Severity</th><th>Driver</th><th>Last Occurrence</th>
+              </tr></thead>
+              <tbody>
+                <tr><td class="t-strong">Marine - Distracted Driving Alert</td><td></td><td>MR0088</td><td><span class="pill"><span class="dot"></span>Major</span></td><td>002358512</td><td><div class="t-strong">09/09/25 09:43:48</div><div class="tsub">25.0860, 55.1513</div></td></tr>
+                <tr><td class="t-strong">Marine - Black trip (Inside Dubai)</td><td></td><td>MR0088</td><td><span class="pill"><span class="dot"></span>Major</span></td><td>002358512</td><td><div class="t-strong">09/09/25 09:43:48</div><div class="tsub">25.0860, 55.1513</div></td></tr>
+                <tr><td class="t-strong">Marine - Camera Disconnect Night</td><td></td><td>MR0088</td><td><span class="pill"><span class="dot"></span>Major</span></td><td>002358512</td><td><div class="t-strong">09/09/25 09:43:48</div><div class="tsub">25.0860, 55.1513</div></td></tr>
+              </tbody>
+            </table>
+            <div class="tfoot">
+              <span class="info">Showing 1 to 4 of 25 entries</span>
+              <div class="pager">
+                <button>Previous</button>
+                <button class="pg active">1</button><button class="pg">2</button><button class="pg">3</button>
+                <button>Next</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAP + LOCATIONS + RESOLUTION -->
+      <div class="grid row r-map">
+        <div class="card">
+          <div class="ph"><div class="ph-title">Violations Heatmap</div></div>
+          <div class="map-wrap">
+            <div class="map-box">
+              <iframe loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=55.10%2C25.05%2C55.40%2C25.32&amp;layer=mapnik"></iframe>
+              <div class="map-pin" style="left:42%;top:55%"></div>
+              <div class="map-pin" style="left:46%;top:60%"></div>
+              <div class="map-pin" style="left:50%;top:52%"></div>
+              <div class="map-shield" style="left:30%;top:30%">D 75</div>
+              <div class="map-shield" style="left:60%;top:25%">E 11</div>
+              <div class="map-shield" style="left:70%;top:48%">E 44</div>
+              <div class="map-shield" style="left:38%;top:72%">D 63</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="ph"><div class="ph-title">Top Alert Locations</div><span class="loc-badge" style="margin-left:auto;margin-top:4px">8 locations</span></div>
+          <div class="locs">
+            <div class="loc"><span class="rank">1</span><div><div class="lname">Sheikh Zayed Road, Dubai</div><div class="lsev">Major</div></div><div class="lval"><div class="lnum">475</div><div class="lunit">Incidents</div></div></div>
+            <div class="loc"><span class="rank">2</span><div><div class="lname">Al Mizhar, Dubai, UAE</div><div class="lsev">Major</div></div><div class="lval"><div class="lnum">323</div><div class="lunit">Incidents</div></div></div>
+            <div class="loc"><span class="rank">3</span><div><div class="lname">Academic City, Dubai, UAE</div><div class="lsev">Major</div></div><div class="lval"><div class="lnum">312</div><div class="lunit">Incidents</div></div></div>
+            <div class="loc"><span class="rank">4</span><div><div class="lname">Ras Al Khor, Dubai, UAE</div><div class="lsev">Major</div></div><div class="lval"><div class="lnum">301</div><div class="lunit">Incidents</div></div></div>
+            <div class="loc"><span class="rank">5</span><div><div class="lname">Al Lisaili, Dubai, UAE</div><div class="lsev">Major</div></div><div class="lval"><div class="lnum">289</div><div class="lunit">Incidents</div></div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="ph"><div class="ph-title">Resolution Performance</div></div>
+          <div class="res">
+            <div class="res-donut">
+              <svg viewBox="0 0 160 160" style="width:150px;height:150px">
+                <circle cx="80" cy="80" r="64" fill="none" stroke="#f3eaeb" stroke-width="18"/>
+                <circle cx="80" cy="80" r="64" fill="none" stroke="#ed4956" stroke-width="18" stroke-linecap="round"
+                        stroke-dasharray="396 402" stroke-dashoffset="0" transform="rotate(-90 80 80)"/>
+              </svg>
+              <div class="res-center"><div class="res-pct">0%</div><div class="res-pl">On Target</div></div>
+            </div>
+            <div class="res-stats">
+              <div class="res-stat"><div class="rs-num green">0%</div><div class="rs-lbl">Within 24h SLA</div></div>
+              <div class="res-stat"><div class="rs-num red">0</div><div class="rs-lbl">Breached</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

@@ -3923,14 +3923,14 @@
 
     const bucketMs = cfg.days <= 7 ? 86400000
                    : (cfg.days * 86400000 / days);
-    const now = Date.now();
+    const now = DATA_NOW;
     const buckets = Array.from({ length: days }, () => ({ low: 0, medium: 0, high: 0 }));
     const labels = [];
 
     if (cfg.days <= 7) {
       // Day-of-week labels for last 7 days
       const dayNames = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
-      const today = new Date();
+      const today = new Date(DATA_NOW);
       for (let i = days - 1; i >= 0; i--) {
         const d = new Date(today);
         d.setDate(today.getDate() - i);

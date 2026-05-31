@@ -10,6 +10,36 @@
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script>
+  /* ════════════════════════════════════════════════════════════════
+   *  SAS VA DDC MESSAGING SHIM
+   *  Self-contained equivalent of util/messagingUtil.js so this file
+   *  drops into VA as a single .html with no sibling JS dependencies.
+   * ════════════════════════════════════════════════════════════════ */
+  (function () {
+    if (window.va && window.va.messagingUtil) return;
+    window.va = window.va || {};
+    var _cb = null;
+    window.va.messagingUtil = {
+      setOnDataReceivedCallback: function (fn) {
+        _cb = fn;
+        window.addEventListener('message', function (ev) {
+          if (ev && ev.data && typeof ev.data === 'object' && _cb) _cb(ev.data);
+        });
+      },
+      postMessage: function (msg) {
+        if (window.parent) window.parent.postMessage(msg, '*');
+      },
+      postSelectionMessage: function (resultName, rows) {
+        rows = (rows || []).map(function (r) { return (typeof r === 'object') ? r : { row: r }; });
+        this.postMessage({ resultName: resultName, selections: rows });
+      },
+      postInstructionalMessage: function (resultName, txt) {
+        this.postMessage({ resultName: resultName, message: txt });
+      }
+    };
+  })();
+</script>
+<script>
   // Apply saved theme inline before stylesheet renders — prevents flash
   (function() {
     try {
@@ -3661,30 +3691,84 @@
     });
   }
 
-  function loadData() {
-    return new Promise((resolve, reject) => {
-      Papa.parse('https://raedaldweik.github.io/reports/alerts.csv', {
-        download: true,
-        header: true,
-        dynamicTyping: false,
-        skipEmptyLines: true,
-        complete: (results) => {
-          ALL_ROWS = results.data.map(r => {
-            r._ts = new Date(r.timestamp).getTime();
-            r.resolution_hours = parseFloat(r.resolution_hours);
-            r.sla_target_hours = parseFloat(r.sla_target_hours);
-            r._search = (r.driver_name + ' ' + r.alert_type + ' ' + r.zone + ' ' + (r.driver_company || '')).toLowerCase();
-            return r;
-          }).filter(r => !isNaN(r._ts));
-          // Anchor date windows to the newest record in the dataset, so the
-          // dashboard stays static instead of emptying out as real time passes.
-          DATA_NOW = ALL_ROWS.reduce((mx, r) => r._ts > mx ? r._ts : mx, 0) || Date.now();
-          console.log(`Loaded ${ALL_ROWS.length} alerts`);
-          resolve();
-        },
-        error: (err) => { console.error('CSV load failed', err); reject(err); }
-      });
+  /* ════════════════════════════════════════════════════════════════
+   *  SAS VA DDC DATA HANDLER
+   *  Receives alerts via the DDC postMessage protocol and populates
+   *  ALL_ROWS with the exact shape the original CSV loader produced.
+   *  Every downstream consumer — recomputeAll, getUserRows, the peer
+   *  comparison, the donut, the activity feed — works without change.
+   *
+   *  The role assignment in VA can be in any order; columns are looked
+   *  up by name/label, so report authors don't have to memorize an
+   *  ordering. Required columns are listed in VA_REQUIRED_COLS.
+   * ════════════════════════════════════════════════════════════════ */
+  let _vaResultName = null;
+
+  const VA_REQUIRED_COLS = [
+    'timestamp', 'status', 'category', 'priority', 'zone',
+    'operator_id', 'alert_type', 'sla_met', 'sla_target_hours',
+    'resolution_hours', 'driver_name', 'driver_company', 'driver_id'
+  ];
+
+  // Robust date parser — handles JS Date objects, ISO 8601 strings, and
+  // the common SAS DATETIME20. format ("24MAY2026:15:50:00") that VA
+  // may serialize for datetime-typed columns.
+  function _parseVADate(v) {
+    if (v instanceof Date) return v.getTime();
+    if (v == null || v === '') return NaN;
+    if (typeof v === 'number') return v;
+    const s = String(v);
+    let t = new Date(s).getTime();
+    if (!isNaN(t)) return t;
+    const m = s.match(/^(\d{1,2})([A-Z]{3})(\d{4})(?::(\d{2}):(\d{2}):(\d{2}))?$/i);
+    if (m) {
+      const MO = { JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11 };
+      const mo = MO[m[2].toUpperCase()];
+      if (mo !== undefined) {
+        return new Date(+m[3], mo, +m[1], +(m[4]||0), +(m[5]||0), +(m[6]||0)).getTime();
+      }
+    }
+    return NaN;
+  }
+
+  function onVADataReceived(vaMsgObj) {
+    if (!vaMsgObj || !Array.isArray(vaMsgObj.data) || !Array.isArray(vaMsgObj.columns)) return;
+    _vaResultName = vaMsgObj.resultName;
+
+    // Case-insensitive name/label → column-index map
+    const idx = {};
+    vaMsgObj.columns.forEach((c, i) => {
+      if (c && c.name)  idx[String(c.name).toLowerCase()]  = i;
+      if (c && c.label) idx[String(c.label).toLowerCase()] = i;
     });
+
+    const missing = VA_REQUIRED_COLS.filter(k => !(k in idx));
+    if (missing.length) {
+      va.messagingUtil.postInstructionalMessage(
+        _vaResultName,
+        'My Performance Hub: please assign the following columns in the Roles tab — ' + missing.join(', ')
+      );
+      return;
+    }
+
+    // Translate VA's 2D data array into the original row-object shape
+    ALL_ROWS = vaMsgObj.data.map(row => {
+      const r = {};
+      VA_REQUIRED_COLS.forEach(k => { r[k] = row[idx[k]]; });
+      r._ts              = _parseVADate(r.timestamp);
+      r.resolution_hours = parseFloat(r.resolution_hours);
+      r.sla_target_hours = parseFloat(r.sla_target_hours);
+      r._search          = ((r.driver_name || '') + ' ' + (r.alert_type || '') + ' ' + (r.zone || '') + ' ' + (r.driver_company || '')).toLowerCase();
+      return r;
+    }).filter(r => !isNaN(r._ts));
+
+    // Anchor date windows to the newest record in the SAS VA dataset, so the
+    // dashboard stays static instead of emptying out as real time passes.
+    DATA_NOW = ALL_ROWS.reduce((mx, r) => r._ts > mx ? r._ts : mx, 0) || Date.now();
+
+    console.log(`DDC received ${ALL_ROWS.length} alerts from SAS VA`);
+
+    recomputeAll();
   }
 
   /* ════════════════════════════════════════════════════════════════
@@ -4128,19 +4212,15 @@
   /* ════════════════════════════════════════════════════════════════
    *  BOOT
    * ════════════════════════════════════════════════════════════════ */
-  document.addEventListener('DOMContentLoaded', async () => {
+  document.addEventListener('DOMContentLoaded', () => {
     initThemeToggle();
     initGlobalFilters();
     initUserSwitcher();
 
-    try {
-      await loadData();
-    } catch (err) {
-      console.error('Could not load alerts.csv', err);
-      return;
-    }
-
-    recomputeAll();
+    // Visual Analytics pushes data through the message protocol as soon
+    // as the report author assigns roles; that triggers the first render
+    // via onVADataReceived → recomputeAll.
+    va.messagingUtil.setOnDataReceivedCallback(onVADataReceived);
   });
 </script>
 </body>

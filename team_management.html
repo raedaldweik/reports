@@ -150,6 +150,11 @@
   .opc-wl { height: 6px; border-radius: 4px; background: #eef0f4; overflow: hidden; }
   .opc-wl span { display: block; height: 100%; border-radius: 4px; }
   .wl-green span { background: var(--green); } .wl-amber span { background: var(--amber); } .wl-red span { background: var(--red); }
+  /* draggable operator cards */
+  .opc { cursor: grab; transition: box-shadow .15s ease, transform .15s ease, opacity .15s ease; }
+  .opc:active { cursor: grabbing; }
+  .opc.dragging { opacity: .5; box-shadow: 0 10px 26px rgba(20,28,46,.18); }
+  .op-cards.is-dragging .opc:not(.dragging):hover { border-color: var(--blue); }
 
   /* bottom row */
   .r-bottom { grid-template-columns: 1fr 1.4fr 1.4fr; }
@@ -428,5 +433,60 @@
 
     </div>
   </div>
+
+  <script>
+    /* ─── Drag-and-drop reordering for the Active Operators cards ─── */
+    (function () {
+      const grid = document.querySelector('.op-cards');
+      if (!grid) return;
+
+      grid.querySelectorAll('.opc').forEach(card => { card.setAttribute('draggable', 'true'); });
+
+      let dragEl = null;
+
+      // Find the card the dragged item should be inserted *before*, based on
+      // pointer position in row-major (reading) order — works for the 2-col grid.
+      function cardAfterPointer(x, y) {
+        const cards = [...grid.querySelectorAll('.opc:not(.dragging)')];
+        return cards.find(el => {
+          const b = el.getBoundingClientRect();
+          const cx = b.left + b.width / 2;
+          const cy = b.top + b.height / 2;
+          return (y < cy - b.height / 2) || (y < cy + b.height / 2 && x < cx);
+        }) || null;
+      }
+
+      grid.addEventListener('dragstart', e => {
+        const card = e.target.closest('.opc');
+        if (!card) return;
+        dragEl = card;
+        card.classList.add('dragging');
+        grid.classList.add('is-dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        // Some browsers need data set for the drag to initiate.
+        try { e.dataTransfer.setData('text/plain', ''); } catch (_) {}
+      });
+
+      grid.addEventListener('dragend', () => {
+        if (dragEl) dragEl.classList.remove('dragging');
+        grid.classList.remove('is-dragging');
+        dragEl = null;
+      });
+
+      grid.addEventListener('dragover', e => {
+        if (!dragEl) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        const after = cardAfterPointer(e.clientX, e.clientY);
+        if (after == null) {
+          grid.appendChild(dragEl);
+        } else if (after !== dragEl) {
+          grid.insertBefore(dragEl, after);
+        }
+      });
+
+      grid.addEventListener('drop', e => e.preventDefault());
+    })();
+  </script>
 </body>
 </html>

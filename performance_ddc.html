@@ -2,7 +2,7 @@
 <html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
-<title>Performance Dashboard — Dark</title>
+<title>Performance Insights — Dark</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -2289,7 +2289,7 @@
       <img class="gov-logo gov-logo-dark" src="https://raedaldweik.github.io/reports/government.png" alt="Government of Dubai">
       <div class="title-block">
         <div class="title-row">
-          <h1 class="title">Performance Dashboard</h1>
+          <h1 class="title">Performance Insights</h1>
           <div class="red-line"></div>
         </div>
 
@@ -2968,6 +2968,9 @@
 
   // Global dataset — populated by onVADataReceived() from SAS VA
   let ALL_ROWS = [];
+  // Anchor "now" to the dataset's latest timestamp so date-window filters
+  // stay static relative to the data instead of sliding with the real clock.
+  let DATA_NOW = Date.now();
 
   // ─── Color palettes for chart series — DARK THEME (vibrant) ───
   const PALETTES = {
@@ -3000,7 +3003,7 @@
   function getFilteredRows() {
     if (!ALL_ROWS.length) return [];
     const cfg = PERIOD_CONFIG[FILTER_STATE.period] || PERIOD_CONFIG.week;
-    const now = Date.now();
+    const now = DATA_NOW;
     const minTime = now - cfg.days * 86400000;
 
     const q = (FILTER_STATE.search || '').toLowerCase();
@@ -3238,6 +3241,10 @@
       return r;
     }).filter(r => !isNaN(r._ts));
 
+    // Anchor date windows to the newest record in the SAS VA dataset, so the
+    // dashboard stays static instead of emptying out as real time passes.
+    DATA_NOW = ALL_ROWS.reduce((mx, r) => r._ts > mx ? r._ts : mx, 0) || Date.now();
+
     console.log(`DDC received ${ALL_ROWS.length} violations from SAS VA`);
 
     // Map init happens once; later data pushes (filter changes in VA,
@@ -3359,7 +3366,7 @@
         'circle-stroke-color': '#ffffff',
         'circle-stroke-width': 3,
         'circle-stroke-opacity': 1,
-        'circle-opacity': 1,
+        'circle-opacity': 0.55,
         'circle-emissive-strength': 1
       }
     });
@@ -3406,7 +3413,7 @@
         ],
         'circle-stroke-color': '#ffffff',
         'circle-stroke-width': 1.5,
-        'circle-opacity': 1,
+        'circle-opacity': 0.55,
         'circle-emissive-strength': 1
       }
     });

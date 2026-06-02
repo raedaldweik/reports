@@ -204,7 +204,11 @@
 
   /* Locations list */
   .locs { padding: 4px 8px 10px; }
-  .loc { display: flex; align-items: center; gap: 12px; padding: 12px; border-bottom: 1px solid #f1f2f5; }
+  .loc { display: flex; align-items: center; gap: 12px; padding: 12px; border-bottom: 1px solid #f1f2f5;
+    cursor: pointer; border-radius: 9px; transition: background .12s ease; }
+  .loc:hover { background: #f6f8fb; }
+  .loc.on { background: var(--blue-soft); }
+  .loc.dim { opacity: .42; }
   .loc:last-child { border-bottom: none; }
   .loc .rank { width: 22px; font-size: 13px; font-weight: 700; color: var(--muted); }
   .loc .lname { font-size: 13px; font-weight: 600; color: var(--ink-1); }
@@ -468,13 +472,14 @@
   })();
 
   /* ─── Filter state + helpers ─── */
-  const F = { severity: '', status: '', type: '', vehicle: '' };
+  const F = { severity: '', status: '', type: '', vehicle: '', location: '' };
   function filtered() {
     return ALL_ROWS.filter(r =>
       (!F.severity || r.severity === F.severity) &&
       (!F.status   || r.status === F.status) &&
       (!F.type     || r.type === F.type) &&
-      (!F.vehicle  || r.vehicle === F.vehicle)
+      (!F.vehicle  || r.vehicle === F.vehicle) &&
+      (!F.location || r.locName === F.location)
     );
   }
   function setFilter(key, val) {
@@ -665,9 +670,10 @@
     mount.innerHTML = '';
     ranked.slice(0, 5).forEach(([name, val], i) => {
       const div = document.createElement('div');
-      div.className = 'loc';
+      div.className = 'loc' + (F.location === name ? ' on' : (F.location ? ' dim' : ''));
       div.innerHTML = `<span class="rank">${i + 1}</span><div><div class="lname">${name}</div><div class="lsev">Major</div></div>
         <div class="lval"><div class="lnum">${fmt(val)}</div><div class="lunit">Incidents</div></div>`;
+      div.onclick = () => setFilter('location', name);
       mount.appendChild(div);
     });
     document.getElementById('locBadge').textContent = ranked.length + ' locations';
@@ -700,16 +706,11 @@
     document.getElementById('dLow').textContent = fmt(c.low);
   }
 
-  /* ─── Map ─── */
+  /* ─── Map (clustered, same approach as performance.html) ─── */
   let mapInstance = null, mapReady = false;
   function rowsToGeoJSON(rows) {
-    let pts = rows;
-    if (rows.length > 1500) { // sample for performance
-      const step = rows.length / 1500;
-      pts = []; for (let i = 0; i < rows.length; i += step) pts.push(rows[Math.floor(i)]);
-    }
-    return { type: 'FeatureCollection', features: pts.map(r => ({
-      type: 'Feature', properties: { c: SEV_COLOR[r.severity] },
+    return { type: 'FeatureCollection', features: rows.map(r => ({
+      type: 'Feature', properties: { severity: r.severity },
       geometry: { type: 'Point', coordinates: [r.lon, r.lat] }
     })) };
   }
@@ -723,15 +724,57 @@
     });
     mapInstance.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
     mapInstance.on('load', () => {
-      mapInstance.addSource('viol', { type: 'geojson', data: rowsToGeoJSON(filtered()) });
-      mapInstance.addLayer({
-        id: 'viol-dots', type: 'circle', source: 'viol',
-        paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 9, 3.5, 13, 6.5],
-          'circle-color': ['get', 'c'], 'circle-opacity': 0.78,
-          'circle-stroke-color': '#ffffff', 'circle-stroke-width': 1.2
+      mapInstance.addSource('viol', {
+        type: 'geojson',
+        data: rowsToGeoJSON(filtered()),
+        cluster: true,
+        clusterMaxZoom: 14,
+        clusterRadius: 55,
+        clusterProperties: {
+          high_count: ['+', ['case', ['==', ['get', 'severity'], 'high'], 1, 0]]
         }
       });
+
+      // Cluster bubbles — colour by share of high-severity alerts
+      mapInstance.addLayer({
+        id: 'clusters', type: 'circle', source: 'viol', filter: ['has', 'point_count'],
+        paint: {
+          'circle-color': ['step', ['/', ['get', 'high_count'], ['max', ['get', 'point_count'], 1]],
+            '#3e8ef7', 0.10, '#f5a524', 0.25, '#ed4956'],
+          'circle-radius': ['step', ['get', 'point_count'], 16, 50, 22, 150, 30, 400, 40],
+          'circle-stroke-color': '#ffffff', 'circle-stroke-width': 3, 'circle-opacity': 0.55
+        }
+      });
+      mapInstance.addLayer({
+        id: 'cluster-count', type: 'symbol', source: 'viol', filter: ['has', 'point_count'],
+        layout: {
+          'text-field': '{point_count_abbreviated}',
+          'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+          'text-size': ['step', ['get', 'point_count'], 12, 50, 13, 150, 14, 400, 16]
+        },
+        paint: { 'text-color': '#ffffff', 'text-halo-color': 'rgba(0,0,0,0.55)', 'text-halo-width': 1.4 }
+      });
+      mapInstance.addLayer({
+        id: 'unclustered-point', type: 'circle', source: 'viol', filter: ['!', ['has', 'point_count']],
+        paint: {
+          'circle-color': ['match', ['get', 'severity'], 'high', '#ed4956', 'medium', '#f5a524', 'low', '#3e8ef7', '#3e8ef7'],
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 4, 14, 6, 17, 9],
+          'circle-stroke-color': '#ffffff', 'circle-stroke-width': 1.4, 'circle-opacity': 0.55
+        }
+      });
+
+      // Click a cluster → zoom in to expand it
+      mapInstance.on('click', 'clusters', (e) => {
+        const feats = mapInstance.queryRenderedFeatures(e.point, { layers: ['clusters'] });
+        const id = feats[0].properties.cluster_id;
+        mapInstance.getSource('viol').getClusterExpansionZoom(id, (err, zoom) => {
+          if (err) return;
+          mapInstance.easeTo({ center: feats[0].geometry.coordinates, zoom });
+        });
+      });
+      mapInstance.on('mouseenter', 'clusters', () => mapInstance.getCanvas().style.cursor = 'pointer');
+      mapInstance.on('mouseleave', 'clusters', () => mapInstance.getCanvas().style.cursor = '');
+
       mapReady = true;
     });
   }
@@ -747,7 +790,8 @@
       severity: { key: 'Severity', val: v => v.charAt(0).toUpperCase() + v.slice(1) },
       status:   { key: 'Status',   val: v => v.charAt(0).toUpperCase() + v.slice(1) },
       type:     { key: 'Type',     val: v => v },
-      vehicle:  { key: 'Vehicle',  val: v => v }
+      vehicle:  { key: 'Vehicle',  val: v => v },
+      location: { key: 'Location', val: v => v.split(',')[0] }
     };
     let any = false;
     Object.keys(labels).forEach(k => {
@@ -762,7 +806,7 @@
     if (any) {
       const clr = document.createElement('span');
       clr.className = 'chip-clear'; clr.textContent = 'Clear all';
-      clr.onclick = () => { F.severity = F.status = F.type = F.vehicle = ''; syncControls(); renderAll(); };
+      clr.onclick = () => { F.severity = F.status = F.type = F.vehicle = F.location = ''; syncControls(); renderAll(); };
       mount.appendChild(clr);
     }
   }

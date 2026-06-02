@@ -60,7 +60,8 @@
     border-radius: var(--r); box-shadow: var(--shadow);
   }
   .grid { display: grid; gap: 16px; }
-  .grid.row { align-items: start; }
+  .grid.row { align-items: stretch; }
+  .grid.row > .card { display: flex; flex-direction: column; }
 
   /* KPI strip */
   .kpis { grid-template-columns: repeat(6, 1fr); margin-bottom: 16px; }
@@ -158,8 +159,8 @@
   .pager .pg.active { background: var(--blue); border-color: var(--blue); color: #fff; }
 
   /* Map */
-  .map-wrap { padding: 12px; }
-  .map-box { position: relative; height: 286px; border-radius: 11px; overflow: hidden; border: 1px solid var(--border); }
+  .map-wrap { padding: 12px; flex: 1; display: flex; }
+  .map-box { position: relative; flex: 1; min-height: 256px; border-radius: 11px; overflow: hidden; border: 1px solid var(--border); }
   .map-box .mapboxgl-map { border-radius: 11px; }
 
   /* Locations list */
@@ -376,8 +377,25 @@
     const tip = document.getElementById('violTip');
     const W = 660, H = 300;
     const x0 = 56, x1 = 636, yTop = 26, yBot = 250;
-    const yMax = 1000;
     const n = 12;
+
+    // Scale Y-axis to the data: find a "nice" rounded max with 5 gridline steps.
+    const dataMax = Math.max(
+      ...DASH.series.high, ...DASH.series.medium, ...DASH.series.low
+    );
+    function niceMax(v) {
+      if (v <= 0) return 100;
+      const steps = 5;
+      const rawStep = (v * 1.08) / steps; // ~8% headroom above the peak
+      const mag = Math.pow(10, Math.floor(Math.log10(rawStep)));
+      const norm = rawStep / mag;
+      const niceStep = (norm <= 1 ? 1 : norm <= 1.5 ? 1.5 : norm <= 2 ? 2
+                       : norm <= 2.5 ? 2.5 : norm <= 3 ? 3 : norm <= 4 ? 4
+                       : norm <= 5 ? 5 : 10) * mag;
+      return niceStep * steps;
+    }
+    const yMax = niceMax(dataMax);
+    const yStep = yMax / 5;
     const X = i => x0 + i * (x1 - x0) / (n - 1);
     const Y = v => yBot - (v / yMax) * (yBot - yTop);
 
@@ -403,7 +421,7 @@
     svg.appendChild(defs);
 
     // gridlines + y labels (integers, no decimals)
-    for (let v = 0; v <= yMax; v += 200) {
+    for (let v = 0; v <= yMax; v += yStep) {
       svg.appendChild(make('line', { x1: x0, y1: Y(v), x2: x1, y2: Y(v), stroke: '#eef0f4', 'stroke-width': 1 }));
       const t = make('text', { x: x0 - 10, y: Y(v) + 3.5, fill: '#aeb6c4', 'font-size': 10, 'font-family': 'Inter', 'text-anchor': 'end' });
       t.textContent = v;
@@ -519,18 +537,20 @@
     const map = new mapboxgl.Map({
       container: 'busmap',
       style: 'mapbox://styles/raeddweik/cmpjd3783006901s2d7hi5ttp',
-      center: [55.255, 25.155],
-      zoom: 9.7,
+      center: [55.315, 25.205],
+      zoom: 9.9,
       attributionControl: false
     });
     map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
 
-    // Scattered violation points around Dubai
+    // Scattered violation points across Dubai's urban area (kept inland —
+    // east of the coastline so none land in the Gulf).
     const seed = [
-      [55.27, 25.20], [55.33, 25.27], [55.18, 25.12], [55.38, 25.16], [55.30, 25.23],
-      [55.24, 25.18], [55.36, 25.30], [55.21, 25.10], [55.41, 25.20], [55.29, 25.14],
-      [55.26, 25.25], [55.34, 25.21], [55.19, 25.16], [55.31, 25.18], [55.23, 25.22],
-      [55.37, 25.25], [55.28, 25.28], [55.40, 25.13], [55.25, 25.07], [55.32, 25.12]
+      [55.275, 25.197], [55.330, 25.255], [55.300, 25.230], [55.345, 25.245],
+      [55.310, 25.210], [55.285, 25.185], [55.360, 25.270], [55.295, 25.165],
+      [55.380, 25.215], [55.320, 25.150], [55.270, 25.245], [55.335, 25.225],
+      [55.305, 25.175], [55.355, 25.200], [55.290, 25.255], [55.370, 25.235],
+      [55.315, 25.260], [55.340, 25.140], [55.260, 25.220], [55.350, 25.180]
     ];
     const colors = ['#ed4956', '#f5a524', '#3e8ef7'];
     const features = [];
@@ -539,7 +559,7 @@
         features.push({
           type: 'Feature',
           properties: { sev: colors[(i + j) % 3] },
-          geometry: { type: 'Point', coordinates: [p[0] + (Math.random() - .5) * .05, p[1] + (Math.random() - .5) * .05] }
+          geometry: { type: 'Point', coordinates: [p[0] + (Math.random() - .5) * .03, p[1] + (Math.random() - .5) * .03] }
         });
       }
     });

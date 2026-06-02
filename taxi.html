@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.js"></script>
 <style>
   :root {
     --bg: #f4f5f8;
@@ -38,35 +40,8 @@
   }
   .app { max-width: 1320px; margin: 0 auto; }
 
-  /* ─────────── TOP BAR ─────────── */
-  .topbar {
-    height: 60px;
-    background: var(--card);
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center;
-    padding: 0 26px;
-    gap: 20px;
-  }
-  .topbar .crumb { font-size: 14px; color: var(--ink-2); font-weight: 500; }
-  .topbar .search {
-    margin-left: auto;
-    width: 280px; height: 38px;
-    background: #f4f5f8; border: 1px solid var(--border);
-    border-radius: 10px;
-    display: flex; align-items: center; gap: 8px; padding: 0 13px;
-    color: var(--muted); font-size: 13.5px;
-  }
-  .topbar .search svg { width: 16px; height: 16px; stroke: var(--muted); }
-  .topbar .ico { width: 18px; height: 18px; stroke: #6b7488; fill: none; stroke-width: 1.8; }
-  .topbar .user { display: flex; align-items: center; gap: 9px; margin-left: 6px; }
-  .topbar .avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover;
-    background: linear-gradient(135deg,#9fb4d4,#6b82a8); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:13px; }
-  .topbar .uname { font-size: 13px; font-weight: 700; color: var(--ink-1); line-height: 1.2; }
-  .topbar .urole { font-size: 11.5px; color: var(--muted); }
-  .topbar .chev { width: 15px; height: 15px; stroke: var(--muted); }
-
   /* ─────────── PAGE ─────────── */
-  .page { padding: 24px 26px 40px; }
+  .page { padding: 26px 26px 40px; }
   .page-head { display: flex; align-items: flex-start; margin-bottom: 20px; }
   .page-title { font-size: 23px; font-weight: 800; letter-spacing: -.4px; }
   .page-sub { font-size: 13px; color: var(--muted); margin-top: 3px; }
@@ -85,6 +60,7 @@
     border-radius: var(--r); box-shadow: var(--shadow);
   }
   .grid { display: grid; gap: 16px; }
+  .grid.row { align-items: start; }
 
   /* KPI strip */
   .kpis { grid-template-columns: repeat(6, 1fr); margin-bottom: 16px; }
@@ -107,11 +83,16 @@
   .kpi.blue  .dot { background: var(--blue); }  .kpi.blue  .sev-num { color: var(--blue); }
 
   /* Panel header */
-  .ph { display: flex; align-items: flex-start; padding: 17px 19px 0; }
+  .ph { display: flex; align-items: center; padding: 17px 19px; }
+  .ph-tx { display: flex; flex-direction: column; }
   .ph-title { font-size: 15.5px; font-weight: 700; }
   .ph-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
   .ph-act { margin-left: auto; color: var(--faint); cursor: pointer; }
   .ph-act svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+  .ph-search { margin-left: auto; width: 210px; height: 34px; background: #f6f7f9;
+    border: 1px solid var(--border); border-radius: 9px; display: flex; align-items: center;
+    gap: 8px; padding: 0 12px; color: var(--muted); font-size: 13px; }
+  .ph-search svg { width: 15px; height: 15px; stroke: var(--muted); fill: none; stroke-width: 2; }
 
   /* row layouts */
   .row { margin-bottom: 16px; }
@@ -120,25 +101,26 @@
   .r-map   { grid-template-columns: 1.3fr 1fr 1fr; }
 
   /* Legend */
-  .legend { display: flex; gap: 16px; font-size: 11.5px; color: var(--muted); }
-  .legend span { display: flex; align-items: center; gap: 5px; }
-  .legend i { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+  .legend { display: flex; gap: 16px; font-size: 11.5px; color: var(--ink-2); }
+  .legend span { display: flex; align-items: center; gap: 6px; }
+  .legend i { width: 12px; height: 4px; border-radius: 2px; display: inline-block; }
 
   /* Area chart */
-  .chart-wrap { padding: 8px 14px 14px; position: relative; }
-  .chart-wrap svg { width: 100%; height: auto; display: block; }
-  .tip {
-    position: absolute; left: 22%; top: 22%;
+  .chart-wrap { padding: 6px 16px 16px; position: relative; }
+  .chart-wrap svg.chart { width: 100%; height: auto; display: block; }
+  .ttip {
+    position: absolute; pointer-events: none; opacity: 0;
     background: #fff; border: 1px solid var(--border); border-radius: 9px;
-    box-shadow: 0 6px 20px rgba(20,28,46,.12); padding: 9px 11px; font-size: 11px; min-width: 110px;
+    box-shadow: 0 6px 20px rgba(20,28,46,.14); padding: 9px 11px; font-size: 11px; min-width: 124px;
+    transition: opacity .12s ease; z-index: 5;
   }
-  .tip .tip-h { font-weight: 700; font-size: 11.5px; margin-bottom: 6px; color: var(--ink-1); }
-  .tip .tip-r { display: flex; align-items: center; gap: 6px; color: var(--ink-2); margin: 2px 0; }
-  .tip .tip-r i { width: 9px; height: 9px; border-radius: 2px; }
-  .tip .tip-r b { margin-left: auto; font-weight: 700; }
+  .ttip .tip-h { font-weight: 700; font-size: 11.5px; margin-bottom: 6px; color: var(--ink-1); }
+  .ttip .tip-r { display: flex; align-items: center; gap: 6px; color: var(--ink-2); margin: 3px 0; }
+  .ttip .tip-r i { width: 9px; height: 9px; border-radius: 2px; flex-shrink: 0; }
+  .ttip .tip-r b { margin-left: auto; font-weight: 700; color: var(--ink-1); }
 
   /* Horizontal volume bars */
-  .vbars { padding: 14px 19px 16px; }
+  .vbars { padding: 8px 19px 16px; }
   .vbar { margin: 13px 0; }
   .vbar-top { display: flex; justify-content: space-between; font-size: 12.5px; margin-bottom: 6px; }
   .vbar-top .vb-name { color: var(--ink-2); font-weight: 500; }
@@ -147,8 +129,8 @@
   .vbar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg,#5aa0f8,#3e8ef7); }
 
   /* Stacked vehicle bars */
-  .svbars { padding: 16px 19px; }
-  .svbar { display: grid; grid-template-columns: 48px 1fr 28px; align-items: center; gap: 12px; margin: 13px 0; }
+  .svbars { padding: 8px 19px 14px; }
+  .svbar { display: grid; grid-template-columns: 52px 1fr 28px; align-items: center; gap: 12px; margin: 14px 0; }
   .svbar .sv-lbl { font-size: 11px; color: var(--muted); font-weight: 600; line-height: 1.15; }
   .svbar .sv-track { height: 11px; background: #eef0f4; border-radius: 6px; overflow: hidden; display: flex; }
   .svbar .sv-track span { height: 100%; display: block; }
@@ -157,17 +139,17 @@
 
   /* Table */
   table { width: 100%; border-collapse: collapse; }
-  .tbl-wrap { padding: 6px 8px 12px; }
+  .tbl-wrap { padding: 0 8px 8px; }
   thead th { font-size: 10.5px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted);
     font-weight: 600; text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--border); }
-  tbody td { font-size: 12.5px; color: var(--ink-2); padding: 14px 12px; border-bottom: 1px solid #f1f2f5; }
+  tbody td { font-size: 12.5px; color: var(--ink-2); padding: 15px 12px; border-bottom: 1px solid #f1f2f5; }
   tbody tr:last-child td { border-bottom: none; }
   td .t-strong { color: var(--ink-1); font-weight: 600; }
   .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600;
     padding: 3px 9px; border-radius: 20px; background: var(--red-soft); color: var(--red); }
   .pill .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
   .tsub { color: var(--muted); font-size: 11px; }
-  .tfoot { display: flex; align-items: center; padding: 14px 20px; }
+  .tfoot { display: flex; align-items: center; padding: 14px 12px 8px; }
   .tfoot .info { font-size: 12px; color: var(--muted); }
   .pager { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 12px; }
   .pager button { border: 1px solid var(--border); background: #fff; border-radius: 7px; padding: 5px 11px;
@@ -177,16 +159,12 @@
 
   /* Map */
   .map-wrap { padding: 12px; }
-  .map-box { position: relative; height: 270px; border-radius: 11px; overflow: hidden; border: 1px solid var(--border); }
-  .map-box iframe { width: 100%; height: 100%; border: 0; filter: saturate(.92); }
-  .map-pin { position: absolute; width: 13px; height: 13px; border-radius: 50%; background: #f5722b;
-    border: 2.5px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.3); transform: translate(-50%,-50%); }
-  .map-shield { position: absolute; background: #2e7d32; color: #fff; font-size: 9px; font-weight: 700;
-    padding: 1px 5px; border-radius: 3px; transform: translate(-50%,-50%); box-shadow: 0 1px 3px rgba(0,0,0,.3); }
+  .map-box { position: relative; height: 286px; border-radius: 11px; overflow: hidden; border: 1px solid var(--border); }
+  .map-box .mapboxgl-map { border-radius: 11px; }
 
   /* Locations list */
-  .locs { padding: 6px 8px 10px; }
-  .loc { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-bottom: 1px solid #f1f2f5; }
+  .locs { padding: 4px 8px 10px; }
+  .loc { display: flex; align-items: center; gap: 12px; padding: 12px; border-bottom: 1px solid #f1f2f5; }
   .loc:last-child { border-bottom: none; }
   .loc .rank { width: 22px; font-size: 13px; font-weight: 700; color: var(--muted); }
   .loc .lname { font-size: 13px; font-weight: 600; color: var(--ink-1); }
@@ -196,40 +174,22 @@
   .loc .lunit { font-size: 9.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
   .loc-badge { font-size: 11px; color: var(--muted); }
 
-  /* Resolution donut */
-  .res { padding: 20px; display: flex; flex-direction: column; align-items: center; }
-  .res-donut { position: relative; width: 150px; height: 150px; }
+  /* Severity donut */
+  .res { padding: 16px 20px 22px; display: flex; flex-direction: column; align-items: center; }
+  .res-donut { position: relative; width: 158px; height: 158px; }
   .res-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-  .res-pct { font-size: 30px; font-weight: 800; color: var(--red); }
-  .res-pl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
-  .res-stats { display: flex; gap: 34px; margin-top: 20px; }
+  .res-total { font-size: 28px; font-weight: 800; color: var(--ink-1); letter-spacing: -.5px; }
+  .res-pl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-top: 2px; }
+  .res-stats { display: flex; gap: 22px; margin-top: 20px; }
   .res-stat { text-align: center; }
-  .res-stat .rs-num { font-size: 19px; font-weight: 800; }
-  .res-stat .rs-num.green { color: var(--green); }
-  .res-stat .rs-num.red { color: var(--red); }
-  .res-stat .rs-lbl { font-size: 10.5px; color: var(--muted); margin-top: 3px; }
+  .res-stat .rs-num { font-size: 18px; font-weight: 800; }
+  .res-stat .rs-num.red { color: var(--red); } .res-stat .rs-num.amber { color: var(--amber); } .res-stat .rs-num.blue { color: var(--blue); }
+  .res-stat .rs-lbl { font-size: 10.5px; color: var(--muted); margin-top: 3px; display: flex; align-items: center; gap: 5px; justify-content: center; }
+  .res-stat .rs-lbl i { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
 </style>
 </head>
 <body>
   <div class="app">
-
-    <!-- TOP BAR -->
-    <header class="topbar">
-      <span class="crumb">Alerts</span>
-      <div class="search">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-        Search...
-      </div>
-      <div class="user">
-        <div class="avatar">ME</div>
-        <div>
-          <div class="uname">Mana El Mansori</div>
-          <div class="urole">Supervisor</div>
-        </div>
-        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
-      </div>
-    </header>
-
     <div class="page">
 
       <!-- HEADING -->
@@ -260,7 +220,7 @@
           <div><div class="kpi-num">1,120</div><div class="kpi-lbl">Resolved Alerts</div></div>
         </div>
         <div class="card kpi sev red">
-          <div class="sev-top"><span class="dot"></span>SLA Breached</div>
+          <div class="sev-top"><span class="dot"></span>High Severity</div>
           <div class="sev-num">512</div>
         </div>
         <div class="card kpi sev amber">
@@ -268,7 +228,7 @@
           <div class="sev-num">1,260</div>
         </div>
         <div class="card kpi sev blue">
-          <div class="sev-top"><span class="dot"></span>Minor Severity</div>
+          <div class="sev-top"><span class="dot"></span>Low Severity</div>
           <div class="sev-num">78</div>
         </div>
       </div>
@@ -278,80 +238,32 @@
         <!-- Area chart -->
         <div class="card">
           <div class="ph">
-            <div><div class="ph-title">Violations Summary</div><div class="ph-sub">Top alert types by volume</div></div>
-            <div class="legend" style="margin-left:auto;margin-top:4px">
-              <span><i style="background:#3e8ef7"></i>Legend</span>
-              <span><i style="background:#f5a524"></i>Legend</span>
-              <span><i style="background:#ed4956"></i>Legend</span>
+            <div class="ph-tx"><div class="ph-title">Violations Summary</div><div class="ph-sub">Alert volume by severity over the year</div></div>
+            <div class="legend" style="margin-left:auto">
+              <span><i style="background:#ed4956"></i>High</span>
+              <span><i style="background:#f5a524"></i>Medium</span>
+              <span><i style="background:#3e8ef7"></i>Low</span>
             </div>
           </div>
           <div class="chart-wrap">
-            <svg viewBox="0 0 640 300" preserveAspectRatio="none">
-              <defs>
-                <linearGradient id="gA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f5a524" stop-opacity=".35"/><stop offset="1" stop-color="#f5a524" stop-opacity="0"/></linearGradient>
-                <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ed4956" stop-opacity=".28"/><stop offset="1" stop-color="#ed4956" stop-opacity="0"/></linearGradient>
-                <linearGradient id="gC" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3e8ef7" stop-opacity=".22"/><stop offset="1" stop-color="#3e8ef7" stop-opacity="0"/></linearGradient>
-              </defs>
-              <!-- gridlines -->
-              <g stroke="#eef0f4" stroke-width="1">
-                <line x1="40" y1="20"  x2="630" y2="20"/>
-                <line x1="40" y1="74"  x2="630" y2="74"/>
-                <line x1="40" y1="128" x2="630" y2="128"/>
-                <line x1="40" y1="182" x2="630" y2="182"/>
-                <line x1="40" y1="236" x2="630" y2="236"/>
-                <line x1="40" y1="262" x2="630" y2="262"/>
-              </g>
-              <!-- y labels -->
-              <g fill="#aeb6c4" font-size="10" font-family="Inter" text-anchor="end">
-                <text x="34" y="24">1000.00</text><text x="34" y="78">800.00</text>
-                <text x="34" y="132">600.00</text><text x="34" y="186">400.00</text>
-                <text x="34" y="240">200.00</text><text x="34" y="266">0</text>
-              </g>
-              <!-- x labels -->
-              <g fill="#aeb6c4" font-size="10" font-family="Inter" text-anchor="middle">
-                <text x="65" y="282">1</text><text x="116" y="282">2</text><text x="167" y="282">3</text>
-                <text x="218" y="282">4</text><text x="269" y="282">5</text><text x="320" y="282">6</text>
-                <text x="371" y="282">7</text><text x="422" y="282">8</text><text x="473" y="282">9</text>
-                <text x="524" y="282">10</text><text x="575" y="282">11</text><text x="620" y="282">12</text>
-                <text x="50" y="298" fill="#c2c8d4" text-anchor="start">Y-axis Label (Unit)</text>
-              </g>
-              <!-- area C (blue, lowest) -->
-              <path fill="url(#gC)" stroke="none" d="M65,210 C100,150 130,165 167,150 C200,138 235,175 269,158 C300,142 350,170 371,150 C420,128 460,165 473,150 C520,135 560,150 620,140 L620,262 L65,262 Z"/>
-              <path fill="none" stroke="#3e8ef7" stroke-width="2" d="M65,210 C100,150 130,165 167,150 C200,138 235,175 269,158 C300,142 350,170 371,150 C420,128 460,165 473,150 C520,135 560,150 620,140"/>
-              <!-- area B (red, middle) -->
-              <path fill="url(#gB)" stroke="none" d="M65,150 C100,95 135,110 167,128 C205,150 235,120 269,150 C305,182 345,130 371,150 C405,176 455,120 473,150 C515,205 560,150 620,165 L620,262 L65,262 Z"/>
-              <path fill="none" stroke="#ed4956" stroke-width="2" d="M65,150 C100,95 135,110 167,128 C205,150 235,120 269,150 C305,182 345,130 371,150 C405,176 455,120 473,150 C515,205 560,150 620,165"/>
-              <!-- area A (amber, top peaks) -->
-              <path fill="url(#gA)" stroke="none" d="M65,120 C100,40 135,55 167,90 C205,130 235,60 269,75 C305,90 345,45 371,80 C410,120 450,40 473,70 C520,108 560,60 620,55 L620,262 L65,262 Z"/>
-              <path fill="none" stroke="#f5a524" stroke-width="2" d="M65,120 C100,40 135,55 167,90 C205,130 235,60 269,75 C305,90 345,45 371,80 C410,120 450,40 473,70 C520,108 560,60 620,55"/>
-              <!-- marker line at x=4 -->
-              <line x1="218" y1="20" x2="218" y2="262" stroke="#cbd2dd" stroke-width="1" stroke-dasharray="3 3"/>
-              <circle cx="218" cy="75" r="3.5" fill="#f5a524"/>
-              <circle cx="218" cy="150" r="3.5" fill="#ed4956"/>
-              <circle cx="218" cy="158" r="3.5" fill="#3e8ef7"/>
-            </svg>
-            <div class="tip">
-              <div class="tip-h">2020/04</div>
-              <div class="tip-r"><i style="background:#f5a524"></i>Legend <b>980.00</b></div>
-              <div class="tip-r"><i style="background:#ed4956"></i>Legend <b>640.00</b></div>
-              <div class="tip-r"><i style="background:#3e8ef7"></i>Legend <b>390.00</b></div>
-            </div>
+            <svg class="chart" id="violChart" viewBox="0 0 660 300"></svg>
+            <div class="ttip" id="violTip"></div>
           </div>
         </div>
 
         <!-- Volume bars -->
         <div class="card">
           <div class="ph">
-            <div><div class="ph-title">Violations Summary</div><div class="ph-sub">Top alert types by volume</div></div>
+            <div class="ph-tx"><div class="ph-title">Violations Summary</div><div class="ph-sub">Top alert types by volume</div></div>
             <div class="ph-act"><svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg></div>
           </div>
           <div class="vbars">
-            <div class="vbar"><div class="vbar-top"><span class="vb-name">PTSM - Vehicle empty while Idling</span><span class="vb-val">568</span></div><div class="vbar-track"><div class="vbar-fill" style="width:47%"></div></div></div>
-            <div class="vbar"><div class="vbar-top"><span class="vb-name">PTSM - Black trip (Inside Dubai)</span><span class="vb-val">580</span></div><div class="vbar-track"><div class="vbar-fill" style="width:48%"></div></div></div>
-            <div class="vbar"><div class="vbar-top"><span class="vb-name">PTSM - Internal Cam Disconnection</span><span class="vb-val">120</span></div><div class="vbar-track"><div class="vbar-fill" style="width:13%"></div></div></div>
-            <div class="vbar"><div class="vbar-top"><span class="vb-name">PTSM - Eating &amp; Drinking</span><span class="vb-val">45</span></div><div class="vbar-track"><div class="vbar-fill" style="width:7%"></div></div></div>
-            <div class="vbar"><div class="vbar-top"><span class="vb-name">PTSM - Driver Sleeping (MNVR)</span><span class="vb-val">22</span></div><div class="vbar-track"><div class="vbar-fill" style="width:5%"></div></div></div>
-            <div class="vbar"><div class="vbar-top"><span class="vb-name">PTSM - Drive Opposite Direction</span><span class="vb-val">15</span></div><div class="vbar-track"><div class="vbar-fill" style="width:4%"></div></div></div>
+            <div class="vbar"><div class="vbar-top"><span class="vb-name">PTSM - Vehicle empty while Idling</span><span class="vb-val">568</span></div><div class="vbar-track"><div class="vbar-fill" style="width:98%"></div></div></div>
+            <div class="vbar"><div class="vbar-top"><span class="vb-name">PTSM - Black trip (Inside Dubai)</span><span class="vb-val">580</span></div><div class="vbar-track"><div class="vbar-fill" style="width:100%"></div></div></div>
+            <div class="vbar"><div class="vbar-top"><span class="vb-name">PTSM - Internal Cam Disconnection</span><span class="vb-val">120</span></div><div class="vbar-track"><div class="vbar-fill" style="width:21%"></div></div></div>
+            <div class="vbar"><div class="vbar-top"><span class="vb-name">PTSM - Eating &amp; Drinking</span><span class="vb-val">45</span></div><div class="vbar-track"><div class="vbar-fill" style="width:8%"></div></div></div>
+            <div class="vbar"><div class="vbar-top"><span class="vb-name">PTSM - Driver Sleeping (MNVR)</span><span class="vb-val">22</span></div><div class="vbar-track"><div class="vbar-fill" style="width:4%"></div></div></div>
+            <div class="vbar"><div class="vbar-top"><span class="vb-name">PTSM - Drive Opposite Direction</span><span class="vb-val">15</span></div><div class="vbar-track"><div class="vbar-fill" style="width:3%"></div></div></div>
           </div>
         </div>
       </div>
@@ -359,7 +271,7 @@
       <!-- VEHICLE VIOLATIONS + RECENT ALERTS -->
       <div class="grid row r-33-66">
         <div class="card">
-          <div class="ph"><div class="ph-title">Top Vehicle Violations</div><div class="ph-act" style="color:#ed4956">•••</div></div>
+          <div class="ph"><div class="ph-tx"><div class="ph-title">Top Vehicle Violations</div></div><div class="ph-act" style="color:#ed4956">•••</div></div>
           <div class="svbars">
             <div class="svbar"><div class="sv-lbl">TX 583</div><div class="sv-track"><span class="seg-red" style="width:46%"></span><span class="seg-amber" style="width:30%"></span><span class="seg-blue" style="width:24%"></span></div><div class="sv-val">28</div></div>
             <div class="svbar"><div class="sv-lbl">TX 349</div><div class="sv-track"><span class="seg-red" style="width:40%"></span><span class="seg-amber" style="width:28%"></span><span class="seg-blue" style="width:14%"></span></div><div class="sv-val">22</div></div>
@@ -372,9 +284,9 @@
 
         <div class="card">
           <div class="ph">
-            <div class="ph-title">Recent Alerts Incidents</div>
-            <div class="search" style="margin-left:auto;width:200px;margin-top:-2px">
-              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>Search...
+            <div class="ph-tx"><div class="ph-title">Recent Alerts Incidents</div></div>
+            <div class="ph-search">
+              <svg viewBox="0 0 24 24" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>Search...
             </div>
           </div>
           <div class="tbl-wrap">
@@ -386,6 +298,7 @@
                 <tr><td class="t-strong">Taxi - Distracted Driving Alert</td><td></td><td>TX1145</td><td><span class="pill"><span class="dot"></span>Major</span></td><td>002358512</td><td><div class="t-strong">09/09/25 09:43:48</div><div class="tsub">25.0860, 55.1513</div></td></tr>
                 <tr><td class="t-strong">Taxi - Black trip (Inside Dubai)</td><td></td><td>TX1145</td><td><span class="pill"><span class="dot"></span>Major</span></td><td>002358512</td><td><div class="t-strong">09/09/25 09:43:48</div><div class="tsub">25.0860, 55.1513</div></td></tr>
                 <tr><td class="t-strong">Taxi - Camera Disconnect Night</td><td></td><td>TX1145</td><td><span class="pill"><span class="dot"></span>Major</span></td><td>002358512</td><td><div class="t-strong">09/09/25 09:43:48</div><div class="tsub">25.0860, 55.1513</div></td></tr>
+                <tr><td class="t-strong">Taxi - Harsh Braking Event</td><td></td><td>TX1145</td><td><span class="pill"><span class="dot"></span>Major</span></td><td>002358512</td><td><div class="t-strong">09/09/25 09:41:02</div><div class="tsub">25.0860, 55.1513</div></td></tr>
               </tbody>
             </table>
             <div class="tfoot">
@@ -400,26 +313,17 @@
         </div>
       </div>
 
-      <!-- MAP + LOCATIONS + RESOLUTION -->
+      <!-- MAP + LOCATIONS + SEVERITY -->
       <div class="grid row r-map">
         <div class="card">
-          <div class="ph"><div class="ph-title">Violations Heatmap</div></div>
+          <div class="ph"><div class="ph-tx"><div class="ph-title">Violations Heatmap</div></div></div>
           <div class="map-wrap">
-            <div class="map-box">
-              <iframe loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=55.10%2C25.05%2C55.40%2C25.32&amp;layer=mapnik"></iframe>
-              <div class="map-pin" style="left:42%;top:55%"></div>
-              <div class="map-pin" style="left:46%;top:60%"></div>
-              <div class="map-pin" style="left:50%;top:52%"></div>
-              <div class="map-shield" style="left:30%;top:30%">D 75</div>
-              <div class="map-shield" style="left:60%;top:25%">E 11</div>
-              <div class="map-shield" style="left:70%;top:48%">E 44</div>
-              <div class="map-shield" style="left:38%;top:72%">D 63</div>
-            </div>
+            <div class="map-box"><div id="busmap" style="width:100%;height:100%"></div></div>
           </div>
         </div>
 
         <div class="card">
-          <div class="ph"><div class="ph-title">Top Alert Locations</div><span class="loc-badge" style="margin-left:auto;margin-top:4px">8 locations</span></div>
+          <div class="ph"><div class="ph-tx"><div class="ph-title">Top Alert Locations</div></div><span class="loc-badge" style="margin-left:auto">8 locations</span></div>
           <div class="locs">
             <div class="loc"><span class="rank">1</span><div><div class="lname">Sheikh Zayed Road, Dubai</div><div class="lsev">Major</div></div><div class="lval"><div class="lnum">475</div><div class="lunit">Incidents</div></div></div>
             <div class="loc"><span class="rank">2</span><div><div class="lname">Al Mizhar, Dubai, UAE</div><div class="lsev">Major</div></div><div class="lval"><div class="lnum">323</div><div class="lunit">Incidents</div></div></div>
@@ -430,19 +334,16 @@
         </div>
 
         <div class="card">
-          <div class="ph"><div class="ph-title">Resolution Performance</div></div>
+          <div class="ph"><div class="ph-tx"><div class="ph-title">Severity Breakdown</div></div></div>
           <div class="res">
             <div class="res-donut">
-              <svg viewBox="0 0 160 160" style="width:150px;height:150px">
-                <circle cx="80" cy="80" r="64" fill="none" stroke="#f3eaeb" stroke-width="18"/>
-                <circle cx="80" cy="80" r="64" fill="none" stroke="#ed4956" stroke-width="18" stroke-linecap="round"
-                        stroke-dasharray="396 402" stroke-dashoffset="0" transform="rotate(-90 80 80)"/>
-              </svg>
-              <div class="res-center"><div class="res-pct">0%</div><div class="res-pl">On Target</div></div>
+              <svg id="sevDonut" viewBox="0 0 160 160" style="width:158px;height:158px"></svg>
+              <div class="res-center"><div class="res-total" id="sevTotal">—</div><div class="res-pl">Total Alerts</div></div>
             </div>
             <div class="res-stats">
-              <div class="res-stat"><div class="rs-num green">0%</div><div class="rs-lbl">Within 24h SLA</div></div>
-              <div class="res-stat"><div class="rs-num red">0</div><div class="rs-lbl">Breached</div></div>
+              <div class="res-stat"><div class="rs-num red"   id="sevHigh">—</div><div class="rs-lbl"><i style="background:#ed4956"></i>High</div></div>
+              <div class="res-stat"><div class="rs-num amber" id="sevMed">—</div><div class="rs-lbl"><i style="background:#f5a524"></i>Medium</div></div>
+              <div class="res-stat"><div class="rs-num blue"  id="sevLow">—</div><div class="rs-lbl"><i style="background:#3e8ef7"></i>Low</div></div>
             </div>
           </div>
         </div>
@@ -450,5 +351,215 @@
 
     </div>
   </div>
+
+<script>
+  /* ════════════════════════════════════════════════════════════════
+   *  PER-CATEGORY CONFIG — drives the chart, donut, and map
+   * ════════════════════════════════════════════════════════════════ */
+  const DASH = {
+    category: 'Taxi',
+    severity: { high: 512, medium: 1260, low: 78 },
+    // Monthly alert volume by severity (Jan…Dec)
+    series: {
+      high:   [420,560,500,610,540,720,640,690,560,760,650,700],
+      medium: [820,980,900,1050,960,1180,1080,1140,1000,1240,1100,1180],
+      low:    [40,62,55,70,58,84,72,78,60,92,76,84]
+    }
+  };
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const MONTHS_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const SVGNS = 'http://www.w3.org/2000/svg';
+
+  /* ─────────── Interactive Violations Summary chart ─────────── */
+  (function renderChart() {
+    const svg = document.getElementById('violChart');
+    const tip = document.getElementById('violTip');
+    const W = 660, H = 300;
+    const x0 = 56, x1 = 636, yTop = 26, yBot = 250;
+    const yMax = 1000;
+    const n = 12;
+    const X = i => x0 + i * (x1 - x0) / (n - 1);
+    const Y = v => yBot - (v / yMax) * (yBot - yTop);
+
+    const make = (tag, attrs) => {
+      const el = document.createElementNS(SVGNS, tag);
+      for (const k in attrs) el.setAttribute(k, attrs[k]);
+      return el;
+    };
+
+    // gradients
+    const defs = make('defs', {});
+    const seriesDefs = [
+      { key: 'low',    color: '#3e8ef7', id: 'gLow' },
+      { key: 'medium', color: '#f5a524', id: 'gMed' },
+      { key: 'high',   color: '#ed4956', id: 'gHigh' }
+    ];
+    seriesDefs.forEach(s => {
+      const g = make('linearGradient', { id: s.id, x1: 0, y1: 0, x2: 0, y2: 1 });
+      g.appendChild(make('stop', { offset: '0', 'stop-color': s.color, 'stop-opacity': '.26' }));
+      g.appendChild(make('stop', { offset: '1', 'stop-color': s.color, 'stop-opacity': '0' }));
+      defs.appendChild(g);
+    });
+    svg.appendChild(defs);
+
+    // gridlines + y labels (integers, no decimals)
+    for (let v = 0; v <= yMax; v += 200) {
+      svg.appendChild(make('line', { x1: x0, y1: Y(v), x2: x1, y2: Y(v), stroke: '#eef0f4', 'stroke-width': 1 }));
+      const t = make('text', { x: x0 - 10, y: Y(v) + 3.5, fill: '#aeb6c4', 'font-size': 10, 'font-family': 'Inter', 'text-anchor': 'end' });
+      t.textContent = v;
+      svg.appendChild(t);
+    }
+    // x labels (months)
+    MONTHS.forEach((m, i) => {
+      const t = make('text', { x: X(i), y: yBot + 20, fill: '#8a93a6', 'font-size': 10, 'font-family': 'Inter', 'text-anchor': 'middle' });
+      t.textContent = m;
+      svg.appendChild(t);
+    });
+
+    // smooth path helper (Catmull-Rom → bezier)
+    function smooth(pts) {
+      if (pts.length < 2) return '';
+      let d = `M${pts[0].x},${pts[0].y}`;
+      for (let i = 0; i < pts.length - 1; i++) {
+        const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
+        const c1x = p1.x + (p2.x - p0.x) / 6, c1y = p1.y + (p2.y - p0.y) / 6;
+        const c2x = p2.x - (p3.x - p1.x) / 6, c2y = p2.y - (p3.y - p1.y) / 6;
+        d += ` C${c1x},${c1y} ${c2x},${c2y} ${p2.x},${p2.y}`;
+      }
+      return d;
+    }
+
+    [{ key: 'low', color: '#3e8ef7', grad: 'url(#gLow)' },
+     { key: 'medium', color: '#f5a524', grad: 'url(#gMed)' },
+     { key: 'high', color: '#ed4956', grad: 'url(#gHigh)' }].forEach(s => {
+      const pts = DASH.series[s.key].map((v, i) => ({ x: X(i), y: Y(v) }));
+      const line = smooth(pts);
+      svg.appendChild(make('path', { d: `${line} L${X(n - 1)},${yBot} L${X(0)},${yBot} Z`, fill: s.grad, stroke: 'none' }));
+      svg.appendChild(make('path', { d: line, fill: 'none', stroke: s.color, 'stroke-width': 2 }));
+    });
+
+    // interactive guide
+    const guide = make('line', { x1: 0, y1: yTop, x2: 0, y2: yBot, stroke: '#cbd2dd', 'stroke-width': 1, 'stroke-dasharray': '3 3', opacity: 0 });
+    svg.appendChild(guide);
+    const dots = ['high', 'medium', 'low'].map((k, idx) => {
+      const c = ['#ed4956', '#f5a524', '#3e8ef7'][idx];
+      const dot = make('circle', { r: 4, fill: c, stroke: '#fff', 'stroke-width': 1.5, opacity: 0 });
+      svg.appendChild(dot);
+      return dot;
+    });
+
+    function moveTo(i) {
+      const gx = X(i);
+      guide.setAttribute('x1', gx); guide.setAttribute('x2', gx); guide.setAttribute('opacity', 1);
+      const vals = ['high', 'medium', 'low'].map(k => DASH.series[k][i]);
+      dots.forEach((d, j) => {
+        const k = ['high', 'medium', 'low'][j];
+        d.setAttribute('cx', gx); d.setAttribute('cy', Y(DASH.series[k][i])); d.setAttribute('opacity', 1);
+      });
+      tip.innerHTML =
+        `<div class="tip-h">${MONTHS_FULL[i]}</div>
+         <div class="tip-r"><i style="background:#ed4956"></i>High <b>${vals[0].toLocaleString()}</b></div>
+         <div class="tip-r"><i style="background:#f5a524"></i>Medium <b>${vals[1].toLocaleString()}</b></div>
+         <div class="tip-r"><i style="background:#3e8ef7"></i>Low <b>${vals[2].toLocaleString()}</b></div>`;
+      const rect = svg.getBoundingClientRect();
+      const leftPx = svg.offsetLeft + (gx / W) * rect.width;
+      const topPx = svg.offsetTop + (Y(Math.max(...vals)) / H) * rect.height;
+      let lx = leftPx + 14;
+      if (lx + 140 > svg.offsetLeft + rect.width) lx = leftPx - 154;
+      tip.style.left = lx + 'px';
+      tip.style.top = Math.max(topPx - 10, 4) + 'px';
+      tip.style.opacity = 1;
+    }
+
+    svg.addEventListener('mousemove', e => {
+      const rect = svg.getBoundingClientRect();
+      const sx = (e.clientX - rect.left) * W / rect.width;
+      let i = Math.round((sx - x0) / ((x1 - x0) / (n - 1)));
+      i = Math.max(0, Math.min(n - 1, i));
+      moveTo(i);
+    });
+    svg.addEventListener('mouseleave', () => {
+      guide.setAttribute('opacity', 0);
+      dots.forEach(d => d.setAttribute('opacity', 0));
+      tip.style.opacity = 0;
+    });
+    moveTo(5);
+  })();
+
+  /* ─────────── Severity donut ─────────── */
+  (function renderDonut() {
+    const svg = document.getElementById('sevDonut');
+    const s = DASH.severity;
+    const total = s.high + s.medium + s.low;
+    const cx = 80, cy = 80, r = 62, C = 2 * Math.PI * r;
+    const mk = (tag, a) => { const el = document.createElementNS(SVGNS, tag); for (const k in a) el.setAttribute(k, a[k]); return el; };
+    svg.appendChild(mk('circle', { cx, cy, r, fill: 'none', stroke: '#eef0f4', 'stroke-width': 16 }));
+    let offset = 0;
+    [['high', '#ed4956'], ['medium', '#f5a524'], ['low', '#3e8ef7']].forEach(([k, color]) => {
+      const frac = total ? s[k] / total : 0;
+      const len = frac * C;
+      const seg = mk('circle', {
+        cx, cy, r, fill: 'none', stroke: color, 'stroke-width': 16, 'stroke-linecap': 'butt',
+        'stroke-dasharray': `${Math.max(len - 2, 0)} ${C - Math.max(len - 2, 0)}`,
+        'stroke-dashoffset': -offset, transform: `rotate(-90 ${cx} ${cy})`
+      });
+      svg.appendChild(seg);
+      offset += len;
+    });
+    document.getElementById('sevTotal').textContent = total.toLocaleString();
+    document.getElementById('sevHigh').textContent = s.high.toLocaleString();
+    document.getElementById('sevMed').textContent = s.medium.toLocaleString();
+    document.getElementById('sevLow').textContent = s.low.toLocaleString();
+  })();
+
+  /* ─────────── Mapbox heatmap (dots) — same light style as performance.html ─────────── */
+  (function renderMap() {
+    if (!window.mapboxgl) return;
+    mapboxgl.accessToken = "pk.eyJ1IjoicmFlZGR3ZWlrIiwiYSI6ImNtMTZqZGtpeTBta2cydnM4NjBkenhsMG8ifQ.r3ufHWJMoGh_DCH3XDhDAg";
+    const map = new mapboxgl.Map({
+      container: 'busmap',
+      style: 'mapbox://styles/raeddweik/cmpjd3783006901s2d7hi5ttp',
+      center: [55.255, 25.155],
+      zoom: 9.7,
+      attributionControl: false
+    });
+    map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
+
+    // Scattered violation points around Dubai
+    const seed = [
+      [55.27, 25.20], [55.33, 25.27], [55.18, 25.12], [55.38, 25.16], [55.30, 25.23],
+      [55.24, 25.18], [55.36, 25.30], [55.21, 25.10], [55.41, 25.20], [55.29, 25.14],
+      [55.26, 25.25], [55.34, 25.21], [55.19, 25.16], [55.31, 25.18], [55.23, 25.22],
+      [55.37, 25.25], [55.28, 25.28], [55.40, 25.13], [55.25, 25.07], [55.32, 25.12]
+    ];
+    const colors = ['#ed4956', '#f5a524', '#3e8ef7'];
+    const features = [];
+    seed.forEach((p, i) => {
+      for (let j = 0; j < 3; j++) {
+        features.push({
+          type: 'Feature',
+          properties: { sev: colors[(i + j) % 3] },
+          geometry: { type: 'Point', coordinates: [p[0] + (Math.random() - .5) * .05, p[1] + (Math.random() - .5) * .05] }
+        });
+      }
+    });
+
+    map.on('load', () => {
+      map.addSource('viol', { type: 'geojson', data: { type: 'FeatureCollection', features } });
+      map.addLayer({
+        id: 'viol-dots',
+        type: 'circle',
+        source: 'viol',
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 9, 4, 13, 7],
+          'circle-color': ['get', 'sev'],
+          'circle-opacity': 0.78,
+          'circle-stroke-color': '#ffffff',
+          'circle-stroke-width': 1.4
+        }
+      });
+    });
+  })();
+</script>
 </body>
 </html>

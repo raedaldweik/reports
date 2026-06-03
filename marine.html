@@ -83,15 +83,16 @@
   .chip-clear:hover { color: var(--red); }
 
   /* ─────────── CARDS / GRID ─────────── */
-  .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); box-shadow: var(--shadow); }
+  .card { background: var(--card); border: 1px solid #C6D2E1; border-radius: var(--r); box-shadow: var(--shadow); }
   .grid { display: grid; gap: 16px; }
   .grid.row { align-items: stretch; }
   .grid.row > .card { display: flex; flex-direction: column; }
 
   /* KPI strip */
   .kpis { grid-template-columns: repeat(6, 1fr); margin-bottom: 16px; }
-  .kpi { padding: 16px 17px; display: flex; align-items: center; gap: 13px; min-height: 84px; }
-  .kpi-ico { width: 42px; height: 42px; border-radius: 11px; background: var(--blue-soft);
+  .kpi { padding: 16px 17px; display: flex; align-items: center; gap: 13px; min-height: 84px;
+    background: #F5F8FB; border-color: #ffffff; box-shadow: 0 4px 6px 5px rgba(73, 73, 73, 0.10); }
+  .kpi-ico { width: 42px; height: 42px; border-radius: 50%; background: var(--blue-soft);
     display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .kpi-ico svg { width: 21px; height: 21px; stroke: var(--blue); fill: none; stroke-width: 1.8; }
   .kpi-num { font-size: 25px; font-weight: 800; letter-spacing: -.5px; line-height: 1; }

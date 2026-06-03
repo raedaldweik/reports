@@ -91,7 +91,8 @@
   /* KPI strip */
   .kpis { grid-template-columns: repeat(6, 1fr); margin-bottom: 16px; }
   .kpi { padding: 16px 17px; display: flex; align-items: center; gap: 13px; min-height: 84px;
-    background: #F5F8FB; border-color: #ffffff; box-shadow: 0 4px 6px 5px rgba(73, 73, 73, 0.10); }
+    background: linear-gradient(105deg, #E7EFF8 0%, #F5F8FB 55%, #ffffff 100%);
+    border-color: #ffffff; box-shadow: 0 4px 6px 5px rgba(73, 73, 73, 0.10); }
   .kpi-ico { width: 42px; height: 42px; border-radius: 50%; background: var(--blue-soft);
     display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .kpi-ico svg { width: 21px; height: 21px; stroke: var(--blue); fill: none; stroke-width: 1.8; }
@@ -105,9 +106,9 @@
   .kpi.sev .sev-top { display: flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
   .kpi.sev .dot { width: 8px; height: 8px; border-radius: 50%; }
   .kpi.sev .sev-num { font-size: 25px; font-weight: 800; margin-top: 9px; letter-spacing: -.5px; }
-  .kpi.red   { background: var(--red-soft);   border-color: var(--red-bd);   color: var(--red); }
-  .kpi.amber { background: var(--amber-soft); border-color: var(--amber-bd); color: var(--amber); }
-  .kpi.blue  { background: var(--blue-soft);  border-color: var(--blue-bd);  color: var(--blue); }
+  .kpi.red   { background: linear-gradient(105deg, #F8D2D7 0%, #FDEEF0 55%, #ffffff 100%); border-color: var(--red-bd);   color: var(--red); }
+  .kpi.amber { background: linear-gradient(105deg, #FAE3BD 0%, #FFF7EA 55%, #ffffff 100%); border-color: var(--amber-bd); color: var(--amber); }
+  .kpi.blue  { background: linear-gradient(105deg, #CBE2FB 0%, #EEF5FE 55%, #ffffff 100%); border-color: var(--blue-bd);  color: var(--blue); }
   .kpi.red   .dot { background: var(--red); }   .kpi.red   .sev-num { color: var(--red); }   .kpi.red   .sev-top { color: var(--ink-2); }
   .kpi.amber .dot { background: var(--amber); } .kpi.amber .sev-num { color: var(--amber); } .kpi.amber .sev-top { color: var(--ink-2); }
   .kpi.blue  .dot { background: var(--blue); }  .kpi.blue  .sev-num { color: var(--blue); }  .kpi.blue  .sev-top { color: var(--ink-2); }

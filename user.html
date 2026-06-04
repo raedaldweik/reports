@@ -2984,19 +2984,13 @@
       <section class="panel panel-welcome">
         <div class="welcome-flex">
           <div class="welcome-id">
-            <div class="welcome-avatar" id="welcome-avatar">—</div>
+            <div class="welcome-avatar" id="welcome-avatar">OP</div>
             <div class="welcome-id-text">
               <div class="welcome-greeting">Welcome back,</div>
               <div class="welcome-name-row">
-                <div class="welcome-name" id="welcome-name">—</div>
-                <button class="user-switch-btn" id="user-switch-btn" title="Switch operator">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M6 9l6 -6l6 6"/><path d="M6 15l6 6l6 -6"/>
-                  </svg>
-                </button>
-                <div class="user-switch-menu" id="user-switch-menu"></div>
+                <div class="welcome-name" id="welcome-name">Operator</div>
               </div>
-              <div class="welcome-role" id="welcome-role">—</div>
+              <div class="welcome-role" id="welcome-role">RTA · Smart Monitoring Centre</div>
             </div>
           </div>
           <div class="welcome-kpis">
@@ -3605,10 +3599,9 @@
   // Anchor "now" to the dataset's latest timestamp so date-window filters
   // stay static relative to the data instead of sliding with the real clock.
   let DATA_NOW = Date.now();
-  // Default user: Ahmed Salem (top performer). Persists in localStorage.
-  let CURRENT_USER_ID = (() => {
-    try { return localStorage.getItem('rta-user-current') || 'OP001'; } catch (e) { return 'OP001'; }
-  })();
+  // Fixed operator — dashboard always shows Ahmed Salem's underlying data,
+  // but the identity is presented generically as "Operator" (no switching).
+  const CURRENT_USER_ID = 'OP001';
 
   const PALETTES = {
     closed:    ['#a8f5b8', '#6ddc8a', '#3a8e5a', '#1f5a36'],
@@ -3812,10 +3805,7 @@
     const op = OPERATOR_BY_ID[CURRENT_USER_ID];
     if (!op) return;
 
-    // Welcome panel
-    document.getElementById('welcome-avatar').textContent = op.initials;
-    document.getElementById('welcome-name').textContent = op.name;
-    document.getElementById('welcome-role').textContent = `${op.role} · ${op.team}`;
+    // Welcome panel — generic operator identity (data still driven by CURRENT_USER_ID)
 
     // KPIs
     const k = scaledKPIs();
@@ -3993,44 +3983,6 @@
   /* ════════════════════════════════════════════════════════════════
    *  USER SWITCHER MENU
    * ════════════════════════════════════════════════════════════════ */
-  function initUserSwitcher() {
-    const btn = document.getElementById('user-switch-btn');
-    const menu = document.getElementById('user-switch-menu');
-    if (!btn || !menu) return;
-
-    menu.innerHTML = OPERATORS.map(op => `
-      <div class="user-switch-item ${op.id === CURRENT_USER_ID ? 'active' : ''}" data-op-id="${op.id}">
-        <div class="user-switch-avatar">${op.initials}</div>
-        <div>
-          <div class="user-switch-name">${op.name}</div>
-          <div class="user-switch-team">${op.team}</div>
-        </div>
-      </div>
-    `).join('');
-
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      menu.classList.toggle('open');
-    });
-
-    menu.querySelectorAll('.user-switch-item').forEach(item => {
-      item.addEventListener('click', () => {
-        const opId = item.dataset.opId;
-        CURRENT_USER_ID = opId;
-        try { localStorage.setItem('rta-user-current', opId); } catch (e) {}
-        menu.classList.remove('open');
-        // Update active state
-        menu.querySelectorAll('.user-switch-item').forEach(i => i.classList.toggle('active', i.dataset.opId === opId));
-        recomputeAll();
-      });
-    });
-
-    // Close on outside click
-    document.addEventListener('click', (e) => {
-      if (!menu.contains(e.target) && e.target !== btn) menu.classList.remove('open');
-    });
-  }
-
   /* ════════════════════════════════════════════════════════════════
    *  GLOBAL FILTERS
    * ════════════════════════════════════════════════════════════════ */
@@ -4131,7 +4083,6 @@
   document.addEventListener('DOMContentLoaded', async () => {
     initThemeToggle();
     initGlobalFilters();
-    initUserSwitcher();
 
     try {
       await loadData();

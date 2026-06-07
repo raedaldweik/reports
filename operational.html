@@ -3040,8 +3040,8 @@
             <path d="M3 17l6 -6l4 4l8 -8"/><path d="M14 7l7 0l0 7"/>
           </svg>
           <div class="fc-titles">
-            <div class="fc-title">Alert Volume Forecast — Next 24 Hours</div>
-            <div class="fc-sub">AI-predicted hourly load · 87% confidence</div>
+            <div class="fc-title">Alert Volume Forecast — Next 14 Days</div>
+            <div class="fc-sub">AI-predicted daily load · 87% confidence</div>
           </div>
           <button class="fc-close" id="close-forecast" aria-label="Close">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -3051,19 +3051,19 @@
           <div class="forecast-chart-wrap" id="forecast-chart-wrap"></div>
           <div class="forecast-insights">
             <div class="forecast-insight peak">
-              <div class="forecast-insight-lbl">Predicted Peak</div>
-              <div class="forecast-insight-val">17:00</div>
-              <div class="forecast-insight-sub">~196 alerts/hr · Taxi + Public Bus driving 71% of volume</div>
+              <div class="forecast-insight-lbl">Predicted Peak Day</div>
+              <div class="forecast-insight-val" id="fc-peak-val">—</div>
+              <div class="forecast-insight-sub" id="fc-peak-sub">—</div>
             </div>
             <div class="forecast-insight dip">
-              <div class="forecast-insight-lbl">Quiet Window</div>
-              <div class="forecast-insight-val">03:00 – 05:00</div>
-              <div class="forecast-insight-sub">~22 alerts/hr · Ideal time to schedule maintenance reviews</div>
+              <div class="forecast-insight-lbl">Quiet Days</div>
+              <div class="forecast-insight-val" id="fc-dip-val">—</div>
+              <div class="forecast-insight-sub" id="fc-dip-sub">—</div>
             </div>
             <div class="forecast-insight total">
-              <div class="forecast-insight-lbl">24h Total</div>
-              <div class="forecast-insight-val">2,840</div>
-              <div class="forecast-insight-sub">+9% vs yesterday · Staffing rec: +2 operators 16:00–19:00</div>
+              <div class="forecast-insight-lbl">14-Day Total</div>
+              <div class="forecast-insight-val" id="fc-total-val">—</div>
+              <div class="forecast-insight-sub" id="fc-total-sub">—</div>
             </div>
           </div>
         </div>
@@ -3078,7 +3078,7 @@
             <path d="M6 4v6a6 6 0 0 0 12 0v-6"/><path d="M6 20v-6a6 6 0 0 1 12 0v6"/><line x1="4" y1="4" x2="20" y2="4"/><line x1="4" y1="20" x2="20" y2="20"/>
           </svg>
           <div class="fc-titles">
-            <div class="fc-title">Workflow Bottleneck Analysis</div>
+            <div class="fc-title">Process Mining</div>
             <div class="fc-sub">Avg dwell time per stage · last 7 days</div>
           </div>
           <button class="fc-close" id="close-bottleneck" aria-label="Close">
@@ -4104,13 +4104,13 @@
               <path d="M3 17l6 -6l4 4l8 -8"/><path d="M14 7l7 0l0 7"/>
             </svg>
             <div class="ai-action-title">Alert Forecast</div>
-            <div class="ai-action-sub">Next 24 Hours</div>
+            <div class="ai-action-sub">Next 14 Days</div>
           </button>
           <button class="ai-action-card cyan" id="btn-bottleneck" type="button">
             <svg class="ai-action-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
               <path d="M6 4v6a6 6 0 0 0 12 0v-6"/><path d="M6 20v-6a6 6 0 0 1 12 0v6"/><line x1="4" y1="4" x2="20" y2="4"/><line x1="4" y1="20" x2="20" y2="20"/>
             </svg>
-            <div class="ai-action-title">Workflow Bottleneck</div>
+            <div class="ai-action-title">Process Mining</div>
             <div class="ai-action-sub">Stage Analysis</div>
           </button>
         </div>
@@ -4219,16 +4219,26 @@
   /* ════════════════════════════════════════════════════════════════
    *  AI ACTION MODALS — Alert Forecast + Workflow Bottleneck
    * ════════════════════════════════════════════════════════════════ */
+  const FC_DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const FC_MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const FORECAST_DATA = (() => {
-    const hours = [];
-    const now = new Date();
-    const startHour = now.getHours() + 1;
-    for (let i = 0; i < 24; i++) {
-      const h = (startHour + i) % 24;
-      const shape = 50 + 140 * Math.exp(-Math.pow((h - 17) / 5.2, 2)) + 28 * Math.exp(-Math.pow((h - 9) / 3.2, 2)) - 28 * Math.exp(-Math.pow((h - 4) / 2.4, 2));
-      hours.push({ hour: h, value: Math.max(15, Math.round(shape)) });
+    const days = [];
+    const today = new Date();
+    for (let i = 0; i < 14; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() + 1 + i);     // forecast starts tomorrow
+      const dow = d.getDay();
+      const weekend = (dow === 0 || dow === 6);
+      const factor = weekend ? 0.58 : (dow === 5 ? 0.86 : 1.0);   // weekly seasonality
+      const wave = 1 + 0.06 * Math.sin(i / 1.7);
+      const value = Math.max(400, Math.round(2300 * factor * wave + i * 22));
+      days.push({
+        value, weekend,
+        label: FC_DOW[dow] + ' ' + d.getDate(),
+        full: FC_DOW[dow] + ', ' + d.getDate() + ' ' + FC_MON[d.getMonth()]
+      });
     }
-    return hours;
+    return days;
   })();
 
   function renderForecastChart(mount) {
@@ -4343,10 +4353,10 @@
       <text x="${lblX + 40}" y="${peakY - 7}" text-anchor="middle" fill="${legendTextColor}" font-family="Manrope" font-size="11" font-weight="700">${values[peakIdx]} alerts</text>
     `);
 
-    // X axis labels
+    // X axis labels (by day)
     FORECAST_DATA.forEach((d, i) => {
-      if (i % 3 !== 0 && i !== n - 1) return;
-      svg.insertAdjacentHTML('beforeend', `<text x="${xs[i]}" y="${padT + chartH + 20}" text-anchor="middle" fill="${xLabelColor}" font-family="Manrope, sans-serif" font-size="11" font-weight="700" letter-spacing="0.08em">${String(d.hour).padStart(2, '0')}:00</text>`);
+      if (i % 2 !== 0 && i !== n - 1) return;
+      svg.insertAdjacentHTML('beforeend', `<text x="${xs[i]}" y="${padT + chartH + 20}" text-anchor="middle" fill="${xLabelColor}" font-family="Manrope, sans-serif" font-size="10.5" font-weight="700" letter-spacing="0.03em">${d.label}</text>`);
     });
 
     // Legend
@@ -4361,6 +4371,55 @@
 
     mount.innerHTML = '';
     mount.appendChild(svg);
+
+    /* ── interactive hover — read any specific day ── */
+    const guide = document.createElementNS(svgNS, 'line');
+    guide.setAttribute('y1', padT); guide.setAttribute('y2', padT + chartH);
+    guide.setAttribute('stroke', isDark ? 'rgba(255,255,255,0.45)' : 'rgba(15,23,42,0.35)');
+    guide.setAttribute('stroke-width', '1'); guide.setAttribute('stroke-dasharray', '3 3'); guide.setAttribute('opacity', '0');
+    svg.appendChild(guide);
+    const hdot = document.createElementNS(svgNS, 'circle');
+    hdot.setAttribute('r', '5'); hdot.setAttribute('fill', '#fff');
+    hdot.setAttribute('stroke', '#f08585'); hdot.setAttribute('stroke-width', '2.2'); hdot.setAttribute('opacity', '0');
+    svg.appendChild(hdot);
+
+    const tip = document.createElement('div');
+    tip.style.cssText = 'position:absolute;pointer-events:none;opacity:0;transition:opacity .1s ease;transform:translate(-50%,-100%);'
+      + 'background:' + (isDark ? 'rgba(8,24,48,0.96)' : '#ffffff') + ';border:1px solid ' + (isDark ? 'rgba(255,255,255,0.16)' : 'rgba(15,23,42,0.10)') + ';'
+      + 'border-radius:9px;box-shadow:0 8px 22px rgba(0,0,0,0.20);padding:8px 11px;z-index:5;white-space:nowrap;font-family:Manrope,sans-serif;';
+    mount.appendChild(tip);
+
+    svg.style.cursor = 'crosshair';
+    svg.addEventListener('mousemove', (e) => {
+      const rect = svg.getBoundingClientRect();
+      const vbX = (e.clientX - rect.left) / rect.width * VB.w;
+      let i = Math.round((vbX - padL) / chartW * (n - 1));
+      i = Math.max(0, Math.min(n - 1, i));
+      const gx = xs[i], gy = yOf(values[i]);
+      guide.setAttribute('x1', gx); guide.setAttribute('x2', gx); guide.setAttribute('opacity', '1');
+      hdot.setAttribute('cx', gx); hdot.setAttribute('cy', gy); hdot.setAttribute('opacity', '1');
+      tip.innerHTML = `<div style="font-size:11px;font-weight:700;color:${isDark ? '#fff' : '#0f172a'}">${FORECAST_DATA[i].full}</div>`
+        + `<div style="font-size:13px;font-weight:800;color:#f08585;margin-top:2px">${values[i].toLocaleString()} alerts</div>`
+        + `<div style="font-size:9.5px;color:${isDark ? 'rgba(255,255,255,0.6)' : 'rgba(15,23,42,0.5)'};margin-top:1px">range ${lower[i].toLocaleString()}–${upper[i].toLocaleString()}</div>`;
+      tip.style.left = (gx / VB.w * rect.width) + 'px';
+      tip.style.top = Math.max((gy / VB.h * rect.height) - 12, 4) + 'px';
+      tip.style.opacity = '1';
+    });
+    svg.addEventListener('mouseleave', () => {
+      guide.setAttribute('opacity', '0'); hdot.setAttribute('opacity', '0'); tip.style.opacity = '0';
+    });
+
+    /* ── insight cards (computed from the daily forecast) ── */
+    const total = values.reduce((a, b) => a + b, 0);
+    const wkEnd = FORECAST_DATA.filter(d => d.weekend);
+    const wkEndAvg = wkEnd.length ? Math.round(wkEnd.reduce((a, d) => a + d.value, 0) / wkEnd.length) : 0;
+    const setTxt = (id, t) => { const el = document.getElementById(id); if (el) el.textContent = t; };
+    setTxt('fc-peak-val', FORECAST_DATA[peakIdx].label);
+    setTxt('fc-peak-sub', `~${values[peakIdx].toLocaleString()} alerts · busiest day in the window`);
+    setTxt('fc-dip-val', 'Weekends');
+    setTxt('fc-dip-sub', `~${wkEndAvg.toLocaleString()} alerts/day · ideal for maintenance reviews`);
+    setTxt('fc-total-val', total.toLocaleString());
+    setTxt('fc-total-sub', `next 14 days · staffing rec: +2 operators on peak weekdays`);
   }
 
   const BOTTLENECK_STAGES = [

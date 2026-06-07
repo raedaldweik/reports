@@ -13,8 +13,7 @@
   // Apply saved theme inline before stylesheet renders — prevents flash
   (function() {
     try {
-      var t = localStorage.getItem('rta-staff-theme');
-      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+      /* theme always opens light — any cached preference is intentionally ignored */
     } catch (e) {}
   })();
 </script>
@@ -3861,10 +3860,10 @@
    * ════════════════════════════════════════════════════════════════ */
   const THEME_KEY = 'rta-staff-theme';
   function getStoredTheme() {
-    try { return localStorage.getItem(THEME_KEY) || 'light'; } catch (e) { return 'light'; }
+    return 'light';   // always open in light theme (preference is not cached)
   }
   function storeTheme(theme) {
-    try { localStorage.setItem(THEME_KEY, theme); } catch (e) {}
+    /* theme intentionally not persisted — dashboard always opens light */
   }
   function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);

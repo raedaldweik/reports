@@ -3,10 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hourly Rental</title>
+<title>Hourly Rental Overview</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.js"></script>
 <style>
   :root {
     --bg: #f4f5f8;
@@ -206,6 +208,9 @@
   .pager .pg.active { background: var(--blue); border-color: var(--blue); color: #fff; }
 
   /* Map */
+  .map-wrap { padding: 12px; flex: 1; display: flex; }
+  .map-box { position: relative; flex: 1; min-height: 256px; border-radius: 11px; overflow: hidden; border: 1px solid var(--border); }
+  .map-box .mapboxgl-map { border-radius: 11px; }
 
   /* Locations list */
   .locs { padding: 4px 8px 10px; }
@@ -236,43 +241,17 @@
   .res-stat .rs-num.red { color: var(--red); } .res-stat .rs-num.amber { color: var(--amber); } .res-stat .rs-num.blue { color: var(--blue); }
   .res-stat .rs-lbl { font-size: 10.5px; color: var(--muted); margin-top: 3px; display: flex; align-items: center; gap: 5px; justify-content: center; }
   .res-stat .rs-lbl i { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
-
-  /* ── hourly-specific ── */
-  .tabs { display: flex; gap: 26px; border-bottom: 1px solid var(--border); margin: 4px 0 18px; }
-  .tab { font-size: 14px; font-weight: 600; color: var(--muted); padding: 0 2px 12px; cursor: pointer; position: relative; }
-  .tab.active { color: var(--blue); }
-  .tab.active::after { content:''; position:absolute; left:0; right:0; bottom:-1px; height:2px; background:var(--blue); border-radius:2px; }
-  .kpi.clik { cursor:pointer; transition:transform .12s ease, box-shadow .12s ease; }
-  .kpi.clik:hover { transform:translateY(-2px); }
-  .kpi.clik.on { box-shadow:0 0 0 2px var(--blue) inset, 0 4px 6px 5px rgba(73,73,73,.10); }
-  .kpi.clik.dim { opacity:.5; }
-  .sd-legend { display:flex; flex-wrap:wrap; gap:9px 16px; justify-content:center; margin-top:18px; }
-  .sd-leg { display:flex; align-items:center; gap:7px; font-size:12px; color:var(--ink-2); cursor:pointer; }
-  .sd-leg i { width:9px; height:9px; border-radius:50%; }
-  .sd-leg b { font-weight:700; }
-  .sd-leg.dim { opacity:.4; }
-  .ra { padding:4px 10px 12px; }
-  .ra-item { display:flex; align-items:flex-start; gap:10px; padding:13px 10px; border-bottom:1px solid #f1f2f5; cursor:pointer; border-radius:9px; transition:background .12s ease; }
-  .ra-item:hover { background:#f6f8fb; }
-  .ra-item:last-child { border-bottom:none; }
-  .ra-main { flex:1; min-width:0; }
-  .ra-id { font-size:10.5px; color:var(--blue); font-weight:600; letter-spacing:.02em; }
-  .ra-name { font-size:13px; font-weight:600; color:var(--ink-1); margin-top:2px; }
-  .ra-time { font-size:11px; color:var(--muted); margin-top:3px; }
-  .ra-sev { font-size:11px; font-weight:700; flex-shrink:0; }
-  .ra-sev.high { color:var(--red); } .ra-sev.medium { color:#c4820e; } .ra-sev.low { color:var(--blue); }
-  .vbar-fill.green { background:linear-gradient(90deg,#34d399,#22b573); }
 </style>
 </head>
 <body>
-
   <div class="app">
     <div class="page">
 
+      <!-- HEADING -->
       <div class="page-head">
         <div>
-          <div class="page-title">Hourly Rental</div>
-          <div class="page-sub" id="subline">— total alerts · — open</div>
+          <div class="page-title">Hourly Rental Overview</div>
+          <div class="page-sub">Overview of fleet alerts, violations, and resolution status.</div>
         </div>
       </div>
 
@@ -290,10 +269,10 @@
           <select id="fSeverity"><option value="">All Severities</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select>
         </div>
         <div class="filt"><span class="filt-lbl">Status</span>
-          <select id="fStatus"><option value="">All Statuses</option><option value="open">Open</option><option value="closed">Closed</option><option value="escalated">Escalated</option><option value="fined">Fined</option></select>
+          <select id="fStatus"><option value="">All Statuses</option><option value="new">New</option><option value="pending">Pending</option><option value="resolved">Resolved</option></select>
         </div>
-        <div class="filt"><span class="filt-lbl">Violation</span>
-          <select id="fType"><option value="">All Violations</option></select>
+        <div class="filt"><span class="filt-lbl">Alert Type</span>
+          <select id="fType"><option value="">All Types</option></select>
         </div>
         <div class="chips" id="chips"></div>
       </div>
@@ -302,362 +281,603 @@
       <div class="grid kpis">
         <div class="card kpi">
           <div class="kpi-ico"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
-          <div><div class="kpi-num" id="kTotal">—</div><div class="kpi-lbl">Total Alerts</div></div>
+          <div><div class="kpi-num" id="kNew">—</div><div class="kpi-lbl">New Alerts</div></div>
         </div>
-        <div class="card kpi clik" data-fk="status" data-fv="open">
-          <div class="kpi-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
-          <div><div class="kpi-num" id="kOpen">—</div><div class="kpi-lbl">Open Alerts</div></div>
+        <div class="card kpi">
+          <div class="kpi-ico"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
+          <div><div class="kpi-num" id="kPending">—</div><div class="kpi-lbl">Pending Alerts</div></div>
         </div>
-        <div class="card kpi clik" data-fk="severity" data-fv="high">
-          <div class="kpi-ico"><svg viewBox="0 0 24 24"><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17v.5"/></svg></div>
-          <div><div class="kpi-num" id="kHigh">—</div><div class="kpi-lbl">High Severity</div></div>
+        <div class="card kpi">
+          <div class="kpi-ico"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
+          <div><div class="kpi-num" id="kResolved">—</div><div class="kpi-lbl">Resolved Alerts</div></div>
         </div>
-        <div class="card kpi clik" data-fk="status" data-fv="fined">
-          <div class="kpi-ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg></div>
-          <div><div class="kpi-num" id="kFines">—</div><div class="kpi-lbl">Fines Issued</div></div>
+        <div class="card kpi sev red" data-sev="high">
+          <div class="sev-top"><span class="dot"></span>High Severity</div>
+          <div class="sev-num" id="kHigh">—</div>
         </div>
-        <div class="card kpi clik" data-fk="sla" data-fv="breached">
-          <div class="kpi-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16v.5"/></svg></div>
-          <div><div class="kpi-num" id="kSLA">—</div><div class="kpi-lbl">SLA Breached</div></div>
+        <div class="card kpi sev amber" data-sev="medium">
+          <div class="sev-top"><span class="dot"></span>Medium Severity</div>
+          <div class="sev-num" id="kMed">—</div>
         </div>
-        <div class="card kpi clik" data-fk="status" data-fv="closed">
-          <div class="kpi-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg></div>
-          <div><div class="kpi-num" id="kClosed">—</div><div class="kpi-lbl">Closed</div></div>
+        <div class="card kpi sev blue" data-sev="low">
+          <div class="sev-top"><span class="dot"></span>Low Severity</div>
+          <div class="sev-num" id="kLow">—</div>
         </div>
       </div>
 
-      <!-- TABS -->
-      <div class="tabs">
-        <div class="tab active">Overview</div>
-        <div class="tab">Fleet Utilisation</div>
-        <div class="tab">Licensing Compliance</div>
-      </div>
-
-      <!-- TREND + STATUS -->
+      <!-- VIOLATIONS SUMMARY ROW -->
       <div class="grid row r-60-40">
         <div class="card">
           <div class="ph">
-            <div class="ph-tx"><div class="ph-title">Alert Trend (14 days)</div><div class="ph-sub">Alerts by severity</div></div>
+            <div class="ph-tx"><div class="ph-title">Violations Summary</div><div class="ph-sub">Alert volume by severity over the year</div></div>
             <div class="legend" style="margin-left:auto">
               <span><i style="background:#ed4956"></i>High</span>
               <span><i style="background:#f5a524"></i>Medium</span>
               <span><i style="background:#3e8ef7"></i>Low</span>
             </div>
           </div>
-          <div class="chart-wrap"><svg class="chart" id="trendChart" viewBox="0 0 660 300"></svg><div class="ttip" id="trendTip"></div></div>
+          <div class="chart-wrap">
+            <svg class="chart" id="violChart" viewBox="0 0 660 300"></svg>
+            <div class="ttip" id="violTip"></div>
+          </div>
         </div>
+
         <div class="card">
-          <div class="ph"><div class="ph-tx"><div class="ph-title">By Status</div></div></div>
-          <div class="res">
-            <div class="res-donut">
-              <svg id="statusDonut" viewBox="0 0 160 160" style="width:158px;height:158px"></svg>
-              <div class="res-center"><div class="res-total" id="stTotal">—</div><div class="res-pl">Total</div></div>
+          <div class="ph">
+            <div class="ph-tx"><div class="ph-title">Violations Summary</div><div class="ph-sub">Top alert types by volume</div></div>
+            <div class="ph-act"><svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg></div>
+          </div>
+          <div class="vbars" id="volBars"></div>
+        </div>
+      </div>
+
+      <!-- VEHICLE VIOLATIONS + RECENT ALERTS -->
+      <div class="grid row r-33-66">
+        <div class="card">
+          <div class="ph"><div class="ph-tx"><div class="ph-title">Top Vehicle Violations</div></div><div class="ph-act" style="color:#ed4956">•••</div></div>
+          <div class="svbars" id="vehBars"></div>
+        </div>
+
+        <div class="card">
+          <div class="ph">
+            <div class="ph-tx"><div class="ph-title">Recent Alerts Incidents</div></div>
+            <div class="ph-search">
+              <svg viewBox="0 0 24 24" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>Search...
             </div>
-            <div class="sd-legend" id="stLegend"></div>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr>
+                <th>Alert Category &amp; Type</th><th>Duplication</th><th>Vehicle</th><th>Severity</th><th>Driver</th><th>Last Occurrence</th>
+              </tr></thead>
+              <tbody id="alertRows"></tbody>
+            </table>
+            <div class="tfoot">
+              <span class="info" id="tblInfo">—</span>
+              <div class="pager">
+                <button>Previous</button>
+                <button class="pg active">1</button><button class="pg">2</button><button class="pg">3</button>
+                <button>Next</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- TOP VIOLATIONS + RECENT -->
-      <div class="grid row r-60-40">
+      <!-- MAP + LOCATIONS + SEVERITY -->
+      <div class="grid row r-map">
         <div class="card">
-          <div class="ph"><div class="ph-tx"><div class="ph-title">Top Violations</div></div><div class="ph-act"><svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg></div></div>
-          <div class="vbars" id="topViol"></div>
+          <div class="ph"><div class="ph-tx"><div class="ph-title">Violations Heatmap</div></div></div>
+          <div class="map-wrap">
+            <div class="map-box"><div id="catmap" style="width:100%;height:100%"></div></div>
+          </div>
         </div>
+
         <div class="card">
-          <div class="ph"><div class="ph-tx"><div class="ph-title">Recent Alerts</div></div></div>
-          <div class="ra" id="recentList"></div>
+          <div class="ph"><div class="ph-tx"><div class="ph-title">Top Alert Locations</div></div><span class="loc-badge" id="locBadge" style="margin-left:auto">—</span></div>
+          <div class="locs" id="locList"></div>
+        </div>
+
+        <div class="card">
+          <div class="ph"><div class="ph-tx"><div class="ph-title">Severity Breakdown</div></div></div>
+          <div class="res">
+            <div class="res-donut">
+              <svg id="sevDonut" viewBox="0 0 160 160" style="width:158px;height:158px"></svg>
+              <div class="res-center"><div class="res-total" id="sevTotal">—</div><div class="res-pl">Total Alerts</div></div>
+            </div>
+            <div class="res-stats">
+              <div class="res-stat" data-sev="high"><div class="rs-num red" id="dHigh">—</div><div class="rs-lbl"><i style="background:#ed4956"></i>High</div></div>
+              <div class="res-stat" data-sev="medium"><div class="rs-num amber" id="dMed">—</div><div class="rs-lbl"><i style="background:#f5a524"></i>Medium</div></div>
+              <div class="res-stat" data-sev="low"><div class="rs-num blue" id="dLow">—</div><div class="rs-lbl"><i style="background:#3e8ef7"></i>Low</div></div>
+            </div>
+          </div>
         </div>
       </div>
-
 
     </div>
   </div>
 
 <script>
   /* ════════════════════════════════════════════════════════════════
-   *  CONFIG
+   *  CONFIG — the only per-category block (swapped for taxi/limo/marine)
    * ════════════════════════════════════════════════════════════════ */
   const CONFIG = {
     category: 'Hourly Rental',
-    total: 320,
-    sevWeights:    { high: 32, medium: 50, low: 18 },
-    statusWeights: { open: 60, closed: 14, escalated: 14, fined: 12 }
+    vehiclePrefix: 'HR',
+    total: 1100,
+    sevWeights:    { high: 26, medium: 60, low: 14 },
+    statusWeights: { new: 46, pending: 22, resolved: 32 }
   };
 
-  const VTYPES = ['Expired Permit','Route Deviation','Unauthorised Passenger','Phone Use While Driving',
-    'Running With No Meter','Passenger No Seatbelt','Capacity Exceeded','Schedule Deviation'];
-  const VTYPE_W = [22, 18, 16, 13, 11, 9, 7, 6];
-  const SEV_KEYS = ['high','medium','low'];
-  const SEV_COLOR = { high:'#ed4956', medium:'#f5a524', low:'#3e8ef7' };
-  const STATUS_KEYS = ['open','closed','escalated','fined'];
-  const STATUS_COLOR = { open:'#3e8ef7', closed:'#22b573', escalated:'#16b1c9', fined:'#8b5cf6' };
-  const STATUS_LABEL = { open:'Open', closed:'Closed', escalated:'Escalated', fined:'Fined' };
-  const LOCATIONS = [
-    { name:'Sheikh Zayed Road, Dubai', lon:55.272, lat:25.205, w:26 },
-    { name:'Al Mizhar, Dubai, UAE',    lon:55.425, lat:25.248, w:18 },
-    { name:'Academic City, Dubai, UAE',lon:55.482, lat:25.128, w:16 },
-    { name:'Ras Al Khor, Dubai, UAE',  lon:55.345, lat:25.182, w:14 },
-    { name:'Al Lisaili, Dubai, UAE',   lon:55.552, lat:24.962, w:11 },
-    { name:'Deira, Dubai, UAE',        lon:55.318, lat:25.271, w:9 },
-    { name:'Business Bay, Dubai, UAE', lon:55.268, lat:25.186, w:7 },
-    { name:'Bur Dubai, Dubai, UAE',    lon:55.297, lat:25.252, w:6 }
+  /* ─── Shared dimensions (identical across categories) ─── */
+  const TYPES = [
+    'Distracted Driving Alert', 'Black trip (Inside Dubai)', 'Vehicle empty while Idling',
+    'Internal Cam Disconnection', 'Camera Disconnect Night', 'Harsh Braking Event',
+    'Eating & Drinking', 'Driver Sleeping (MNVR)', 'Drive Opposite Direction'
   ];
-  const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const MONF = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const TYPE_W = [22, 20, 18, 12, 10, 9, 6, 4, 3];
+  const VEHICLE_SUFFIX = ['583','349','0661','644','0019','447','712','228','905','156'];
+  const VEHICLE_W = [30, 24, 20, 16, 13, 10, 8, 6, 5, 4];
+  // Dubai locations — all on land (east of the coastline)
+  const LOCATIONS = [
+    { name: 'Sheikh Zayed Road, Dubai', lon: 55.272, lat: 25.205, w: 26 },
+    { name: 'Al Mizhar, Dubai, UAE',    lon: 55.425, lat: 25.248, w: 18 },
+    { name: 'Academic City, Dubai, UAE',lon: 55.482, lat: 25.128, w: 16 },
+    { name: 'Ras Al Khor, Dubai, UAE',  lon: 55.345, lat: 25.182, w: 14 },
+    { name: 'Al Lisaili, Dubai, UAE',   lon: 55.552, lat: 24.962, w: 11 },
+    { name: 'Deira, Dubai, UAE',        lon: 55.318, lat: 25.271, w: 9 },
+    { name: 'Business Bay, Dubai, UAE', lon: 55.268, lat: 25.186, w: 7 },
+    { name: 'Bur Dubai, Dubai, UAE',    lon: 55.297, lat: 25.252, w: 6 }
+  ];
+  const MONTH_W = [82, 104, 96, 110, 100, 122, 112, 118, 104, 126, 114, 120];
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const MONTHS_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const SEV_COLOR = { high: '#ed4956', medium: '#f5a524', low: '#3e8ef7' };
   const SVGNS = 'http://www.w3.org/2000/svg';
 
-  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
-  function hashStr(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
-  const rng = mulberry32(hashStr(CONFIG.category));
-  function wpick(items, weights){const t=weights.reduce((s,w)=>s+w,0);let r=rng()*t;for(let i=0;i<items.length;i++){r-=weights[i];if(r<=0)return i;}return items.length-1;}
-  const fmt = (n) => n.toLocaleString();
-  const cap = (v) => v.charAt(0).toUpperCase() + v.slice(1);
-  const mk = (tag, a) => { const el=document.createElementNS(SVGNS,tag); for(const k in a) el.setAttribute(k,a[k]); return el; };
-
-  /* ─── 14-day window ─── */
-  const DAY_MS = 86400000;
-  const START = new Date(2026, 3, 28).getTime();          // 28 Apr 2026
-  const NOW   = new Date(2026, 4, 11, 15, 0, 0).getTime(); // 11 May 2026, 3pm
-  const NDAYS = 14;
-  const DAY_W = [60, 72, 66, 88, 108, 82, 70, 96, 80, 100, 86, 92, 78, 124];
-  const DAY_LABELS = [], DAY_FULL = [];
-  for (let i = 0; i < NDAYS; i++) {
-    const d = new Date(START + i * DAY_MS);
-    DAY_LABELS.push(d.getDate() + ' ' + MON[d.getMonth()]);
-    DAY_FULL.push(d.getDate() + ' ' + MONF[d.getMonth()] + ' 2026');
+  /* ─── Seeded RNG (deterministic per category) ─── */
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      let t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
   }
+  function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+  const rng = mulberry32(hashStr(CONFIG.category));
+  function wpick(items, weights) {
+    const tot = weights.reduce((s, w) => s + w, 0);
+    let r = rng() * tot;
+    for (let i = 0; i < items.length; i++) { r -= weights[i]; if (r <= 0) return i; }
+    return items.length - 1;
+  }
+  const pad = (n) => String(n).padStart(2, '0');
 
-  /* ─── dataset ─── */
+  /* ─── Generate the row-level dataset ─── */
+  const SEV_KEYS = ['high', 'medium', 'low'];
+  const STATUS_KEYS = ['new', 'pending', 'resolved'];
   const ALL_ROWS = [];
-  (function generate(){
-    const sevW = SEV_KEYS.map(k=>CONFIG.sevWeights[k]);
-    const stW  = STATUS_KEYS.map(k=>CONFIG.statusWeights[k]);
-    const locW = LOCATIONS.map(l=>l.w);
+  (function generate() {
+    const sevW = SEV_KEYS.map(k => CONFIG.sevWeights[k]);
+    const stW = STATUS_KEYS.map(k => CONFIG.statusWeights[k]);
+    const locW = LOCATIONS.map(l => l.w);
     for (let i = 0; i < CONFIG.total; i++) {
       const sev = SEV_KEYS[wpick(SEV_KEYS, sevW)];
       const status = STATUS_KEYS[wpick(STATUS_KEYS, stW)];
-      const type = VTYPES[wpick(VTYPES, VTYPE_W)];
-      const di = wpick(DAY_LABELS, DAY_W);
-      let ts = START + di * DAY_MS + Math.floor(rng() * DAY_MS);
-      if (ts > NOW) ts = NOW - Math.floor(rng() * 3600000);
-      const sla = rng() < 0.32 ? 'breached' : 'met';
-      const loc = LOCATIONS[wpick(LOCATIONS, locW)];
+      const type = TYPES[wpick(TYPES, TYPE_W)];
+      const vIdx = wpick(VEHICLE_SUFFIX, VEHICLE_W);
+      const vehicle = CONFIG.vehiclePrefix + ' ' + VEHICLE_SUFFIX[vIdx];
+      const li = wpick(LOCATIONS, locW);
+      const loc = LOCATIONS[li];
+      const month = wpick(MONTHS, MONTH_W);
+      const day = 1 + Math.floor(rng() * 28);
+      const hh = Math.floor(rng() * 24), mm = Math.floor(rng() * 60), ss = Math.floor(rng() * 60);
+      const ts = new Date(2025, month, day, hh, mm, ss).getTime();
       ALL_ROWS.push({
-        id: 'SMC-2026-' + String(601 + i).padStart(4,'0'),
-        severity: sev, status, type, sla, locName: loc.name,
-        lon: loc.lon + (rng()-.5)*.03, lat: loc.lat + (rng()-.5)*.03, ts
+        type, vehicle, severity: sev, status, locName: loc.name,
+        lon: loc.lon + (rng() - .5) * .03, lat: loc.lat + (rng() - .5) * .03,
+        driver: '00' + (10000000 + Math.floor(rng() * 89999999)),
+        ts,
+        time: `${pad(day)}/${pad(month + 1)}/25 ${pad(hh)}:${pad(mm)}:${pad(ss)}`
       });
     }
   })();
 
-  /* ─── filter state ─── */
-  const F = { severity:'', status:'', type:'', location:'', sla:'', month:'' };
-  function filtered(){
+  /* ─── Filter state + helpers ─── */
+  const F = { severity: '', status: '', type: '', vehicle: '', location: '', month: '' };
+  function filtered() {
     return ALL_ROWS.filter(r =>
       (!F.severity || r.severity === F.severity) &&
       (!F.status   || r.status === F.status) &&
       (!F.type     || r.type === F.type) &&
+      (!F.vehicle  || r.vehicle === F.vehicle) &&
       (!F.location || r.locName === F.location) &&
-      (!F.sla      || r.sla === F.sla) &&
       (F.month === '' || new Date(r.ts).getMonth() === F.month)
     );
   }
-  function setFilter(k, v){ F[k] = (F[k] === v) ? '' : v; syncControls(); renderAll(); }
-
-  function ago(ts){
-    const d = NOW - ts, m = Math.floor(d/60000);
-    if (m < 1) return 'less than a minute ago';
-    if (m < 60) return m + ' minute' + (m>1?'s':'') + ' ago';
-    const h = Math.floor(m/60); if (h < 24) return h + ' hour' + (h>1?'s':'') + ' ago';
-    const dd = Math.floor(h/24); return dd + ' day' + (dd>1?'s':'') + ' ago';
+  function setFilter(key, val) {
+    F[key] = (F[key] === val) ? '' : val;   // toggle
+    syncControls();
+    renderAll();
   }
 
-  /* populate Violation dropdown */
-  (function(){ const s=document.getElementById('fType'); VTYPES.forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;s.appendChild(o);}); })();
+  /* populate the Type dropdown */
+  (function () {
+    const sel = document.getElementById('fType');
+    TYPES.forEach(t => { const o = document.createElement('option'); o.value = t; o.textContent = t; sel.appendChild(o); });
+  })();
 
   /* ════════════════════════════════════════════════════════════════
    *  RENDERERS
    * ════════════════════════════════════════════════════════════════ */
-  function renderKPIs(rows){
-    const by = (k,v)=>rows.filter(r=>r[k]===v).length;
-    const total=rows.length, open=by('status','open'), high=by('severity','high'),
-          fined=by('status','fined'), sla=by('sla','breached'), closed=by('status','closed');
-    document.getElementById('kTotal').textContent=fmt(total);
-    document.getElementById('kOpen').textContent=fmt(open);
-    document.getElementById('kHigh').textContent=fmt(high);
-    document.getElementById('kFines').textContent=fmt(fined);
-    document.getElementById('kSLA').textContent=fmt(sla);
-    document.getElementById('kClosed').textContent=fmt(closed);
-    document.getElementById('subline').textContent=`${fmt(total)} total alerts · ${fmt(open)} open`;
-    document.querySelectorAll('.kpi.clik').forEach(el=>{
-      const fk=el.dataset.fk, fv=el.dataset.fv;
-      el.classList.toggle('on', F[fk]===fv);
-      el.classList.toggle('dim', F[fk]!=='' && F[fk]!==fv);
+  const mk = (tag, a) => { const el = document.createElementNS(SVGNS, tag); for (const k in a) el.setAttribute(k, a[k]); return el; };
+  const fmt = (n) => n.toLocaleString();
+
+  function renderKPIs(rows) {
+    const by = (k, v) => rows.filter(r => r[k] === v).length;
+    document.getElementById('kNew').textContent = fmt(by('status', 'new'));
+    document.getElementById('kPending').textContent = fmt(by('status', 'pending'));
+    document.getElementById('kResolved').textContent = fmt(by('status', 'resolved'));
+    document.getElementById('kHigh').textContent = fmt(by('severity', 'high'));
+    document.getElementById('kMed').textContent = fmt(by('severity', 'medium'));
+    document.getElementById('kLow').textContent = fmt(by('severity', 'low'));
+    document.querySelectorAll('.kpi.sev').forEach(el => {
+      const s = el.dataset.sev;
+      el.classList.toggle('on', F.severity === s);
+      el.classList.toggle('dim', F.severity && F.severity !== s);
     });
   }
 
-  function drawArea(svgId, tipId, series, labels, fullLabels){
-    const svg=document.getElementById(svgId), tip=document.getElementById(tipId);
-    svg.innerHTML='';
-    const W=660,H=300,x0=42,x1=640,yTop=26,yBot=250,n=labels.length;
-    const X=i=>x0+i*(x1-x0)/(n-1);
-    const dataMax=Math.max(1,...series.high,...series.medium,...series.low);
-    function niceMax(v){const steps=5,rs=(v*1.08)/steps,mag=Math.pow(10,Math.floor(Math.log10(rs))),nr=rs/mag;
-      const ns=(nr<=1?1:nr<=1.5?1.5:nr<=2?2:nr<=2.5?2.5:nr<=3?3:nr<=4?4:nr<=5?5:10)*mag;return Math.max(ns*steps,steps);}
-    const yMax=niceMax(dataMax), yStep=yMax/5, Y=v=>yBot-(v/yMax)*(yBot-yTop);
-    const defs=mk('defs',{});
-    [['low','gLow'],['medium','gMed'],['high','gHigh']].forEach(([k,id])=>{
-      const g=mk('linearGradient',{id,x1:0,y1:0,x2:0,y2:1});
-      g.appendChild(mk('stop',{offset:'0','stop-color':SEV_COLOR[k],'stop-opacity':'.26'}));
-      g.appendChild(mk('stop',{offset:'1','stop-color':SEV_COLOR[k],'stop-opacity':'0'}));
+  function renderChart(rows) {
+    const svg = document.getElementById('violChart');
+    const tip = document.getElementById('violTip');
+    svg.innerHTML = '';
+    const W = 660, H = 300, x0 = 56, x1 = 636, yTop = 26, yBot = 250, n = 12;
+    const X = i => x0 + i * (x1 - x0) / (n - 1);
+
+    const series = { high: Array(12).fill(0), medium: Array(12).fill(0), low: Array(12).fill(0) };
+    rows.forEach(r => { series[r.severity][new Date(r.ts).getMonth()]++; });
+
+    const dataMax = Math.max(1, ...series.high, ...series.medium, ...series.low);
+    function niceMax(v) {
+      const steps = 5, rawStep = (v * 1.08) / steps;
+      const mag = Math.pow(10, Math.floor(Math.log10(rawStep)));
+      const norm = rawStep / mag;
+      const ns = (norm <= 1 ? 1 : norm <= 1.5 ? 1.5 : norm <= 2 ? 2 : norm <= 2.5 ? 2.5
+                 : norm <= 3 ? 3 : norm <= 4 ? 4 : norm <= 5 ? 5 : 10) * mag;
+      return Math.max(ns * steps, steps);
+    }
+    const yMax = niceMax(dataMax), yStep = yMax / 5;
+    const Y = v => yBot - (v / yMax) * (yBot - yTop);
+
+    const defs = mk('defs', {});
+    [['low', 'gLow'], ['medium', 'gMed'], ['high', 'gHigh']].forEach(([k, id]) => {
+      const g = mk('linearGradient', { id, x1: 0, y1: 0, x2: 0, y2: 1 });
+      g.appendChild(mk('stop', { offset: '0', 'stop-color': SEV_COLOR[k], 'stop-opacity': '.26' }));
+      g.appendChild(mk('stop', { offset: '1', 'stop-color': SEV_COLOR[k], 'stop-opacity': '0' }));
       defs.appendChild(g);
     });
     svg.appendChild(defs);
-    for(let v=0;v<=yMax+0.5;v+=yStep){
-      svg.appendChild(mk('line',{x1:x0,y1:Y(v),x2:x1,y2:Y(v),stroke:'#eef0f4','stroke-width':1}));
-      const t=mk('text',{x:x0-8,y:Y(v)+3.5,fill:'#aeb6c4','font-size':10,'font-family':'Inter','text-anchor':'end'});
-      t.textContent=Math.round(v); svg.appendChild(t);
+
+    for (let v = 0; v <= yMax + 0.5; v += yStep) {
+      svg.appendChild(mk('line', { x1: x0, y1: Y(v), x2: x1, y2: Y(v), stroke: '#eef0f4', 'stroke-width': 1 }));
+      const t = mk('text', { x: x0 - 10, y: Y(v) + 3.5, fill: '#aeb6c4', 'font-size': 10, 'font-family': 'Inter', 'text-anchor': 'end' });
+      t.textContent = Math.round(v); svg.appendChild(t);
     }
-    labels.forEach((m,i)=>{ const t=mk('text',{x:X(i),y:yBot+20,fill:'#8a93a6','font-size':9,'font-family':'Inter','text-anchor':'middle'}); t.textContent=m; svg.appendChild(t); });
-    function smooth(pts){let d=`M${pts[0].x},${pts[0].y}`;for(let i=0;i<pts.length-1;i++){const p0=pts[i-1]||pts[i],p1=pts[i],p2=pts[i+1],p3=pts[i+2]||p2;d+=` C${p1.x+(p2.x-p0.x)/6},${p1.y+(p2.y-p0.y)/6} ${p2.x-(p3.x-p1.x)/6},${p2.y-(p3.y-p1.y)/6} ${p2.x},${p2.y}`;}return d;}
-    [['low','url(#gLow)'],['medium','url(#gMed)'],['high','url(#gHigh)']].forEach(([k,grad])=>{
-      const pts=series[k].map((v,i)=>({x:X(i),y:Y(v)})); const line=smooth(pts);
-      svg.appendChild(mk('path',{d:`${line} L${X(n-1)},${yBot} L${X(0)},${yBot} Z`,fill:grad,stroke:'none'}));
-      svg.appendChild(mk('path',{d:line,fill:'none',stroke:SEV_COLOR[k],'stroke-width':2}));
+    MONTHS.forEach((m, i) => {
+      const t = mk('text', { x: X(i), y: yBot + 20, fill: '#8a93a6', 'font-size': 10, 'font-family': 'Inter', 'text-anchor': 'middle' });
+      t.textContent = m; svg.appendChild(t);
     });
-    const guide=mk('line',{x1:0,y1:yTop,x2:0,y2:yBot,stroke:'#cbd2dd','stroke-width':1,'stroke-dasharray':'3 3',opacity:0});
+
+    function smooth(pts) {
+      let d = `M${pts[0].x},${pts[0].y}`;
+      for (let i = 0; i < pts.length - 1; i++) {
+        const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
+        d += ` C${p1.x + (p2.x - p0.x) / 6},${p1.y + (p2.y - p0.y) / 6} ${p2.x - (p3.x - p1.x) / 6},${p2.y - (p3.y - p1.y) / 6} ${p2.x},${p2.y}`;
+      }
+      return d;
+    }
+    [['low', 'url(#gLow)'], ['medium', 'url(#gMed)'], ['high', 'url(#gHigh)']].forEach(([k, grad]) => {
+      const pts = series[k].map((v, i) => ({ x: X(i), y: Y(v) }));
+      const line = smooth(pts);
+      svg.appendChild(mk('path', { d: `${line} L${X(n - 1)},${yBot} L${X(0)},${yBot} Z`, fill: grad, stroke: 'none' }));
+      svg.appendChild(mk('path', { d: line, fill: 'none', stroke: SEV_COLOR[k], 'stroke-width': 2 }));
+    });
+
+    const guide = mk('line', { x1: 0, y1: yTop, x2: 0, y2: yBot, stroke: '#cbd2dd', 'stroke-width': 1, 'stroke-dasharray': '3 3', opacity: 0 });
     svg.appendChild(guide);
-    const dots=SEV_KEYS.map(k=>{const d=mk('circle',{r:4,fill:SEV_COLOR[k],stroke:'#fff','stroke-width':1.5,opacity:0});svg.appendChild(d);return d;});
-    function moveTo(i){
-      const gx=X(i); guide.setAttribute('x1',gx); guide.setAttribute('x2',gx); guide.setAttribute('opacity',1);
-      const vals=SEV_KEYS.map(k=>series[k][i]);
-      dots.forEach((d,j)=>{d.setAttribute('cx',gx);d.setAttribute('cy',Y(series[SEV_KEYS[j]][i]));d.setAttribute('opacity',1);});
-      tip.innerHTML=`<div class="tip-h">${fullLabels[i]}</div>
-        <div class="tip-r"><i style="background:#ed4956"></i>High <b>${fmt(vals[0])}</b></div>
-        <div class="tip-r"><i style="background:#f5a524"></i>Medium <b>${fmt(vals[1])}</b></div>
-        <div class="tip-r"><i style="background:#3e8ef7"></i>Low <b>${fmt(vals[2])}</b></div>`;
-      const rect=svg.getBoundingClientRect();
-      const leftPx=svg.offsetLeft+(gx/W)*rect.width, topPx=svg.offsetTop+(Y(Math.max(...vals))/H)*rect.height;
-      let lx=leftPx+14; if(lx+140>svg.offsetLeft+rect.width) lx=leftPx-154;
-      tip.style.left=lx+'px'; tip.style.top=Math.max(topPx-10,4)+'px'; tip.style.opacity=1;
+    const dots = SEV_KEYS.map(k => { const d = mk('circle', { r: 4, fill: SEV_COLOR[k], stroke: '#fff', 'stroke-width': 1.5, opacity: 0 }); svg.appendChild(d); return d; });
+
+    function moveTo(i) {
+      const gx = X(i);
+      guide.setAttribute('x1', gx); guide.setAttribute('x2', gx); guide.setAttribute('opacity', 1);
+      const vals = SEV_KEYS.map(k => series[k][i]);
+      dots.forEach((d, j) => { d.setAttribute('cx', gx); d.setAttribute('cy', Y(series[SEV_KEYS[j]][i])); d.setAttribute('opacity', 1); });
+      tip.innerHTML = `<div class="tip-h">${MONTHS_FULL[i]}</div>
+         <div class="tip-r"><i style="background:#ed4956"></i>High <b>${fmt(vals[0])}</b></div>
+         <div class="tip-r"><i style="background:#f5a524"></i>Medium <b>${fmt(vals[1])}</b></div>
+         <div class="tip-r"><i style="background:#3e8ef7"></i>Low <b>${fmt(vals[2])}</b></div>`;
+      const rect = svg.getBoundingClientRect();
+      const leftPx = svg.offsetLeft + (gx / W) * rect.width;
+      const topPx = svg.offsetTop + (Y(Math.max(...vals)) / H) * rect.height;
+      let lx = leftPx + 14; if (lx + 140 > svg.offsetLeft + rect.width) lx = leftPx - 154;
+      tip.style.left = lx + 'px'; tip.style.top = Math.max(topPx - 10, 4) + 'px'; tip.style.opacity = 1;
     }
-    svg.onmousemove=e=>{const rect=svg.getBoundingClientRect();const sx=(e.clientX-rect.left)*W/rect.width;let i=Math.round((sx-x0)/((x1-x0)/(n-1)));moveTo(Math.max(0,Math.min(n-1,i)));};
-    svg.onmouseleave=()=>{guide.setAttribute('opacity',0);dots.forEach(d=>d.setAttribute('opacity',0));tip.style.opacity=0;};
-  }
-
-  function renderTrend(rows){
-    const series={high:Array(NDAYS).fill(0),medium:Array(NDAYS).fill(0),low:Array(NDAYS).fill(0)};
-    rows.forEach(r=>{const d=Math.floor((r.ts-START)/DAY_MS);if(d>=0&&d<NDAYS)series[r.severity][d]++;});
-    drawArea('trendChart','trendTip',series,DAY_LABELS,DAY_FULL);
-  }
-
-  function renderStatusDonut(rows){
-    const svg=document.getElementById('statusDonut'); svg.innerHTML='';
-    const c={}; STATUS_KEYS.forEach(k=>c[k]=0); rows.forEach(r=>c[r.status]++);
-    const total=STATUS_KEYS.reduce((s,k)=>s+c[k],0);
-    const cx=80,cy=80,r=62,C=2*Math.PI*r;
-    svg.appendChild(mk('circle',{cx,cy,r,fill:'none',stroke:'#eef0f4','stroke-width':16}));
-    let off=0;
-    STATUS_KEYS.forEach(k=>{
-      const frac=total?c[k]/total:0,len=frac*C;
-      const seg=mk('circle',{cx,cy,r,fill:'none',stroke:STATUS_COLOR[k],'stroke-width':16,
-        'stroke-dasharray':`${Math.max(len-2,0)} ${C-Math.max(len-2,0)}`,'stroke-dashoffset':-off,
-        transform:`rotate(-90 ${cx} ${cy})`,class:'seg',opacity:(F.status&&F.status!==k)?0.28:1});
-      seg.addEventListener('click',()=>setFilter('status',k)); svg.appendChild(seg); off+=len;
-    });
-    document.getElementById('stTotal').textContent=fmt(total);
-    const leg=document.getElementById('stLegend'); leg.innerHTML='';
-    STATUS_KEYS.forEach(k=>{
-      const d=document.createElement('div'); d.className='sd-leg'+((F.status&&F.status!==k)?' dim':'');
-      d.innerHTML=`<i style="background:${STATUS_COLOR[k]}"></i>${STATUS_LABEL[k]} <b>${fmt(c[k])}</b>`;
-      d.onclick=()=>setFilter('status',k); leg.appendChild(d);
-    });
-  }
-
-  function renderTopViol(rows){
-    const counts={}; VTYPES.forEach(t=>counts[t]=0); rows.forEach(r=>counts[r.type]++);
-    const ranked=VTYPES.map(t=>[t,counts[t]]).sort((a,b)=>b[1]-a[1]);
-    const max=Math.max(1,...ranked.map(r=>r[1]));
-    const m=document.getElementById('topViol'); m.innerHTML='';
-    ranked.forEach(([type,val])=>{
-      const div=document.createElement('div');
-      div.className='vbar'+(F.type===type?' on':(F.type?' dim':''));
-      div.innerHTML=`<div class="vbar-top"><span class="vb-name">${type}</span><span class="vb-val">${fmt(val)}</span></div><div class="vbar-track"><div class="vbar-fill green" style="width:${Math.max(val/max*100,2)}%"></div></div>`;
-      div.onclick=()=>setFilter('type',type); m.appendChild(div);
-    });
-  }
-
-  function renderRecent(rows){
-    const sorted=[...rows].sort((a,b)=>b.ts-a.ts).slice(0,6);
-    const m=document.getElementById('recentList'); m.innerHTML='';
-    if(!sorted.length){ m.innerHTML='<div class="empty" style="padding:24px 0;text-align:center;color:var(--muted);font-size:12.5px">No alerts match the current filters.</div>'; return; }
-    sorted.forEach(r=>{
-      const lab=cap(r.severity);
-      const div=document.createElement('div'); div.className='ra-item';
-      div.innerHTML=`<div class="ra-main"><div class="ra-id">${r.id}</div><div class="ra-name">${r.type}</div><div class="ra-time">${ago(r.ts)}</div></div><div class="ra-sev ${r.severity}">${lab}</div>`;
-      div.onclick=()=>setFilter('type',r.type); m.appendChild(div);
-    });
-  }
-
-
-  /* ─── chips + controls ─── */
-  function renderChips(){
-    const mount=document.getElementById('chips'); mount.innerHTML='';
-    const labels={
-      severity:{key:'Severity',val:v=>cap(v)},
-      status:{key:'Status',val:v=>STATUS_LABEL[v]||cap(v)},
-      type:{key:'Violation',val:v=>v},
-      location:{key:'Location',val:v=>v.split(',')[0]},
-      sla:{key:'SLA',val:v=>cap(v)},
-      month:{key:'Date',val:v=>MONF[v]+' 2026'}
+    svg.onmousemove = e => {
+      const rect = svg.getBoundingClientRect();
+      const sx = (e.clientX - rect.left) * W / rect.width;
+      let i = Math.round((sx - x0) / ((x1 - x0) / (n - 1)));
+      moveTo(Math.max(0, Math.min(n - 1, i)));
     };
-    let any=false;
-    Object.keys(labels).forEach(k=>{
-      if(F[k]===''||F[k]==null) return; any=true;
-      const chip=document.createElement('div'); chip.className='chip-f';
-      chip.innerHTML=`${labels[k].key}: ${labels[k].val(F[k])} <span class="x">✕</span>`;
-      chip.querySelector('.x').onclick=()=>{F[k]='';syncControls();renderAll();};
+    svg.onmouseleave = () => { guide.setAttribute('opacity', 0); dots.forEach(d => d.setAttribute('opacity', 0)); tip.style.opacity = 0; };
+  }
+
+  function renderVolBars(rows) {
+    const counts = {};
+    rows.forEach(r => { counts[r.type] = (counts[r.type] || 0) + 1; });
+    const ranked = TYPES.map(t => [t, counts[t] || 0]).sort((a, b) => b[1] - a[1]).slice(0, 6);
+    const max = Math.max(1, ...ranked.map(r => r[1]));
+    const mount = document.getElementById('volBars');
+    mount.innerHTML = '';
+    ranked.forEach(([type, val]) => {
+      const div = document.createElement('div');
+      div.className = 'vbar' + (F.type === type ? ' on' : (F.type ? ' dim' : ''));
+      div.innerHTML = `<div class="vbar-top"><span class="vb-name">PTSM - ${type}</span><span class="vb-val">${fmt(val)}</span></div>
+        <div class="vbar-track"><div class="vbar-fill" style="width:${Math.max(val / max * 100, 2)}%"></div></div>`;
+      div.onclick = () => setFilter('type', type);
+      mount.appendChild(div);
+    });
+  }
+
+  function renderVehBars(rows) {
+    const byVeh = {};
+    rows.forEach(r => {
+      byVeh[r.vehicle] = byVeh[r.vehicle] || { total: 0, high: 0, medium: 0, low: 0 };
+      byVeh[r.vehicle].total++; byVeh[r.vehicle][r.severity]++;
+    });
+    const ranked = Object.entries(byVeh).sort((a, b) => b[1].total - a[1].total).slice(0, 6);
+    const max = Math.max(1, ...ranked.map(r => r[1].total));
+    const mount = document.getElementById('vehBars');
+    mount.innerHTML = '';
+    ranked.forEach(([veh, d]) => {
+      const scale = d.total / max * 100;
+      const seg = (c, v) => v > 0 ? `<span class="${c}" style="width:${v / d.total * scale}%"></span>` : '';
+      const div = document.createElement('div');
+      div.className = 'svbar' + (F.vehicle === veh ? ' on' : (F.vehicle ? ' dim' : ''));
+      div.innerHTML = `<div class="sv-lbl">${veh}</div>
+        <div class="sv-track">${seg('seg-red', d.high)}${seg('seg-amber', d.medium)}${seg('seg-blue', d.low)}</div>
+        <div class="sv-val">${fmt(d.total)}</div>`;
+      div.onclick = () => setFilter('vehicle', veh);
+      mount.appendChild(div);
+    });
+  }
+
+  function renderTable(rows) {
+    const sorted = [...rows].sort((a, b) => b.ts - a.ts).slice(0, 4);
+    const tb = document.getElementById('alertRows');
+    tb.innerHTML = '';
+    if (!sorted.length) {
+      tb.innerHTML = '<tr><td colspan="6" class="empty">No alerts match the current filters.</td></tr>';
+    } else {
+      sorted.forEach(r => {
+        const tr = document.createElement('tr');
+        if (F.type === r.type) tr.className = 'on';
+        const sevLabel = r.severity === 'high' ? 'Major' : r.severity === 'medium' ? 'Moderate' : 'Minor';
+        tr.innerHTML = `<td class="t-strong">${CONFIG.category} - ${r.type}</td><td></td><td>${r.vehicle}</td>
+          <td><span class="pill ${r.severity}"><span class="dot"></span>${sevLabel}</span></td>
+          <td>${r.driver}</td>
+          <td><div class="t-strong">${r.time}</div><div class="tsub">${r.lat.toFixed(4)}, ${r.lon.toFixed(4)}</div></td>`;
+        tr.onclick = () => setFilter('type', r.type);
+        tb.appendChild(tr);
+      });
+    }
+    document.getElementById('tblInfo').textContent =
+      `Showing 1 to ${Math.min(4, rows.length)} of ${fmt(rows.length)} entries`;
+  }
+
+  function renderLocations(rows) {
+    const counts = {};
+    rows.forEach(r => { counts[r.locName] = (counts[r.locName] || 0) + 1; });
+    const ranked = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    const mount = document.getElementById('locList');
+    mount.innerHTML = '';
+    ranked.slice(0, 5).forEach(([name, val], i) => {
+      const div = document.createElement('div');
+      div.className = 'loc' + (F.location === name ? ' on' : (F.location ? ' dim' : ''));
+      div.innerHTML = `<span class="rank">${i + 1}</span><div><div class="lname">${name}</div><div class="lsev">Major</div></div>
+        <div class="lval"><div class="lnum">${fmt(val)}</div><div class="lunit">Incidents</div></div>`;
+      div.onclick = () => setFilter('location', name);
+      mount.appendChild(div);
+    });
+    document.getElementById('locBadge').textContent = ranked.length + ' locations';
+  }
+
+  function renderDonut(rows) {
+    const svg = document.getElementById('sevDonut');
+    svg.innerHTML = '';
+    const c = { high: 0, medium: 0, low: 0 };
+    rows.forEach(r => c[r.severity]++);
+    const total = c.high + c.medium + c.low;
+    const cx = 80, cy = 80, r = 62, C = 2 * Math.PI * r;
+    svg.appendChild(mk('circle', { cx, cy, r, fill: 'none', stroke: '#eef0f4', 'stroke-width': 16 }));
+    let offset = 0;
+    SEV_KEYS.forEach(k => {
+      const frac = total ? c[k] / total : 0, len = frac * C;
+      const seg = mk('circle', {
+        cx, cy, r, fill: 'none', stroke: SEV_COLOR[k], 'stroke-width': 16,
+        'stroke-dasharray': `${Math.max(len - 2, 0)} ${C - Math.max(len - 2, 0)}`,
+        'stroke-dashoffset': -offset, transform: `rotate(-90 ${cx} ${cy})`,
+        class: 'seg', opacity: (F.severity && F.severity !== k) ? 0.28 : 1
+      });
+      seg.addEventListener('click', () => setFilter('severity', k));
+      svg.appendChild(seg);
+      offset += len;
+    });
+    document.getElementById('sevTotal').textContent = fmt(total);
+    document.getElementById('dHigh').textContent = fmt(c.high);
+    document.getElementById('dMed').textContent = fmt(c.medium);
+    document.getElementById('dLow').textContent = fmt(c.low);
+  }
+
+  /* ─── Map (clustered, same approach as performance.html) ─── */
+  let mapInstance = null, mapReady = false;
+  function rowsToGeoJSON(rows) {
+    return { type: 'FeatureCollection', features: rows.map(r => ({
+      type: 'Feature', properties: { severity: r.severity },
+      geometry: { type: 'Point', coordinates: [r.lon, r.lat] }
+    })) };
+  }
+  function initMap() {
+    if (!window.mapboxgl) return;
+    mapboxgl.accessToken = "pk.eyJ1IjoicmFlZGR3ZWlrIiwiYSI6ImNtMTZqZGtpeTBta2cydnM4NjBkenhsMG8ifQ.r3ufHWJMoGh_DCH3XDhDAg";
+    mapInstance = new mapboxgl.Map({
+      container: 'catmap',
+      style: 'mapbox://styles/raeddweik/cmpjd3783006901s2d7hi5ttp',
+      center: [55.36, 25.16], zoom: 9.4, attributionControl: false
+    });
+    mapInstance.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
+    mapInstance.on('load', () => {
+      mapInstance.addSource('viol', {
+        type: 'geojson',
+        data: rowsToGeoJSON(filtered()),
+        cluster: true,
+        clusterMaxZoom: 14,
+        clusterRadius: 55,
+        clusterProperties: {
+          high_count: ['+', ['case', ['==', ['get', 'severity'], 'high'], 1, 0]]
+        }
+      });
+
+      // Cluster bubbles — colour by share of high-severity alerts
+      mapInstance.addLayer({
+        id: 'clusters', type: 'circle', source: 'viol', filter: ['has', 'point_count'],
+        paint: {
+          'circle-color': ['step', ['/', ['get', 'high_count'], ['max', ['get', 'point_count'], 1]],
+            '#3e8ef7', 0.10, '#f5a524', 0.25, '#ed4956'],
+          'circle-radius': ['step', ['get', 'point_count'], 16, 50, 22, 150, 30, 400, 40],
+          'circle-stroke-color': '#ffffff', 'circle-stroke-width': 3, 'circle-opacity': 0.55
+        }
+      });
+      mapInstance.addLayer({
+        id: 'cluster-count', type: 'symbol', source: 'viol', filter: ['has', 'point_count'],
+        layout: {
+          'text-field': '{point_count_abbreviated}',
+          'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+          'text-size': ['step', ['get', 'point_count'], 12, 50, 13, 150, 14, 400, 16]
+        },
+        paint: { 'text-color': '#ffffff', 'text-halo-color': 'rgba(0,0,0,0.55)', 'text-halo-width': 1.4 }
+      });
+      mapInstance.addLayer({
+        id: 'unclustered-point', type: 'circle', source: 'viol', filter: ['!', ['has', 'point_count']],
+        paint: {
+          'circle-color': ['match', ['get', 'severity'], 'high', '#ed4956', 'medium', '#f5a524', 'low', '#3e8ef7', '#3e8ef7'],
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 4, 14, 6, 17, 9],
+          'circle-stroke-color': '#ffffff', 'circle-stroke-width': 1.4, 'circle-opacity': 0.55
+        }
+      });
+
+      // Click a cluster → zoom in to expand it
+      mapInstance.on('click', 'clusters', (e) => {
+        const feats = mapInstance.queryRenderedFeatures(e.point, { layers: ['clusters'] });
+        const id = feats[0].properties.cluster_id;
+        mapInstance.getSource('viol').getClusterExpansionZoom(id, (err, zoom) => {
+          if (err) return;
+          mapInstance.easeTo({ center: feats[0].geometry.coordinates, zoom });
+        });
+      });
+      mapInstance.on('mouseenter', 'clusters', () => mapInstance.getCanvas().style.cursor = 'pointer');
+      mapInstance.on('mouseleave', 'clusters', () => mapInstance.getCanvas().style.cursor = '');
+
+      mapReady = true;
+    });
+  }
+  function renderMap(rows) {
+    if (mapReady && mapInstance.getSource('viol')) mapInstance.getSource('viol').setData(rowsToGeoJSON(rows));
+  }
+
+  /* ─── Active-filter chips ─── */
+  function renderChips() {
+    const mount = document.getElementById('chips');
+    mount.innerHTML = '';
+    const labels = {
+      severity: { key: 'Severity', val: v => v.charAt(0).toUpperCase() + v.slice(1) },
+      status:   { key: 'Status',   val: v => v.charAt(0).toUpperCase() + v.slice(1) },
+      type:     { key: 'Type',     val: v => v },
+      vehicle:  { key: 'Vehicle',  val: v => v },
+      location: { key: 'Location', val: v => v.split(',')[0] },
+      month:    { key: 'Date',     val: v => MONTHS_FULL[v] + ' 2025' }
+    };
+    let any = false;
+    Object.keys(labels).forEach(k => {
+      if (F[k] === '' || F[k] == null) return;
+      any = true;
+      const chip = document.createElement('div');
+      chip.className = 'chip-f';
+      chip.innerHTML = `${labels[k].key}: ${labels[k].val(F[k])} <span class="x">✕</span>`;
+      chip.querySelector('.x').onclick = () => { F[k] = ''; syncControls(); renderAll(); };
       mount.appendChild(chip);
     });
-    if(any){const clr=document.createElement('span');clr.className='chip-clear';clr.textContent='Clear all';
-      clr.onclick=()=>{F.severity=F.status=F.type=F.location=F.sla=F.month='';syncControls();renderAll();};mount.appendChild(clr);}
+    if (any) {
+      const clr = document.createElement('span');
+      clr.className = 'chip-clear'; clr.textContent = 'Clear all';
+      clr.onclick = () => { F.severity = F.status = F.type = F.vehicle = F.location = F.month = ''; syncControls(); renderAll(); };
+      mount.appendChild(clr);
+    }
   }
-  function syncControls(){
-    document.getElementById('fSeverity').value=F.severity;
-    document.getElementById('fStatus').value=F.status;
-    document.getElementById('fType').value=F.type;
-    document.getElementById('dateLbl').textContent=F.month===''?'Pick a date':MONF[F.month]+' 2026';
-  }
-
-  function renderAll(){
-    const rows=filtered();
-    renderKPIs(rows); renderTrend(rows); renderStatusDonut(rows);
-    renderTopViol(rows); renderRecent(rows); renderChips();
+  function syncControls() {
+    document.getElementById('fSeverity').value = F.severity;
+    document.getElementById('fStatus').value = F.status;
+    document.getElementById('fType').value = F.type;
+    document.getElementById('dateLbl').textContent = F.month === '' ? 'Pick a date' : MONTHS_FULL[F.month] + ' 2025';
   }
 
-  /* ─── wiring ─── */
-  document.getElementById('fSeverity').onchange=e=>{F.severity=e.target.value;renderAll();};
-  document.getElementById('fStatus').onchange=e=>{F.status=e.target.value;renderAll();};
-  document.getElementById('fType').onchange=e=>{F.type=e.target.value;renderAll();};
+  /* ─── Master render ─── */
+  function renderAll() {
+    const rows = filtered();
+    renderKPIs(rows);
+    renderChart(rows);
+    renderVolBars(rows);
+    renderVehBars(rows);
+    renderTable(rows);
+    renderLocations(rows);
+    renderDonut(rows);
+    renderMap(rows);
+    renderChips();
+  }
 
-  document.querySelectorAll('.kpi.clik').forEach(el=>{ el.onclick=()=>setFilter(el.dataset.fk, el.dataset.fv); });
+  /* ─── Wire up dropdowns ─── */
+  document.getElementById('fSeverity').onchange = e => { F.severity = e.target.value; renderAll(); };
+  document.getElementById('fStatus').onchange   = e => { F.status = e.target.value; renderAll(); };
+  document.getElementById('fType').onchange     = e => { F.type = e.target.value; renderAll(); };
 
-  document.querySelectorAll('.tab').forEach(t=>{ t.onclick=()=>{ document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active'); }; });
-
-  (function(){
-    const btn=document.getElementById('dateBtn'), pop=document.getElementById('datePop');
-    const months=[...new Set(ALL_ROWS.map(r=>new Date(r.ts).getMonth()))].sort((a,b)=>a-b);
-    const opts=[['','All dates']].concat(months.map(m=>[String(m),MONF[m]+' 2026']));
-    function build(){ pop.innerHTML=''; const cur=F.month===''?'':String(F.month);
-      opts.forEach(([v,txt])=>{const d=document.createElement('div');d.className='date-pop-item'+(v===cur?' on':'');d.textContent=txt;
-        d.onclick=(e)=>{e.stopPropagation();F.month=(v==='')?'':parseInt(v,10);pop.classList.remove('open');syncControls();renderAll();};pop.appendChild(d);}); }
-    btn.onclick=(e)=>{e.stopPropagation();build();pop.classList.toggle('open');};
-    document.addEventListener('click',(e)=>{if(!pop.contains(e.target)&&!btn.contains(e.target))pop.classList.remove('open');});
+  /* ─── Date (month) picker ─── */
+  (function () {
+    const btn = document.getElementById('dateBtn');
+    const pop = document.getElementById('datePop');
+    const opts = [['', 'All dates']].concat(MONTHS_FULL.map((m, i) => [String(i), m + ' 2025']));
+    function build() {
+      pop.innerHTML = '';
+      const cur = F.month === '' ? '' : String(F.month);
+      opts.forEach(([v, txt]) => {
+        const d = document.createElement('div');
+        d.className = 'date-pop-item' + (v === cur ? ' on' : '');
+        d.textContent = txt;
+        d.onclick = (e) => {
+          e.stopPropagation();
+          F.month = (v === '') ? '' : parseInt(v, 10);
+          pop.classList.remove('open');
+          syncControls(); renderAll();
+        };
+        pop.appendChild(d);
+      });
+    }
+    btn.onclick = (e) => { e.stopPropagation(); build(); pop.classList.toggle('open'); };
+    document.addEventListener('click', (e) => { if (!pop.contains(e.target) && !btn.contains(e.target)) pop.classList.remove('open'); });
   })();
 
+  initMap();
   renderAll();
 </script>
-
 </body>
 </html>

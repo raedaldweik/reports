@@ -1,29 +1,41 @@
 export default function Header() {
   return (
-    <header className="flex items-center justify-between px-6 py-3 shrink-0"
-      style={{ background: 'var(--nav-grad)', borderBottom: '2px solid rgba(185,28,44,0.5)' }}>
-      <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-lg flex items-center justify-center p-1"
-          style={{ background: 'rgba(255,255,255,0.92)' }}>
-          <img src="/logo.png" alt="RTA" className="w-full h-full object-contain"
-            onError={e => { e.target.style.display = 'none'; }} />
-        </div>
-        <div>
-          <div className="text-sm font-extrabold tracking-wide text-white">RTA Smart Monitoring Assistant</div>
-          <div className="text-[9.5px] font-bold tracking-[0.18em] uppercase" style={{ color: '#dc2626' }}>
-            Smart Monitoring · Agentic AI
-          </div>
-        </div>
+    <header className="grid items-center gap-5 px-7 pt-4 shrink-0"
+      style={{ gridTemplateColumns: 'auto 1fr auto' }}>
+
+      {/* Government of Dubai logo — left, like the dashboards */}
+      <img src="/gov.png" alt="Government of Dubai"
+        className="h-14 w-auto object-contain"
+        style={{ filter: 'drop-shadow(0 1px 2px rgba(15,23,42,0.08))' }}
+        onError={e => { e.target.style.display = 'none'; }} />
+
+      {/* Title + red line — the dashboards' title-row */}
+      <div className="flex items-center gap-5 min-w-0">
+        <h1 className="whitespace-nowrap shrink-0"
+          style={{ fontSize: '22px', fontWeight: 500, color: 'var(--text)', letterSpacing: '-0.01em' }}>
+          Smart Monitoring Assistant
+        </h1>
+        <div className="red-line" />
       </div>
-      <div className="flex items-center gap-2.5">
-        <div className="text-right">
-          <div className="text-[11.5px] font-semibold text-white">Mana El Mansori</div>
-          <div className="text-[9.5px]" style={{ color: 'rgba(255,255,255,0.55)' }}>RTA Smart Monitoring Centre</div>
+
+      {/* RTA logo + Manager chip — right */}
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+          style={{
+            background: 'linear-gradient(180deg, rgba(255,255,255,0.85), rgba(247,243,236,0.7))',
+            border: '1px solid rgba(15,23,42,0.10)',
+            boxShadow: '0 1px 2px rgba(15,23,42,0.06), inset 0 1px 0 rgba(255,255,255,0.9)',
+          }}>
+          <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white"
+            style={{ background: 'var(--gold-grad)' }}>
+            M
+          </div>
+          <span className="text-[11.5px] font-semibold" style={{ color: 'var(--text-md)' }}>Manager</span>
         </div>
-        <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[11px] font-bold text-white"
-          style={{ background: 'var(--gold-grad)' }}>
-          ME
-        </div>
+        <img src="/logo.png" alt="RTA"
+          className="h-11 w-auto object-contain"
+          style={{ filter: 'drop-shadow(0 1px 2px rgba(15,23,42,0.08))' }}
+          onError={e => { e.target.style.display = 'none'; }} />
       </div>
     </header>
   );

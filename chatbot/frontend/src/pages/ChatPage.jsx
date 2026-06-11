@@ -52,8 +52,8 @@ export default function ChatPage() {
 
       {/* Chat history panel (left) */}
       <div className="w-[260px] shrink-0 glass-card flex flex-col">
-        <div className="p-4 border-b border-[rgba(185,28,44,0.10)]">
-          <p className="text-[10px] font-bold tracking-widest uppercase" style={{ color: 'var(--gold)' }}>Recent conversations</p>
+        <div className="p-4 border-b border-[rgba(15,23,42,0.07)]">
+          <p className="panel-title">Recent conversations</p>
         </div>
         <div className="flex-1 overflow-y-auto p-2 space-y-1">
           {chats.map(chat => {
@@ -110,7 +110,7 @@ export default function ChatPage() {
             );
           })}
         </div>
-        <div className="p-3 border-t border-[rgba(185,28,44,0.10)]">
+        <div className="p-3 border-t border-[rgba(15,23,42,0.07)]">
           <button onClick={() => { createNewChat(); }}
             className="w-full py-2.5 rounded-lg text-xs font-bold transition-all"
             style={{ border: '2px dashed rgba(185,28,44,0.35)', color: 'var(--gold)', background: 'rgba(185,28,44,0.03)' }}>
@@ -124,7 +124,7 @@ export default function ChatPage() {
         <img src="/logo.png" alt="" className="chat-watermark" onError={e => e.target.style.display='none'} />
 
         {/* Header with title */}
-        <div className="flex items-center justify-between px-6 py-3 border-b border-[rgba(185,28,44,0.10)] relative z-[1]">
+        <div className="flex items-center justify-between px-6 py-3 border-b border-[rgba(15,23,42,0.07)] relative z-[1]">
           <div className="flex items-center gap-2">
             <span className="w-[3px] h-4 rounded" style={{ background: 'var(--gold-grad)' }} />
             <span className="text-sm font-bold" style={{ color: 'var(--text)' }}>{activeChat?.title || 'New conversation'}</span>
@@ -141,8 +141,9 @@ export default function ChatPage() {
               {/* Avatar */}
               {msg.role === 'user' ? (
                 <div className="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center text-xs font-bold"
+                  title="Manager"
                   style={{ background: 'rgba(185,28,44,0.12)', border: '1px solid rgba(185,28,44,0.28)', color: 'var(--gold-lo)' }}>
-                  ME
+                  M
                 </div>
               ) : (
                 <div className="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center p-1"
@@ -204,8 +205,8 @@ export default function ChatPage() {
 
         {/* Input bar */}
         <div className="px-5 pb-4 pt-2 relative z-[1]">
-          <div className="flex items-center gap-1.5 px-2 py-1 rounded-xl border border-[rgba(185,28,44,0.20)] transition-all focus-within:border-[var(--gold-hi)] focus-within:shadow-[0_0_0_3px_rgba(185,28,44,0.10)]"
-            style={{ background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(12px)' }}>
+          <div className="flex items-center gap-1.5 px-2 py-1 rounded-xl border border-[rgba(15,23,42,0.10)] transition-all focus-within:border-[var(--gold-hi)] focus-within:shadow-[0_0_0_3px_rgba(185,28,44,0.10)]"
+            style={{ background: 'var(--glass-strong)', backdropFilter: 'blur(12px)' }}>
 
             {/* Text input */}
             <textarea ref={inputRef} rows="1" value={input}

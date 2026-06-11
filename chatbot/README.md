@@ -40,6 +40,13 @@ npm install
 npm run dev                   # http://localhost:5173 (proxies /api to :8000)
 ```
 
+Port 8000 already taken? Run the backend on any other port and point the dev proxy at it:
+
+```bash
+uvicorn main:app --reload --port 8010              # backend
+VITE_API_PORT=8010 npm run dev                     # frontend
+```
+
 The backend looks for `alerts.csv` / `violations.csv` at the repo root; if they aren't found
 it falls back to the published copies at `https://raedaldweik.github.io/reports/`.
 

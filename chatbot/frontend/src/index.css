@@ -1,0 +1,163 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Variable NAMES mirror the Health assistant theme so the chat components are
+     interchangeable — VALUES are re-skinned to RTA Dubai red. */
+  --gold: #b91c2c;                 /* RTA red */
+  --gold-hi: #dc2626;              /* lighter red */
+  --gold-lo: #7f1d1d;              /* deep red */
+  --gold-grad: linear-gradient(135deg, #dc2626, #b91c2c, #7f1d1d);
+  --nav-grad: linear-gradient(135deg, #0a1628 0%, #1e293b 45%, #14202f 75%, #243447 100%);
+  --text: #0a1628;
+  --text-md: #1e293b;
+  --text-dim: #475569;
+  --text-faint: #94a3b8;
+  --green: #047857;
+  --green-bg: rgba(4,120,87,0.1);
+  --green-border: rgba(4,120,87,0.25);
+  --red: #b91c2c;
+  --red-bg: rgba(185,28,44,0.09);
+  --amber: #b45309;
+  --amber-bg: rgba(180,83,9,0.1);
+  --blue: #0e7490;
+  --teal: #0e7490;                 /* trace panel accent */
+
+  --glass: rgba(255,255,255,0.55);
+  --glass-border: rgba(185,28,44,0.14);
+  --glass-shadow: 0 4px 24px rgba(10,22,40,0.08), 0 1px 3px rgba(10,22,40,0.06);
+  --glass-shadow-lg: 0 8px 40px rgba(10,22,40,0.12), 0 2px 8px rgba(10,22,40,0.06);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: var(--text);
+  background: linear-gradient(145deg, #f7f3ec 0%, #efe7d8 35%, #e8edf3 70%, #f5f1e9 100%);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: rgba(185,28,44,0.04); }
+::-webkit-scrollbar-thumb { background: rgba(185,28,44,0.22); border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(185,28,44,0.35); }
+
+/* ═══ Glass Cards ═══ */
+.glass-card {
+  background: var(--glass);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  box-shadow: var(--glass-shadow);
+  position: relative;
+  overflow: hidden;
+}
+.glass-card::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+  background: var(--gold-grad); z-index: 2;
+}
+
+/* ═══ Chat Specific ═══ */
+.chat-watermark {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px; height: 300px;
+  object-fit: contain; opacity: 0.07;
+  pointer-events: none; z-index: 0;
+}
+
+.msg-bot-bubble {
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(185,28,44,0.14);
+  border-left: 3px solid var(--gold);
+  border-radius: 14px;
+  border-top-left-radius: 4px;
+  box-shadow: 0 2px 8px rgba(10,22,40,0.05);
+}
+
+.msg-user-bubble {
+  background: linear-gradient(135deg, rgba(185,28,44,0.10), rgba(185,28,44,0.04));
+  border: 1px solid rgba(185,28,44,0.15);
+  border-radius: 14px;
+  border-top-right-radius: 4px;
+}
+
+/* ═══ Suggestion chips ═══ */
+.suggestion-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 13px;
+  background: rgba(255,255,255,0.65);
+  border: 1px solid rgba(185,28,44,0.15);
+  border-radius: 999px;
+  font-size: 12px; font-weight: 500;
+  color: var(--gold);
+  cursor: pointer; transition: all 0.18s;
+}
+.suggestion-chip:hover {
+  background: var(--gold);
+  color: white;
+  border-color: var(--gold);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(185,28,44,0.25);
+}
+.suggestion-chip .chip-tag {
+  font-size: 9.5px; font-weight: 700; letter-spacing: 0.08em;
+  opacity: 0.6;
+}
+
+/* ═══ Reasoning trace ═══ */
+.trace-panel {
+  background: linear-gradient(135deg, rgba(14,116,144,0.04), rgba(14,116,144,0.02));
+  border: 1px solid rgba(14,116,144,0.18);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.trace-header {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 14px;
+  background: rgba(14,116,144,0.06);
+  border-bottom: 1px solid rgba(14,116,144,0.10);
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--teal); cursor: pointer;
+}
+.trace-step {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 7px 14px;
+  border-bottom: 1px solid rgba(14,116,144,0.06);
+  font-size: 11.5px;
+}
+.trace-step:last-child { border-bottom: none; }
+.trace-step-tool {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 10px; font-weight: 600;
+  color: var(--teal);
+  background: rgba(14,116,144,0.08);
+  padding: 1px 7px; border-radius: 4px;
+  white-space: nowrap;
+}
+
+/* ═══ Animations ═══ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up { animation: fadeUp 0.45s ease both; }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-up { animation: slideUp 0.35s ease both; }
+
+@keyframes pop {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.3; }
+  30% { transform: translateY(-7px); opacity: 1; }
+}

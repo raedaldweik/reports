@@ -3,330 +3,208 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>الخلفية السينمائية — شرطة دبي</title>
+<title>خلفية اللوحة — شرطة دبي</title>
 <style>
   /* ════════════════════════════════════════════════════════════════════
-   *  ✦  شرطة دبي · الخلفية السينمائية  ✦
-   *  Pure animated backdrop — no layout, no text. Everything else is
-   *  overlaid in SAS VA. WebGL aurora (domain-warped fbm) + light dust
-   *  + comets + ghost radar rings + cinematic grade (grain / vignette).
+   *  ✦  شرطة دبي · خلفية اللوحة الرئيسية  ✦
+   *  Sleek static backdrop for SAS VA overlay — dark emerald tech.
+   *  Near-black stage · soft green light · thin HUD rings behind centre
+   *  · fine contour lines. No animation, no JS, no external assets.
    * ════════════════════════════════════════════════════════════════════ */
+  :root {
+    --mint:      #2ee6a8;
+    --mint-soft: rgba(46, 230, 168, 0.55);
+  }
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { width: 100%; height: 100%; overflow: hidden; background: #030a06; }
+
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+
+  body {
+    /* base: near-black with deep emerald pooling, like the reference heroes */
+    background:
+      /* main light — soft emerald bloom upper centre-right */
+      radial-gradient(ellipse 52% 44% at 68% 22%, rgba(38, 190, 138, 0.16) 0%, transparent 65%),
+      /* counter light — lower left, dimmer, cooler */
+      radial-gradient(ellipse 46% 40% at 12% 88%, rgba(30, 150, 110, 0.12) 0%, transparent 62%),
+      /* centre stage glow — barely there, keeps overlaid objects lifted */
+      radial-gradient(ellipse 36% 32% at 50% 52%, rgba(40, 200, 145, 0.07) 0%, transparent 70%),
+      /* deep vertical grade */
+      linear-gradient(178deg, #071510 0%, #04100b 38%, #020a07 74%, #020805 100%);
+  }
 
   .layer { position: fixed; inset: 0; }
 
-  /* 1 ── WebGL aurora (also the CSS fallback surface) */
-  #gl {
-    width: 100%; height: 100%;
-    display: block;
-    background:
-      radial-gradient(ellipse 70% 55% at 50% 115%, rgba(31, 122, 75, 0.35) 0%, transparent 62%),
-      radial-gradient(ellipse 60% 45% at 85% -8%,  rgba(24, 92, 60, 0.35)  0%, transparent 60%),
-      linear-gradient(158deg, #081611 0%, #050f0a 45%, #030c07 100%);
+  /* diagonal light shaft from the top-right corner — the "hero" light */
+  .shaft {
+    background: linear-gradient(215deg,
+      rgba(46, 230, 168, 0.10) 0%,
+      rgba(46, 230, 168, 0.035) 22%,
+      transparent 48%);
   }
 
-  /* 2 ── light dust */
-  #dust { pointer-events: none; }
+  /* svg artwork: rings, ticks, contour lines, dot fields */
+  svg.art { width: 100%; height: 100%; display: block; }
 
-  /* 3 ── ghost radar ring system (identity, not content) */
-  .rings { pointer-events: none; display: grid; place-items: center; }
-  .rings > div { position: absolute; border-radius: 50%; }
-  .ring-a { width: 62vmin; height: 62vmin; border: 1px solid rgba(147, 242, 189, 0.07); }
-  .ring-b { width: 84vmin; height: 84vmin; border: 1px solid rgba(147, 242, 189, 0.05); }
-  .ring-c {
-    width: 73vmin; height: 73vmin;
-    border: 1px dashed rgba(147, 242, 189, 0.09);
-    animation: ring-spin 90s linear infinite;
-  }
-  .ring-d {
-    width: 100vmin; height: 100vmin;
-    background: conic-gradient(from 0deg, transparent 0deg, rgba(63, 214, 133, 0.05) 18deg, transparent 46deg, transparent 360deg);
-    -webkit-mask: radial-gradient(circle, transparent 55%, #000 56%, #000 61%, transparent 62%);
-            mask: radial-gradient(circle, transparent 55%, #000 56%, #000 61%, transparent 62%);
-    animation: ring-spin 36s linear infinite;
-  }
-  @keyframes ring-spin { to { transform: rotate(360deg); } }
-  .ring-c::before {
-    content: '';
-    position: absolute; top: -3px; left: 50%;
-    width: 6px; height: 6px; border-radius: 50%;
-    background: rgba(147, 242, 189, 0.75);
-    box-shadow: 0 0 10px rgba(63, 214, 133, 0.9);
-  }
-
-  /* 4 ── comets */
-  .comet {
-    position: fixed; pointer-events: none;
-    width: 22vw; height: 2px;
-    background: linear-gradient(90deg, transparent, rgba(147, 242, 189, 0.85), transparent);
-    filter: drop-shadow(0 0 8px rgba(63, 214, 133, 0.8));
-    opacity: 0;
-    transform: rotate(-22deg);
-    animation: comet-fly 11s ease-in infinite;
-  }
-  .c1 { top: 14%; left: -24%; animation-delay: 3s; }
-  .c2 { top: 46%; left: -24%; width: 15vw; animation-delay: 8.2s; }
-  .c3 { top: 72%; left: -24%; width: 12vw; animation-delay: 14.6s; animation-duration: 16s; }
-  @keyframes comet-fly {
-    0%, 86% { opacity: 0; transform: translateX(0) rotate(-22deg); }
-    88.5% { opacity: 0.85; }
-    100% { opacity: 0; transform: translateX(150vw) rotate(-22deg); }
-  }
-
-  /* 5 ── cinematic grade: grain + vignette + top sheen */
-  .grade { pointer-events: none; }
+  /* vignette + hairline top highlight — the cinematic frame */
   .grade::before {
-    /* film grain */
-    content: '';
-    position: absolute; inset: -60px;
-    background-image:
-      radial-gradient(circle at 1px 1px, rgba(210, 255, 232, 0.05) 1px, transparent 1px),
-      radial-gradient(circle at 17px 11px, rgba(210, 255, 232, 0.025) 1px, transparent 1px);
-    background-size: 26px 26px, 41px 41px;
-    animation: grain-shift 0.9s steps(3) infinite;
-    opacity: 0.55;
-  }
-  @keyframes grain-shift {
-    0%   { transform: translate(0, 0); }
-    33%  { transform: translate(-14px, 9px); }
-    66%  { transform: translate(11px, -13px); }
-    100% { transform: translate(0, 0); }
-  }
-  .grade::after {
-    /* vignette + subtle top light */
     content: '';
     position: absolute; inset: 0;
     background:
-      linear-gradient(180deg, rgba(147, 242, 189, 0.045) 0%, transparent 12%),
-      radial-gradient(ellipse 88% 78% at 50% 46%, transparent 55%, rgba(2, 7, 4, 0.55) 100%);
+      linear-gradient(180deg, rgba(210, 255, 236, 0.05) 0%, transparent 1.5px),
+      radial-gradient(ellipse 92% 84% at 50% 46%, transparent 58%, rgba(1, 5, 3, 0.62) 100%);
   }
-
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation-duration: 0.001s !important; animation-iteration-count: 1 !important; }
+  /* film grain — static, whisper-quiet */
+  .grade::after {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(210, 255, 236, 0.030) 1px, transparent 1px),
+      radial-gradient(circle at 19px 13px, rgba(210, 255, 236, 0.016) 1px, transparent 1px);
+    background-size: 30px 30px, 47px 47px;
   }
 </style>
 </head>
 <body>
-  <canvas id="gl" class="layer"></canvas>
-  <canvas id="dust" class="layer"></canvas>
-  <div class="rings layer">
-    <div class="ring-b"></div>
-    <div class="ring-a"></div>
-    <div class="ring-c"></div>
-    <div class="ring-d"></div>
-  </div>
-  <div class="comet c1"></div>
-  <div class="comet c2"></div>
-  <div class="comet c3"></div>
-  <div class="grade layer"></div>
 
-<script>
-'use strict';
+  <div class="layer shaft"></div>
 
-/* toggles — flip while iterating with the design team */
-const FLAGS = { aurora: true, dust: true, rings: true, comets: true };
-if (!FLAGS.rings)  document.querySelector('.rings').style.display = 'none';
-if (!FLAGS.comets) document.querySelectorAll('.comet').forEach(c => c.style.display = 'none');
+  <svg class="art layer" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <!-- glow for the bright arc -->
+      <filter id="arcGlow" x="-60%" y="-60%" width="220%" height="220%">
+        <feGaussianBlur stdDeviation="7" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <linearGradient id="arcGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0"   stop-color="rgba(46, 230, 168, 0)"/>
+        <stop offset="0.5" stop-color="rgba(46, 230, 168, 0.85)"/>
+        <stop offset="1"   stop-color="rgba(46, 230, 168, 0)"/>
+      </linearGradient>
+      <linearGradient id="arcGrad2" x1="1" y1="1" x2="0" y2="0">
+        <stop offset="0"   stop-color="rgba(46, 230, 168, 0)"/>
+        <stop offset="0.5" stop-color="rgba(46, 230, 168, 0.35)"/>
+        <stop offset="1"   stop-color="rgba(46, 230, 168, 0)"/>
+      </linearGradient>
+      <!-- dot field pattern -->
+      <pattern id="dots" width="26" height="26" patternUnits="userSpaceOnUse">
+        <circle cx="1.3" cy="1.3" r="1.3" fill="rgba(146, 255, 205, 0.09)"/>
+      </pattern>
+      <radialGradient id="dotFadeTL" cx="0" cy="0" r="1">
+        <stop offset="0"   stop-color="#fff"/>
+        <stop offset="1"   stop-color="#000"/>
+      </radialGradient>
+      <radialGradient id="dotFadeBR" cx="1" cy="1" r="1">
+        <stop offset="0"   stop-color="#fff"/>
+        <stop offset="1"   stop-color="#000"/>
+      </radialGradient>
+      <mask id="dotMaskTL"><rect x="0" y="0" width="640" height="480" fill="url(#dotFadeTL)"/></mask>
+      <mask id="dotMaskBR"><rect x="1280" y="620" width="640" height="460" fill="url(#dotFadeBR)"/></mask>
+      <!-- fade for contour lines: strongest mid-right, gone at edges -->
+      <linearGradient id="lineFade" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0"    stop-color="rgba(46, 230, 168, 0)"/>
+        <stop offset="0.35" stop-color="rgba(46, 230, 168, 0.10)"/>
+        <stop offset="0.72" stop-color="rgba(46, 230, 168, 0.16)"/>
+        <stop offset="1"    stop-color="rgba(46, 230, 168, 0)"/>
+      </linearGradient>
+      <!-- smooth centre halo — no hard edges -->
+      <radialGradient id="haloGrad" cx="0.5" cy="0.5" r="0.5">
+        <stop offset="0"    stop-color="rgba(46, 230, 168, 0.070)"/>
+        <stop offset="0.45" stop-color="rgba(46, 230, 168, 0.038)"/>
+        <stop offset="0.75" stop-color="rgba(46, 230, 168, 0.012)"/>
+        <stop offset="1"    stop-color="rgba(46, 230, 168, 0)"/>
+      </radialGradient>
+    </defs>
 
-const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    <!-- ── corner dot fields ─────────────────────────────────────── -->
+    <rect x="0" y="0" width="640" height="480" fill="url(#dots)" mask="url(#dotMaskTL)"/>
+    <rect x="1280" y="620" width="640" height="460" fill="url(#dots)" mask="url(#dotMaskBR)"/>
 
-/* ══════════════════════════════════════════════════════════════════
- *  1 · WEBGL AURORA — domain-warped fbm, emerald/gold grade
- * ══════════════════════════════════════════════════════════════════ */
-(function aurora() {
-  if (!FLAGS.aurora) return;
-  const cv = document.getElementById('gl');
-  const gl = cv.getContext('webgl', { antialias: false, depth: false, stencil: false, alpha: false })
-          || cv.getContext('experimental-webgl');
-  if (!gl) return; /* CSS gradient fallback stays visible */
+    <!-- ── flowing contour lines, sweeping the lower stage ───────── -->
+    <g fill="none" stroke="url(#lineFade)" stroke-width="1.1">
+      <path d="M -40 852  C 420 800, 760 918, 1150 860  S 1720 792, 1960 838"/>
+      <path d="M -40 886  C 430 836, 770 950, 1160 892  S 1730 826, 1960 872"/>
+      <path d="M -40 921  C 440 873, 780 983, 1170 925  S 1740 861, 1960 907"/>
+      <path d="M -40 957  C 450 911, 790 1017, 1180 959 S 1750 897, 1960 943"/>
+      <path d="M -40 994  C 460 950, 800 1052, 1190 994 S 1760 934, 1960 980"/>
+      <path d="M -40 1032 C 470 990, 810 1088, 1200 1030 S 1770 972, 1960 1018"/>
+    </g>
+    <!-- a mirrored, fainter set high in the frame -->
+    <g fill="none" stroke="url(#lineFade)" stroke-width="1" opacity="0.45">
+      <path d="M -40 118 C 480 168, 900 76, 1300 130 S 1800 186, 1960 152"/>
+      <path d="M -40 84  C 490 132, 910 44,  1310 96  S 1810 150, 1960 118"/>
+    </g>
 
-  const VSRC = `
-    attribute vec2 a_pos;
-    void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }`;
+    <!-- ── the centrepiece: thin HUD rings behind the main object ── -->
+    <g>
+      <!-- soft centre halo -->
+      <circle cx="960" cy="540" r="430" fill="url(#haloGrad)"/>
 
-  const FSRC = `
-    precision highp float;
-    uniform vec2  u_res;
-    uniform float u_time;
+      <!-- concentric hairlines -->
+      <circle cx="960" cy="540" r="212" fill="none" stroke="rgba(146, 255, 205, 0.13)" stroke-width="1"/>
+      <circle cx="960" cy="540" r="286" fill="none" stroke="rgba(146, 255, 205, 0.085)" stroke-width="1"/>
+      <circle cx="960" cy="540" r="368" fill="none" stroke="rgba(146, 255, 205, 0.055)" stroke-width="1"/>
+      <circle cx="960" cy="540" r="452" fill="none" stroke="rgba(146, 255, 205, 0.035)" stroke-width="1"/>
+      <!-- dashed orbit -->
+      <circle cx="960" cy="540" r="324" fill="none" stroke="rgba(146, 255, 205, 0.09)" stroke-width="1" stroke-dasharray="2 10"/>
 
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }
+      <!-- tick ring: 60 fine ticks on r=368 -->
+      <g id="ticks" stroke="rgba(146, 255, 205, 0.10)" stroke-width="1"></g>
 
-    float noise(vec2 p) {
-      vec2 i = floor(p), f = fract(p);
-      vec2 u = f * f * (3.0 - 2.0 * f);
-      return mix(mix(hash(i),                 hash(i + vec2(1.0, 0.0)), u.x),
-                 mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
-    }
+      <!-- the bright arc — top-right, like the reference lock badge -->
+      <path d="M 960 328 A 212 212 0 0 1 1148 431"
+            fill="none" stroke="url(#arcGrad)" stroke-width="2.5" stroke-linecap="round" filter="url(#arcGlow)"/>
+      <!-- its counterweight — bottom-left, dimmer, wider ring -->
+      <path d="M 772 649 A 286 286 0 0 1 700 466"
+            fill="none" stroke="url(#arcGrad2)" stroke-width="2" stroke-linecap="round" filter="url(#arcGlow)"/>
 
-    float fbm(vec2 p) {
-      float v = 0.0, a = 0.5;
-      mat2 rot = mat2(1.6, 1.2, -1.2, 1.6);
-      for (int i = 0; i < 5; i++) { v += a * noise(p); p = rot * p; a *= 0.5; }
-      return v;
-    }
+      <!-- nodes where the arcs end -->
+      <circle cx="1148" cy="431" r="4"   fill="#2ee6a8" filter="url(#arcGlow)"/>
+      <circle cx="1148" cy="431" r="9"   fill="none" stroke="rgba(46, 230, 168, 0.35)" stroke-width="1"/>
+      <circle cx="700"  cy="466" r="3"   fill="rgba(46, 230, 168, 0.75)"/>
+      <circle cx="960"  cy="328" r="2.5" fill="rgba(146, 255, 205, 0.55)"/>
 
-    /* one aurora curtain: sharp luminous base edge, rayed body, long tail */
-    vec3 curtain(vec2 uv, float t, float yBase, float tilt, float amp, float widthK, float gain, float raySeed) {
-      float xx = uv.x * 2.2;
-      float curve = yBase
-        + tilt * (uv.x - 0.5)
-        + amp * sin(xx * 1.5 + t * 1.1)
-        + amp * 0.9 * fbm(vec2(xx * 0.8 + t * 0.35, raySeed));
-      float d = uv.y - curve;
-      float w = widthK * (1.0 + 0.55 * fbm(vec2(xx * 1.3 - t * 0.4, raySeed + 4.2)));
+      <!-- four cardinal micro-marks on the outer ring -->
+      <g stroke="rgba(146, 255, 205, 0.22)" stroke-width="1.5">
+        <line x1="960" y1="82"  x2="960" y2="96"/>
+        <line x1="960" y1="984" x2="960" y2="998"/>
+        <line x1="502" y1="540" x2="516" y2="540"/>
+        <line x1="1404" y1="540" x2="1418" y2="540"/>
+      </g>
+    </g>
 
-      /* sharp below the edge, long glowing tail above it */
-      float env = d > 0.0
-        ? exp(-d / (w * 3.0))
-        : exp(-(d * d) / (w * w * 0.085));
+    <!-- ── sparse "+" field marks — designed emptiness ───────────── -->
+    <g stroke="rgba(146, 255, 205, 0.14)" stroke-width="1">
+      <path d="M 250 260 h 12 M 256 254 v 12"/>
+      <path d="M 1690 210 h 12 M 1696 204 v 12"/>
+      <path d="M 1770 760 h 12 M 1776 754 v 12"/>
+      <path d="M 165 700 h 12 M 171 694 v 12"/>
+      <path d="M 1220 150 h 10 M 1225 145 v 10"/>
+      <path d="M 640 940 h 10 M 645 935 v 10"/>
+    </g>
 
-      /* vertical rays — the aurora signature (irregular, high contrast) */
-      float bend = fbm(vec2(uv.x * 4.2, t * 0.5 + raySeed)) * 3.2;
-      float rays = fbm(vec2(uv.x * 22.0 + bend, t * 1.6 + raySeed));
-      rays = 0.28 + 0.72 * pow(rays, 1.6);
-      float rays2 = 0.60 + 0.40 * noise(vec2(uv.x * 55.0 - t * 2.0, raySeed * 3.1));
-      float A = env * rays * rays2 * gain;
+    <script type="application/ecmascript"><![CDATA[
+      /* 60 tick marks on r=368 — generated so the markup stays clean */
+      (function () {
+        var g = document.getElementById('ticks');
+        var NS = 'http://www.w3.org/2000/svg';
+        for (var i = 0; i < 60; i++) {
+          var a = i * Math.PI * 2 / 60;
+          var big = i % 5 === 0;
+          var r0 = 368, r1 = big ? 378 : 374;
+          var l = document.createElementNS(NS, 'line');
+          l.setAttribute('x1', (960 + r0 * Math.cos(a)).toFixed(1));
+          l.setAttribute('y1', (540 + r0 * Math.sin(a)).toFixed(1));
+          l.setAttribute('x2', (960 + r1 * Math.cos(a)).toFixed(1));
+          l.setAttribute('y2', (540 + r1 * Math.sin(a)).toFixed(1));
+          if (big) l.setAttribute('stroke', 'rgba(146, 255, 205, 0.16)');
+          g.appendChild(l);
+        }
+      })();
+    ]]></script>
+  </svg>
 
-      vec3 core = vec3(0.50, 1.00, 0.68);
-      vec3 mint = vec3(0.16, 0.82, 0.46);
-      vec3 teal = vec3(0.024, 0.270, 0.170);
-      vec3 gold = vec3(0.90, 0.66, 0.22);
+  <div class="layer grade"></div>
 
-      /* colour along the tail: hot mint core → mint → deep teal */
-      vec3 aur = mix(core, mint, clamp(d / (w * 0.55), 0.0, 1.0));
-      aur = mix(aur, teal, clamp(d / (w * 3.6), 0.0, 1.0));
-      vec3 col = aur * A;
-
-      /* the faintest warm whisper under the bright edge */
-      float fringe = exp(-pow((d + w * 0.45) / (w * 0.20), 2.0));
-      col += gold * fringe * rays * 0.09 * gain;
-      return col;
-    }
-
-    void main() {
-      vec2 uv = gl_FragCoord.xy / u_res.xy;
-      vec2 p  = (gl_FragCoord.xy - 0.5 * u_res.xy) / u_res.y;
-      float t = u_time * 0.055;
-
-      vec3 deep = vec3(0.006, 0.020, 0.013);
-      vec3 em   = vec3(0.022, 0.150, 0.085);
-
-      /* near-black stage with a whisper of drifting silk */
-      vec2 ps = vec2(p.x * 0.9, p.y * 1.8);
-      float fog = fbm(ps * 1.2 + vec2(t * 0.5, -t * 0.2));
-      vec3 col = deep + em * fog * 0.30;
-
-      /* main curtain sweeping the upper stage + a deeper one behind it */
-      col += curtain(uv, t,        0.62,  0.16, 0.14, 0.105, 1.55, 3.7);
-      col += curtain(uv, t * 0.8,  0.85, -0.08, 0.07, 0.120, 0.36, 9.3);
-      /* low counter-curtain grazing the bottom — keeps the stage floor alive */
-      col += curtain(uv, -t * 0.7, 0.05, -0.10, 0.05, 0.075, 0.34, 6.1);
-
-      /* soft rising glow so overlaid objects never sit in pure black */
-      col += em * 1.15 * exp(-3.0 * length(p - vec2(0.0, -0.66)));
-
-      /* vignette + slow breathe */
-      float vig = smoothstep(1.38, 0.34, length(p * vec2(1.02, 1.28)));
-      col *= mix(0.36, 1.0, vig);
-      col *= 0.95 + 0.05 * sin(u_time * 0.22);
-
-      /* filmic-ish tame of the highlights */
-      col = col / (1.0 + col * 0.45);
-
-      /* dither to kill banding */
-      col += (hash(gl_FragCoord.xy) - 0.5) * 0.012;
-
-      gl_FragColor = vec4(col, 1.0);
-    }`;
-
-  function mk(type, src) {
-    const s = gl.createShader(type);
-    gl.shaderSource(s, src); gl.compileShader(s);
-    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { console.error(gl.getShaderInfoLog(s)); return null; }
-    return s;
-  }
-  const vs = mk(gl.VERTEX_SHADER, VSRC), fs = mk(gl.FRAGMENT_SHADER, FSRC);
-  if (!vs || !fs) return;
-  const prog = gl.createProgram();
-  gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
-  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { console.error(gl.getProgramInfoLog(prog)); return; }
-  gl.useProgram(prog);
-
-  const buf = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-  const loc = gl.getAttribLocation(prog, 'a_pos');
-  gl.enableVertexAttribArray(loc);
-  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-
-  const uRes = gl.getUniformLocation(prog, 'u_res');
-  const uTime = gl.getUniformLocation(prog, 'u_time');
-
-  /* render at 0.7 scale, DPR-capped — soft is good for a backdrop, and cheap */
-  const SCALE = 0.85 * Math.min(1.5, devicePixelRatio || 1);
-  function size() {
-    cv.width = Math.round(innerWidth * SCALE);
-    cv.height = Math.round(innerHeight * SCALE);
-    gl.viewport(0, 0, cv.width, cv.height);
-  }
-  size(); addEventListener('resize', size);
-
-  const t0 = performance.now();
-  function draw() {
-    gl.uniform2f(uRes, cv.width, cv.height);
-    gl.uniform1f(uTime, (performance.now() - t0) / 1000);
-    gl.drawArrays(gl.TRIANGLES, 0, 3);
-    if (!REDUCED) requestAnimationFrame(draw);
-  }
-  draw();
-})();
-
-/* ══════════════════════════════════════════════════════════════════
- *  2 · LIGHT DUST — drifting motes with depth + twinkle
- * ══════════════════════════════════════════════════════════════════ */
-(function dust() {
-  if (!FLAGS.dust) return;
-  const cv = document.getElementById('dust'), cx = cv.getContext('2d');
-  let W, H, motes;
-  function size() {
-    W = cv.width = innerWidth; H = cv.height = innerHeight;
-    const n = Math.round(Math.min(150, W * H / 15000));
-    motes = Array.from({ length: n }, () => spawn(true));
-  }
-  function spawn(anywhere) {
-    const depth = 0.25 + Math.random() * 0.75; /* far … near */
-    return {
-      x: Math.random() * W,
-      y: anywhere ? Math.random() * H : H + 10,
-      vx: (Math.random() - 0.5) * 0.06 * depth,
-      vy: -(0.05 + Math.random() * 0.16) * depth,
-      r: (0.5 + Math.random() * 1.8) * depth,
-      tw: Math.random() * Math.PI * 2,
-      tws: 0.4 + Math.random() * 1.4,
-      depth: depth,
-      gold: Math.random() < 0.07,
-    };
-  }
-  size(); addEventListener('resize', size);
-  let last = performance.now();
-  function frame(now) {
-    const dt = Math.min(50, now - last) / 16.7; last = now;
-    cx.clearRect(0, 0, W, H);
-    for (let i = 0; i < motes.length; i++) {
-      const m = motes[i];
-      m.x += m.vx * dt; m.y += m.vy * dt; m.tw += 0.02 * m.tws * dt;
-      if (m.y < -12 || m.x < -12 || m.x > W + 12) { motes[i] = spawn(false); continue; }
-      const a = (0.12 + 0.30 * (0.5 + 0.5 * Math.sin(m.tw))) * m.depth;
-      cx.fillStyle = m.gold
-        ? `rgba(216, 180, 90, ${a.toFixed(3)})`
-        : `rgba(147, 242, 189, ${a.toFixed(3)})`;
-      cx.beginPath(); cx.arc(m.x, m.y, m.r, 0, 7); cx.fill();
-    }
-    if (!REDUCED) requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
-})();
-</script>
 </body>
 </html>

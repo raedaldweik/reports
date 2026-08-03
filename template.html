@@ -169,6 +169,39 @@
     box-shadow: 0 0 0.7cqw rgba(46, 230, 168, 0.30);
     opacity: 0.7;
   }
+
+  /* ── demo chart layer ── */
+  .pal {
+    position: absolute; top: 0.55cqw; inset-inline-end: 0.7cqw;
+    font-size: 0.5cqw; font-weight: 700; color: var(--ink-4);
+    letter-spacing: 0.05em;
+    pointer-events: none;
+  }
+  .pal b { color: var(--ink-3); font-family: 'Manrope'; }
+  .cbody { position: absolute; inset: 2cqw 0.8cqw 0.6cqw; }
+  .cbody svg { width: 100%; height: 100%; display: block; }
+  .ax-t  { font-family: 'IBM Plex Sans Arabic', sans-serif; font-size: 11px; font-weight: 500; fill: var(--ink-3); }
+  .ax-n  { font-family: 'Manrope', sans-serif; font-size: 11.5px; font-weight: 700; fill: var(--ink-2); }
+  .ax-nb { font-family: 'Manrope', sans-serif; font-size: 12.5px; font-weight: 800; fill: var(--ink-1); }
+  .gl    { stroke: rgba(146, 255, 205, 0.07); stroke-width: 1; }
+  .lg-t  { font-family: 'IBM Plex Sans Arabic', sans-serif; font-size: 11px; font-weight: 600; fill: var(--ink-3); }
+  .dcap  { font-family: 'IBM Plex Sans Arabic', sans-serif; font-size: 11.5px; font-weight: 600; fill: var(--ink-3); }
+  .dval  { font-family: 'Manrope', sans-serif; font-size: 26px; font-weight: 800; fill: var(--ink-1); }
+
+  /* KPI internals */
+  .kpi-inner {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; gap: 0.9cqw;
+    padding: 0 1.5cqw 0 1cqw;
+  }
+  .kpi-txt { flex: 1; min-width: 0; padding-top: 0.9cqw; }
+  .kpi-num { font-size: 1.75cqw; font-weight: 800; color: var(--ink-1); line-height: 1.05; white-space: nowrap; text-shadow: 0 0 1.3cqw rgba(46, 230, 168, 0.20); }
+  .kpi-num .unit { font-size: 0.75cqw; color: var(--ink-3); font-weight: 700; margin-inline-start: 0.2cqw; }
+  .kpi-sub { display: flex; align-items: center; gap: 0.45cqw; margin-top: 0.18cqw; font-size: 0.53cqw; font-weight: 500; color: var(--ink-3); }
+  .kpi-sub .chip { display: inline-flex; align-items: center; gap: 0.15cqw; font-weight: 700; }
+  .kpi-sub .chip.up { color: #e0836a; }
+  .kpi-sub .chip.dn { color: #6fe6b1; }
+  .kpi-spark { flex: 0 0 auto; width: 5.8cqw; height: 2.3cqw; }
 </style>
 </head>
 <body>
@@ -398,21 +431,249 @@
     </div>
 
     <div class="kpi-row">
-      <div class="well"><div class="tag"><span class="tick"></span> عدد المخالفات</div></div>
-      <div class="well"><div class="tag"><span class="tick"></span> قيمة المخالفات</div></div>
-      <div class="well"><div class="tag"><span class="tick"></span> إجمالي السائقين الخطرين</div></div>
+      <div class="well">
+        <div class="tag"><span class="tick"></span> عدد المخالفات</div>
+        <div class="kpi-inner">
+          <div class="kpi-txt">
+            <div class="kpi-num num">2,462</div>
+            <div class="kpi-sub"><span class="chip dn num">▾ 4.2%</span> مقارنة بالفترة السابقة</div>
+          </div>
+          <svg class="kpi-spark" viewBox="0 0 120 46" preserveAspectRatio="none">
+            <defs><linearGradient id="sp1" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="rgba(46,230,168,0.30)"/><stop offset="1" stop-color="rgba(46,230,168,0)"/>
+            </linearGradient></defs>
+            <path d="M4 18 L18 24 L32 15 L46 27 L60 21 L74 30 L88 25 L104 33 L116 29 L116 44 L4 44 Z" fill="url(#sp1)"/>
+            <path d="M4 18 L18 24 L32 15 L46 27 L60 21 L74 30 L88 25 L104 33 L116 29" fill="none" stroke="#2ee6a8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="116" cy="29" r="3" fill="#2ee6a8"/>
+          </svg>
+        </div>
+      </div>
+      <div class="well">
+        <div class="tag"><span class="tick"></span> قيمة المخالفات</div>
+        <div class="kpi-inner">
+          <div class="kpi-txt">
+            <div class="kpi-num num">7.87<span class="unit">مليون د.إ</span></div>
+            <div class="kpi-sub">متوسط الغرامة <span class="num" style="color:var(--ink-2);font-weight:700;">3,195</span> د.إ</div>
+          </div>
+          <svg class="kpi-spark" viewBox="0 0 120 46" preserveAspectRatio="none">
+            <defs><linearGradient id="sp2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="rgba(216,180,90,0.30)"/><stop offset="1" stop-color="rgba(216,180,90,0)"/>
+            </linearGradient></defs>
+            <path d="M4 30 L18 26 L32 31 L46 22 L60 26 L74 17 L88 22 L104 14 L116 18 L116 44 L4 44 Z" fill="url(#sp2)"/>
+            <path d="M4 30 L18 26 L32 31 L46 22 L60 26 L74 17 L88 22 L104 14 L116 18" fill="none" stroke="#d8b45a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="116" cy="18" r="3" fill="#d8b45a"/>
+          </svg>
+        </div>
+      </div>
+      <div class="well">
+        <div class="tag"><span class="tick"></span> إجمالي السائقين الخطرين</div>
+        <div class="kpi-inner">
+          <div class="kpi-txt">
+            <div class="kpi-num num">750</div>
+            <div class="kpi-sub"><span class="chip up num">▴ 41.7%</span> من إجمالي السائقين</div>
+          </div>
+          <svg class="kpi-spark" viewBox="0 0 120 46" preserveAspectRatio="none">
+            <defs><linearGradient id="sp3" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="rgba(224,131,106,0.28)"/><stop offset="1" stop-color="rgba(224,131,106,0)"/>
+            </linearGradient></defs>
+            <path d="M4 34 L18 30 L32 33 L46 26 L60 29 L74 22 L88 25 L104 17 L116 20 L116 44 L4 44 Z" fill="url(#sp3)"/>
+            <path d="M4 34 L18 30 L32 33 L46 26 L60 29 L74 22 L88 25 L104 17 L116 20" fill="none" stroke="#e0836a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="116" cy="20" r="3" fill="#e0836a"/>
+          </svg>
+        </div>
+      </div>
     </div>
 
     <div class="row-3">
-      <div class="well"><div class="tag"><span class="tick"></span> نصوص المخالفات الأعلى تكراراً</div></div>
-      <div class="well"><div class="tag"><span class="tick"></span> المخالفات المرورية حسب الإمارة</div></div>
-      <div class="well"><div class="tag"><span class="tick"></span> الذكاء الاصطناعي والتنبؤ</div></div>
+      <!-- A · horizontal bars — sequential emerald ramp -->
+      <div class="well">
+        <div class="tag"><span class="tick"></span> نصوص المخالفات الأعلى تكراراً</div>
+        <div class="pal"><b>A</b> · تدرّج أخضر</div>
+        <div class="cbody">
+          <svg viewBox="0 0 420 250" preserveAspectRatio="xMidYMid meet" style="direction:ltr">
+            <g>
+              <text class="ax-t" x="416" y="26"  text-anchor="end">المخالفة الأولى</text>
+              <rect x="106" y="16" width="230" height="13" rx="3" fill="#93f2bd"/>
+              <text class="ax-n" x="98" y="27" text-anchor="end">198</text>
+
+              <text class="ax-t" x="416" y="66"  text-anchor="end">المخالفة الثانية</text>
+              <rect x="150" y="56" width="186" height="13" rx="3" fill="#3fd685"/>
+              <text class="ax-n" x="142" y="67" text-anchor="end">160</text>
+
+              <text class="ax-t" x="416" y="106" text-anchor="end">المخالفة الثالثة</text>
+              <rect x="170" y="96" width="166" height="13" rx="3" fill="#27a563"/>
+              <text class="ax-n" x="162" y="107" text-anchor="end">143</text>
+
+              <text class="ax-t" x="416" y="146" text-anchor="end">المخالفة الرابعة</text>
+              <rect x="187" y="136" width="149" height="13" rx="3" fill="#1f7a4b"/>
+              <text class="ax-n" x="179" y="147" text-anchor="end">128</text>
+
+              <text class="ax-t" x="416" y="186" text-anchor="end">المخالفة الخامسة</text>
+              <rect x="195" y="176" width="141" height="13" rx="3" fill="#1a5c3a"/>
+              <text class="ax-n" x="187" y="187" text-anchor="end">121</text>
+
+              <text class="ax-t" x="416" y="226" text-anchor="end">المخالفة السادسة</text>
+              <rect x="200" y="216" width="136" height="13" rx="3" fill="#164a30"/>
+              <text class="ax-n" x="192" y="227" text-anchor="end">117</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <!-- B · vertical bars — mono mint gradient (hero) -->
+      <div class="well">
+        <div class="tag"><span class="tick"></span> المخالفات المرورية حسب الإمارة</div>
+        <div class="pal"><b>B</b> · أحادي متوهّج</div>
+        <div class="cbody">
+          <svg viewBox="0 0 460 300" preserveAspectRatio="xMidYMid meet" style="direction:ltr">
+            <defs>
+              <linearGradient id="vb" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#93f2bd"/><stop offset="0.45" stop-color="#3fd685"/><stop offset="1" stop-color="rgba(31,122,75,0.45)"/>
+              </linearGradient>
+              <filter id="bGlow2" x="-40%" y="-40%" width="180%" height="180%">
+                <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#2ee6a8" flood-opacity="0.35"/>
+              </filter>
+            </defs>
+            <line class="gl" x1="20" y1="70"  x2="440" y2="70"/>
+            <line class="gl" x1="20" y1="150" x2="440" y2="150"/>
+            <line x1="20" y1="252" x2="440" y2="252" stroke="rgba(146,255,205,0.18)" stroke-width="1"/>
+            <g>
+              <rect x="46"  y="42"  width="34" height="210" rx="4" fill="url(#vb)" filter="url(#bGlow2)"/>
+              <rect x="104" y="90"  width="34" height="162" rx="4" fill="url(#vb)"/>
+              <rect x="162" y="126" width="34" height="126" rx="4" fill="url(#vb)"/>
+              <rect x="220" y="180" width="34" height="72"  rx="4" fill="url(#vb)"/>
+              <rect x="278" y="187" width="34" height="65"  rx="4" fill="url(#vb)"/>
+              <rect x="336" y="197" width="34" height="55"  rx="4" fill="url(#vb)"/>
+              <rect x="394" y="221" width="34" height="31"  rx="4" fill="url(#vb)"/>
+            </g>
+            <g class="ax-nb" text-anchor="middle">
+              <text x="63" y="30">717</text><text x="121" y="78">552</text><text x="179" y="114">431</text>
+              <text x="237" y="168">246</text><text x="295" y="175">222</text><text x="353" y="185">187</text><text x="411" y="209">107</text>
+            </g>
+            <g class="ax-t" text-anchor="middle">
+              <text x="63" y="274">دبي</text><text x="121" y="274">أبوظبي</text><text x="179" y="274">الشارقة</text>
+              <text x="237" y="274">رأس الخيمة</text><text x="295" y="274">الفجيرة</text><text x="353" y="274">عجمان</text><text x="411" y="274">أم القيوين</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <!-- C · donut — categorical multi-hue -->
+      <div class="well">
+        <div class="tag"><span class="tick"></span> الذكاء الاصطناعي والتنبؤ</div>
+        <div class="pal"><b>C</b> · متعدد الألوان</div>
+        <div class="cbody">
+          <svg viewBox="0 0 420 260" preserveAspectRatio="xMidYMid meet" style="direction:ltr">
+            <g transform="translate(210 104)">
+              <circle r="72" fill="none" stroke="rgba(146,255,205,0.05)" stroke-width="26"/>
+              <!-- 35% / 28% / 22% / 15%, gaps ~2.5deg, C=452.4 -->
+              <circle r="72" fill="none" stroke="#3fd685" stroke-width="26" stroke-dasharray="155 297.4" stroke-dashoffset="0" transform="rotate(-90)"/>
+              <circle r="72" fill="none" stroke="#38c9d8" stroke-width="26" stroke-dasharray="123 329.4" stroke-dashoffset="-161" transform="rotate(-90)"/>
+              <circle r="72" fill="none" stroke="#d8b45a" stroke-width="26" stroke-dasharray="96 356.4"  stroke-dashoffset="-290" transform="rotate(-90)"/>
+              <circle r="72" fill="none" stroke="#dd7a5f" stroke-width="26" stroke-dasharray="62 390.4"  stroke-dashoffset="-392" transform="rotate(-90)"/>
+              <text class="dval" y="6" text-anchor="middle">2.5K</text>
+              <text class="dcap" y="26" text-anchor="middle">إجمالي</text>
+            </g>
+            <g style="direction:rtl">
+              <circle cx="406" cy="216" r="5" fill="#3fd685"/><text class="lg-t" x="392" y="220">الفئة الأولى · 35%</text>
+              <circle cx="200" cy="216" r="5" fill="#38c9d8"/><text class="lg-t" x="186" y="220">الفئة الثانية · 28%</text>
+              <circle cx="406" cy="244" r="5" fill="#d8b45a"/><text class="lg-t" x="392" y="248">الفئة الثالثة · 22%</text>
+              <circle cx="200" cy="244" r="5" fill="#dd7a5f"/><text class="lg-t" x="186" y="248">الفئة الرابعة · 15%</text>
+            </g>
+          </svg>
+        </div>
+      </div>
     </div>
 
     <div class="row-3">
-      <div class="well"><div class="tag"><span class="tick"></span> تصنيف السائقين حسب الخطورة</div></div>
-      <div class="well"><div class="tag"><span class="tick"></span> معاهد السياقة مقابل فئة الخطورة</div></div>
-      <div class="well"><div class="tag"><span class="tick"></span> متوسط درجة الخطورة</div></div>
+      <!-- D · donut — status colors -->
+      <div class="well">
+        <div class="tag"><span class="tick"></span> تصنيف السائقين حسب الخطورة</div>
+        <div class="pal"><b>D</b> · ألوان الحالة</div>
+        <div class="cbody">
+          <svg viewBox="0 0 420 260" preserveAspectRatio="xMidYMid meet" style="direction:ltr">
+            <g transform="translate(210 104)">
+              <circle r="72" fill="none" stroke="rgba(146,255,205,0.05)" stroke-width="26"/>
+              <!-- 32 / 28 / 22 / 18 % -->
+              <circle r="72" fill="none" stroke="#34d17b" stroke-width="26" stroke-dasharray="142 310.4" stroke-dashoffset="0" transform="rotate(-90)"/>
+              <circle r="72" fill="none" stroke="#f6b73c" stroke-width="26" stroke-dasharray="123 329.4" stroke-dashoffset="-148" transform="rotate(-90)"/>
+              <circle r="72" fill="none" stroke="#ec835a" stroke-width="26" stroke-dasharray="96 356.4"  stroke-dashoffset="-277" transform="rotate(-90)"/>
+              <circle r="72" fill="none" stroke="#d0433b" stroke-width="26" stroke-dasharray="75 377.4"  stroke-dashoffset="-379" transform="rotate(-90)"/>
+              <text class="dval" y="6" text-anchor="middle">1,799</text>
+              <text class="dcap" y="26" text-anchor="middle">سائق</text>
+            </g>
+            <g style="direction:rtl">
+              <circle cx="406" cy="216" r="5" fill="#34d17b"/><text class="lg-t" x="392" y="220">منخفضة · 32%</text>
+              <circle cx="200" cy="216" r="5" fill="#f6b73c"/><text class="lg-t" x="186" y="220">متوسطة · 28%</text>
+              <circle cx="406" cy="244" r="5" fill="#ec835a"/><text class="lg-t" x="392" y="248">مرتفعة · 22%</text>
+              <circle cx="200" cy="244" r="5" fill="#d0433b"/><text class="lg-t" x="186" y="248">حرجة · 18%</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <!-- E · grouped bars — mint + gold duo -->
+      <div class="well">
+        <div class="tag"><span class="tick"></span> معاهد السياقة مقابل فئة الخطورة</div>
+        <div class="pal"><b>E</b> · أخضر وذهبي</div>
+        <div class="cbody">
+          <svg viewBox="0 0 460 300" preserveAspectRatio="xMidYMid meet" style="direction:ltr">
+            <line class="gl" x1="20" y1="90"  x2="440" y2="90"/>
+            <line class="gl" x1="20" y1="170" x2="440" y2="170"/>
+            <line x1="20" y1="252" x2="440" y2="252" stroke="rgba(146,255,205,0.18)" stroke-width="1"/>
+            <g>
+              <rect x="52"  y="72"  width="20" height="180" rx="3" fill="#3fd685"/>
+              <rect x="76"  y="132" width="20" height="120" rx="3" fill="#d8b45a"/>
+              <rect x="122" y="97"  width="20" height="155" rx="3" fill="#3fd685"/>
+              <rect x="146" y="152" width="20" height="100" rx="3" fill="#d8b45a"/>
+              <rect x="192" y="117" width="20" height="135" rx="3" fill="#3fd685"/>
+              <rect x="216" y="167" width="20" height="85"  rx="3" fill="#d8b45a"/>
+              <rect x="262" y="137" width="20" height="115" rx="3" fill="#3fd685"/>
+              <rect x="286" y="182" width="20" height="70"  rx="3" fill="#d8b45a"/>
+              <rect x="332" y="157" width="20" height="95"  rx="3" fill="#3fd685"/>
+              <rect x="356" y="197" width="20" height="55"  rx="3" fill="#d8b45a"/>
+              <rect x="402" y="177" width="20" height="75"  rx="3" fill="#3fd685"/>
+              <rect x="426" y="212" width="20" height="40"  rx="3" fill="#d8b45a"/>
+            </g>
+            <g class="ax-t" text-anchor="middle">
+              <text x="74"  y="274">معهد ١</text><text x="144" y="274">معهد ٢</text><text x="214" y="274">معهد ٣</text>
+              <text x="284" y="274">معهد ٤</text><text x="354" y="274">معهد ٥</text><text x="424" y="274">معهد ٦</text>
+            </g>
+            <g style="direction:rtl">
+              <circle cx="368" cy="34" r="5" fill="#3fd685"/><text class="lg-t" x="356" y="38">إجمالي السائقين</text>
+              <circle cx="238" cy="34" r="5" fill="#d8b45a"/><text class="lg-t" x="226" y="38">عالي الخطورة</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <!-- F · donut — emerald shades + gold highlight -->
+      <div class="well">
+        <div class="tag"><span class="tick"></span> متوسط درجة الخطورة</div>
+        <div class="pal"><b>F</b> · أحادي + ذهبي</div>
+        <div class="cbody">
+          <svg viewBox="0 0 420 260" preserveAspectRatio="xMidYMid meet" style="direction:ltr">
+            <g transform="translate(210 98)">
+              <circle r="72" fill="none" stroke="rgba(146,255,205,0.05)" stroke-width="26"/>
+              <!-- 30 / 25 / 20 / 15 / 10(gold) % -->
+              <circle r="72" fill="none" stroke="#93f2bd" stroke-width="26" stroke-dasharray="133 319.4" stroke-dashoffset="0" transform="rotate(-90)"/>
+              <circle r="72" fill="none" stroke="#3fd685" stroke-width="26" stroke-dasharray="109 343.4" stroke-dashoffset="-139" transform="rotate(-90)"/>
+              <circle r="72" fill="none" stroke="#27a563" stroke-width="26" stroke-dasharray="86 366.4"  stroke-dashoffset="-254" transform="rotate(-90)"/>
+              <circle r="72" fill="none" stroke="#1a5c3a" stroke-width="26" stroke-dasharray="62 390.4"  stroke-dashoffset="-346" transform="rotate(-90)"/>
+              <circle r="72" fill="none" stroke="#d8b45a" stroke-width="26" stroke-dasharray="38 414.4"  stroke-dashoffset="-414" transform="rotate(-90)"/>
+              <text class="dval" y="6" text-anchor="middle">0.57</text>
+              <text class="dcap" y="26" text-anchor="middle">من أصل 1.0</text>
+            </g>
+            <g style="direction:rtl">
+              <circle cx="406" cy="206" r="5" fill="#93f2bd"/><text class="lg-t" x="392" y="210">شريحة ١ · 30%</text>
+              <circle cx="200" cy="206" r="5" fill="#3fd685"/><text class="lg-t" x="186" y="210">شريحة ٢ · 25%</text>
+              <circle cx="406" cy="232" r="5" fill="#27a563"/><text class="lg-t" x="392" y="236">شريحة ٣ · 20%</text>
+              <circle cx="200" cy="232" r="5" fill="#1a5c3a"/><text class="lg-t" x="186" y="236">شريحة ٤ · 15%</text>
+              <circle cx="406" cy="250" r="5" fill="#d8b45a"/><text class="lg-t" x="392" y="254">تمييز ذهبي · 10%</text>
+            </g>
+          </svg>
+        </div>
+      </div>
     </div>
   </div>
 

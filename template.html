@@ -3,570 +3,427 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>القالب السينمائي — رادار المخالفات المرورية</title>
+<title>قالب اللوحة — شرطة دبي</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
   /* ════════════════════════════════════════════════════════════════════
-   *  ✦  شرطة دبي · القالب السينمائي  ✦
-   *  Poster-stage backdrop for SAS VA web-content overlay.
-   *  Same inventory as the source dashboard: 3 KPIs · 6 objects · filters.
-   *  Every "well" is an empty drop zone labelled with its intended object.
+   *  ✦  شرطة دبي · قالب اللوحة الرئيسية  ✦
+   *  The sleek emerald backdrop dressed with the dashboard skeleton:
+   *  header · filter rail · 3 KPI wells · 6 object wells (2 × 3).
+   *  Wells are empty frosted glass — SAS VA objects drop on top.
    * ════════════════════════════════════════════════════════════════════ */
   :root {
-    --bg-0: #040b07;
-    --glass:        rgba(13, 33, 24, 0.40);
-    --glass-strong: rgba(16, 40, 29, 0.66);
-    --hairline:      rgba(146, 255, 205, 0.10);
-    --highlight:     rgba(210, 255, 232, 0.09);
-
+    --mint: #2ee6a8;
     --ink-1: #eefff6;
     --ink-2: #c2dccf;
     --ink-3: #85a795;
     --ink-4: #5b7c6b;
-    --ink-5: #3d564a;
-
-    --seq-3: #27a563;
-    --seq-4: #3fd685;
-    --seq-5: #93f2bd;
-    --accent-glow: rgba(63, 214, 133, 0.32);
-    --gold: #d8b45a;
-
+    --hairline: rgba(146, 255, 205, 0.10);
+    --highlight: rgba(210, 255, 232, 0.08);
+    --glass: rgba(10, 26, 19, 0.38);
+    --glass-strong: rgba(13, 33, 24, 0.60);
     --sh-2: 0 1px 2px rgba(0,0,0,0.28), 0 6px 16px rgba(0,0,0,0.30);
-    --r-lg: 0.95cqw;
+    --r-lg: 0.9cqw;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  html, body {
-    width: 100%; height: 100%;
-    background: var(--bg-0);
-    overflow: hidden;
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+
+  body {
     font-family: 'IBM Plex Sans Arabic', 'Manrope', -apple-system, system-ui, sans-serif;
     color: var(--ink-2);
     -webkit-font-smoothing: antialiased;
+    background:
+      radial-gradient(ellipse 52% 44% at 68% 22%, rgba(38, 195, 158, 0.17) 0%, transparent 65%),
+      radial-gradient(ellipse 46% 40% at 12% 88%, rgba(28, 150, 100, 0.13) 0%, transparent 62%),
+      radial-gradient(ellipse 36% 32% at 50% 52%, rgba(40, 200, 145, 0.08) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 18% at 50% 101%, rgba(40, 190, 140, 0.10) 0%, transparent 70%),
+      linear-gradient(178deg, #071510 0%, #04100b 38%, #020a07 74%, #020805 100%);
   }
   .num { font-family: 'Manrope', sans-serif; font-variant-numeric: tabular-nums; }
 
-  /* ════════════════════════════════════════════════════════════════
-   *  STAGE
-   * ════════════════════════════════════════════════════════════════ */
-  .stage {
-    position: relative;
-    width: 100vw; height: 100vh;
-    container-type: inline-size;
-    overflow: hidden;
-    display: grid;
-    grid-template-rows: auto auto auto 1fr auto;
-    gap: 0.65cqw;
-    padding: 0.75cqw 1cqw 0.85cqw;
-    background:
-      radial-gradient(ellipse 70% 55% at 50% 118%, rgba(31, 122, 75, 0.28) 0%, transparent 62%),
-      radial-gradient(ellipse 62% 46% at 88% -10%, rgba(24, 92, 60, 0.30)  0%, transparent 60%),
-      radial-gradient(ellipse 40% 34% at 6% 4%,    rgba(216, 180, 90, 0.05) 0%, transparent 60%),
-      linear-gradient(158deg, #081611 0%, #050f0a 45%, #030c07 100%);
-  }
+  .layer { position: fixed; inset: 0; }
 
-  /* film grain */
-  .stage::before {
+  .shaft {
+    background: linear-gradient(215deg,
+      rgba(46, 230, 168, 0.10) 0%,
+      rgba(46, 230, 168, 0.035) 22%,
+      transparent 48%);
+  }
+  svg.art { width: 100%; height: 100%; display: block; }
+  .grade { pointer-events: none; }
+  .grade::before {
     content: '';
-    position: absolute; inset: 0; z-index: 0;
-    background-image:
-      radial-gradient(circle at 1px 1px, rgba(146, 255, 205, 0.028) 1px, transparent 1px),
-      radial-gradient(circle at 23px 17px, rgba(146, 255, 205, 0.014) 1px, transparent 1px);
-    background-size: 32px 32px, 48px 48px;
-    pointer-events: none;
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(180deg, rgba(210, 255, 236, 0.05) 0%, transparent 1.5px),
+      radial-gradient(ellipse 92% 84% at 50% 46%, transparent 58%, rgba(1, 5, 3, 0.62) 100%);
   }
-
-  /* aurora blobs */
-  .bokeh { position: absolute; border-radius: 50%; transform: translate(-50%, -50%); aspect-ratio: 1; pointer-events: none; z-index: 0; }
-  .b-mint { background: radial-gradient(circle, rgba(63,214,133,0.13) 0%, rgba(63,214,133,0.03) 40%, transparent 70%); filter: blur(2cqw); }
-  .b-teal { background: radial-gradient(circle, rgba(38,168,138,0.11) 0%, rgba(38,168,138,0.03) 40%, transparent 70%); filter: blur(2.2cqw); }
-  .b-gold { background: radial-gradient(circle, rgba(216,180,90,0.09) 0%, rgba(216,180,90,0.02) 42%, transparent 72%); filter: blur(1.8cqw); }
-  @keyframes breathe { 0%,100% { opacity: 0.55; transform: translate(-50%,-50%) scale(1); } 50% { opacity: 1; transform: translate(-50%,-50%) scale(1.08); } }
-  .bokeh { animation: breathe 11s ease-in-out infinite; }
-  .k1 { top: 10%; left: 12%; width: 24cqw; }
-  .k2 { top: 86%; left: 86%; width: 28cqw; animation-delay: 3s; }
-  .k3 { top: 16%; left: 86%; width: 17cqw; animation-delay: 6s; }
-  .k4 { top: 80%; left: 16%; width: 20cqw; animation-delay: 1.6s; }
-
-  /* particle canvas */
-  #net { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
-
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation-duration: 0.001s !important; animation-iteration-count: 1 !important; transition-duration: 0.001s !important; }
+  .grade::after {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(210, 255, 236, 0.030) 1px, transparent 1px),
+      radial-gradient(circle at 19px 13px, rgba(210, 255, 236, 0.016) 1px, transparent 1px);
+    background-size: 30px 30px, 47px 47px;
   }
 
   /* ════════════════════════════════════════════════════════════════
-   *  HEADER
+   *  DASHBOARD SKELETON
    * ════════════════════════════════════════════════════════════════ */
+  .board {
+    position: fixed; inset: 0;
+    container-type: inline-size;
+    display: grid;
+    grid-template-rows: auto auto 5.4cqw 1fr 1fr;
+    gap: 0.65cqw;
+    padding: 0.75cqw 1cqw 0.9cqw;
+    z-index: 2;
+  }
+
+  /* ── header ── */
   .topbar {
-    position: relative; z-index: 4;
     display: flex; align-items: center; gap: 1cqw;
     background: linear-gradient(180deg, var(--glass-strong) 0%, var(--glass) 100%);
     border: 1px solid var(--hairline);
     border-radius: var(--r-lg);
     padding: 0.5cqw 1cqw;
     box-shadow: var(--sh-2), inset 0 1px 0 var(--highlight);
-    backdrop-filter: blur(14px);
+    backdrop-filter: blur(12px);
   }
   .topbar > * { flex: 0 0 auto; white-space: nowrap; }
-  .topbar .topbar-spacer { flex: 1 1 0; }
+  .topbar .spacer { flex: 1 1 0; }
   .brand { display: flex; align-items: center; gap: 0.7cqw; }
-  .brand-shield { width: 2.05cqw; height: 2.05cqw; filter: drop-shadow(0 0 0.6cqw rgba(63,214,133,0.35)); }
-  .brand-txt .ar { font-size: 0.98cqw; font-weight: 700; color: var(--ink-1); line-height: 1.15; }
-  .brand-txt .en { font-size: 0.48cqw; font-weight: 600; color: var(--ink-3); letter-spacing: 0.34em; font-family: 'Manrope'; }
-  .topbar-div { width: 1px; height: 2cqw; background: linear-gradient(180deg, transparent, var(--hairline), transparent); }
-  .center-name .ar { font-size: 0.74cqw; font-weight: 600; color: var(--ink-2); }
-  .center-name .en { font-size: 0.47cqw; font-weight: 600; color: var(--ink-4); letter-spacing: 0.14em; font-family: 'Manrope'; }
+  .brand-shield { width: 2cqw; height: 2cqw; filter: drop-shadow(0 0 0.6cqw rgba(46, 230, 168, 0.35)); }
+  .brand-txt .ar { font-size: 0.96cqw; font-weight: 700; color: var(--ink-1); line-height: 1.15; }
+  .brand-txt .en { font-size: 0.47cqw; font-weight: 600; color: var(--ink-3); letter-spacing: 0.34em; font-family: 'Manrope'; }
+  .tdiv { width: 1px; height: 2cqw; background: linear-gradient(180deg, transparent, var(--hairline), transparent); }
+  .center-name .ar { font-size: 0.72cqw; font-weight: 600; color: var(--ink-2); }
+  .center-name .en { font-size: 0.46cqw; font-weight: 600; color: var(--ink-4); letter-spacing: 0.14em; font-family: 'Manrope'; }
   .clockbox { text-align: center; }
-  .clockbox .t { font-size: 0.9cqw; font-weight: 700; color: var(--ink-1); letter-spacing: 0.04em; }
-  .clockbox .d { font-size: 0.48cqw; color: var(--ink-3); font-weight: 500; }
+  .clockbox .t { font-size: 0.88cqw; font-weight: 700; color: var(--ink-1); letter-spacing: 0.04em; }
+  .clockbox .d { font-size: 0.47cqw; color: var(--ink-3); font-weight: 500; }
   .chip-btn {
     display: inline-flex; align-items: center; gap: 0.4cqw;
     font-family: inherit; cursor: pointer;
-    font-size: 0.64cqw; font-weight: 600; color: var(--ink-1);
-    background: linear-gradient(180deg, rgba(63,214,133,0.14), rgba(63,214,133,0.05));
-    border: 1px solid rgba(63,214,133,0.28);
+    font-size: 0.62cqw; font-weight: 600; color: var(--ink-1);
+    background: linear-gradient(180deg, rgba(46, 230, 168, 0.13), rgba(46, 230, 168, 0.045));
+    border: 1px solid rgba(46, 230, 168, 0.28);
     border-radius: 2cqw;
-    padding: 0.4cqw 0.9cqw;
+    padding: 0.38cqw 0.9cqw;
     transition: all 0.22s ease;
   }
-  .chip-btn:hover { border-color: rgba(63,214,133,0.6); box-shadow: 0 0 0.9cqw var(--accent-glow); transform: translateY(-1px); }
-  .chip-btn.quiet { background: rgba(210,255,232,0.04); border-color: var(--hairline); color: var(--ink-2); }
-  .chip-btn svg { width: 0.72cqw; height: 0.72cqw; }
-  .ai-dot { width: 0.4cqw; height: 0.4cqw; border-radius: 50%; background: var(--seq-4); box-shadow: 0 0 0.5cqw var(--seq-4); animation: pulse-dot 2.2s ease-in-out infinite; }
-  @keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .chip-btn:hover { border-color: rgba(46, 230, 168, 0.6); box-shadow: 0 0 0.9cqw rgba(46, 230, 168, 0.30); transform: translateY(-1px); }
+  .chip-btn.quiet { background: rgba(210, 255, 232, 0.04); border-color: var(--hairline); color: var(--ink-2); }
+  .chip-btn svg { width: 0.7cqw; height: 0.7cqw; }
+  .ai-dot { width: 0.38cqw; height: 0.38cqw; border-radius: 50%; background: var(--mint); box-shadow: 0 0 0.5cqw var(--mint); }
 
-  /* ════════════════════════════════════════════════════════════════
-   *  WELLS — empty drop zones for SAS VA objects
-   * ════════════════════════════════════════════════════════════════ */
+  /* ── filter rail ── */
+  .filter-rail {
+    display: flex; align-items: center; gap: 0.55cqw;
+    background: linear-gradient(180deg, rgba(10, 26, 19, 0.26) 0%, rgba(10, 26, 19, 0.14) 100%);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-lg);
+    padding: 0.42cqw 0.9cqw;
+    box-shadow: var(--sh-2), inset 0 1px 0 var(--highlight);
+    backdrop-filter: blur(3px);
+  }
+  .f-tag { display: inline-flex; align-items: center; gap: 0.38cqw; font-size: 0.58cqw; font-weight: 700; color: var(--ink-3); }
+  .f-tag .tick { width: 0.22cqw; height: 0.85cqw; border-radius: 0.2cqw; background: linear-gradient(180deg, #93f2bd, #27a563); box-shadow: 0 0 0.4cqw rgba(46, 230, 168, 0.35); }
+  .f-pill {
+    height: 1.4cqw; border-radius: 2cqw;
+    border: 1px dashed rgba(146, 255, 205, 0.14);
+    flex: 0 0 8.5cqw;
+  }
+  .f-pill.seg { flex-basis: 6cqw; }
+  .f-note { margin-inline-start: auto; font-size: 0.5cqw; font-weight: 600; color: var(--ink-4); }
+
+  /* ── wells ── */
+  .kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.65cqw; min-height: 0; }
+  .row-3 { display: grid; grid-template-columns: 1fr 1.15fr 1fr; gap: 0.65cqw; min-height: 0; }
+
   .well {
     position: relative;
     border-radius: var(--r-lg);
-    background: linear-gradient(180deg, var(--glass) 0%, rgba(13, 33, 24, 0.22) 100%);
+    background: linear-gradient(180deg, rgba(9, 23, 17, 0.24) 0%, rgba(9, 23, 17, 0.10) 100%);
     border: 1px solid var(--hairline);
     box-shadow: var(--sh-2), inset 0 1px 0 var(--highlight);
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(2px);
     min-height: 0; min-width: 0;
   }
-  /* quiet HUD corner brackets */
-  .well .hud { position: absolute; width: 0.85cqw; height: 0.85cqw; pointer-events: none; }
-  .well .hud::before {
-    content: ''; position: absolute; inset: 0;
-    border: 1.5px solid rgba(63, 214, 133, 0.38);
-    animation: hud-pulse 6s ease-in-out infinite;
-  }
-  @keyframes hud-pulse { 0%,100% { opacity: 0.45; } 50% { opacity: 0.95; } }
-  .hud.tr { top: -1px; inset-inline-start: -1px; } .hud.tr::before { border-inline-end: 0; border-bottom: 0; border-start-start-radius: 0.45cqw; }
-  .hud.tl { top: -1px; inset-inline-end: -1px; } .hud.tl::before { border-inline-start: 0; border-bottom: 0; border-start-end-radius: 0.45cqw; }
-  .hud.br { bottom: -1px; inset-inline-start: -1px; } .hud.br::before { border-inline-end: 0; border-top: 0; border-end-start-radius: 0.45cqw; }
-  .hud.bl { bottom: -1px; inset-inline-end: -1px; } .hud.bl::before { border-inline-start: 0; border-top: 0; border-end-end-radius: 0.45cqw; }
-
-  /* module tag — names the SAS object that belongs in the well */
-  .mod-tag {
+  .well .tag {
     position: absolute; top: 0.55cqw; inset-inline-start: 0.7cqw;
     display: inline-flex; align-items: center; gap: 0.38cqw;
-    font-size: 0.6cqw; font-weight: 700; color: var(--ink-3);
-    pointer-events: none; z-index: 1;
-  }
-  .mod-tag .tick { width: 0.24cqw; height: 0.85cqw; border-radius: 0.2cqw; background: linear-gradient(180deg, var(--seq-5), var(--seq-3)); box-shadow: 0 0 0.4cqw var(--accent-glow); }
-
-  /* ════════════════════════════════════════════════════════════════
-   *  FILTER DOCK
-   * ════════════════════════════════════════════════════════════════ */
-  .filter-dock {
-    position: relative; z-index: 3;
-    height: 2.55cqw;
-    display: flex; align-items: center; gap: 0.7cqw;
-    padding: 0 0.9cqw;
-  }
-  .filter-dock .mod-tag { position: static; }
-  .fd-ghosts { display: flex; align-items: center; gap: 0.5cqw; flex: 1; }
-  .fd-pill {
-    height: 1.45cqw; border-radius: 2cqw;
-    border: 1.5px dashed rgba(146, 255, 205, 0.12);
-    flex: 0 0 9cqw;
-    animation: dash-glow 5s ease-in-out infinite;
-  }
-  .fd-pill:nth-child(2) { animation-delay: 0.7s; }
-  .fd-pill:nth-child(3) { animation-delay: 1.4s; }
-  .fd-pill:nth-child(4) { animation-delay: 2.1s; }
-  .fd-pill:nth-child(5) { animation-delay: 2.8s; flex-basis: 6.5cqw; }
-  @keyframes dash-glow { 0%,100% { border-color: rgba(146,255,205,0.08); } 50% { border-color: rgba(146,255,205,0.16); } }
-
-  /* ════════════════════════════════════════════════════════════════
-   *  KPI ROW — the 3 KPIs of the source dashboard
-   * ════════════════════════════════════════════════════════════════ */
-  .kpi-row {
-    position: relative; z-index: 2;
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 0.7cqw;
-    height: 5.6cqw;
-  }
-  .kpi-well .mod-tag { top: 0.6cqw; }
-  .kpi-well::after {
-    content: '';
-    position: absolute; inset-inline-start: 0; top: 18%; bottom: 18%;
-    width: 3px; border-radius: 3px;
-    background: linear-gradient(180deg, var(--seq-5), var(--seq-3));
-    box-shadow: 0 0 0.7cqw var(--accent-glow);
-    opacity: 0.75;
-  }
-
-  /* ════════════════════════════════════════════════════════════════
-   *  MAIN COMPOSITION — 2 side objects each flank the map hero
-   * ════════════════════════════════════════════════════════════════ */
-  .main {
-    position: relative; z-index: 2;
-    display: grid;
-    grid-template-columns: 1fr 2.05fr 1fr;
-    gap: 0.7cqw;
-    min-height: 0;
-  }
-  .side { display: grid; grid-template-rows: 1fr 1fr; gap: 0.7cqw; min-height: 0; }
-
-  /* ── HERO ── */
-  .hero { position: relative; display: flex; flex-direction: column; min-height: 0; }
-  .hero-title { text-align: center; padding: 0.25cqw 0 0; position: relative; z-index: 3; }
-  .hero-title h1 {
-    font-size: 1.95cqw; font-weight: 700; line-height: 1.25;
-    background: linear-gradient(100deg, #eefff6 15%, #93f2bd 38%, #d8b45a 52%, #93f2bd 66%, #eefff6 85%);
-    background-size: 220% 100%;
-    -webkit-background-clip: text; background-clip: text;
-    -webkit-text-fill-color: transparent; color: transparent;
-    animation: title-sheen 8s ease-in-out infinite;
-    filter: drop-shadow(0 0 1.6cqw rgba(63, 214, 133, 0.22));
-  }
-  @keyframes title-sheen { 0%,100% { background-position: 0% 0; } 50% { background-position: 100% 0; } }
-  .hero-sub {
-    display: flex; align-items: center; justify-content: center; gap: 0.7cqw;
-    font-size: 0.6cqw; color: var(--ink-3); font-weight: 500;
-    margin-top: 0.1cqw;
-  }
-  .hero-sub .line { width: 4cqw; height: 1px; background: linear-gradient(90deg, transparent, rgba(146,255,205,0.35)); }
-  .hero-sub .line.l2 { background: linear-gradient(-90deg, transparent, rgba(146,255,205,0.35)); }
-  .live-pill {
-    display: inline-flex; align-items: center; gap: 0.35cqw;
-    font-size: 0.52cqw; font-weight: 700; color: var(--seq-5);
-    border: 1px solid rgba(63,214,133,0.35); border-radius: 2cqw;
-    padding: 0.16cqw 0.6cqw;
-    background: rgba(63,214,133,0.07);
-  }
-  .live-pill .ld { width: 0.36cqw; height: 0.36cqw; border-radius: 50%; background: var(--seq-4); box-shadow: 0 0 0.45cqw var(--seq-4); animation: pulse-dot 1.8s ease-in-out infinite; }
-
-  .hero-map { position: relative; flex: 1; min-height: 0; }
-  .hero-map svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-
-  /* single slow orbit ring behind the map */
-  .orbit {
-    position: absolute; top: 52%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 41cqw; height: 41cqw;
-    border-radius: 50%;
-    border: 1px dashed rgba(146, 255, 205, 0.11);
-    animation: spin 80s linear infinite;
+    font-size: 0.58cqw; font-weight: 700; color: var(--ink-3);
     pointer-events: none;
   }
-  @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
-  .orbit .sat {
-    position: absolute; top: -0.26cqw; left: 50%;
-    width: 0.5cqw; height: 0.5cqw; border-radius: 50%;
-    background: var(--seq-5);
-    box-shadow: 0 0 0.7cqw var(--seq-4);
+  .well .tag .tick { width: 0.22cqw; height: 0.85cqw; border-radius: 0.2cqw; background: linear-gradient(180deg, #93f2bd, #27a563); box-shadow: 0 0 0.4cqw rgba(46, 230, 168, 0.35); }
+  .kpi-row .well::after {
+    content: '';
+    position: absolute; inset-inline-start: 0; top: 20%; bottom: 20%;
+    width: 3px; border-radius: 3px;
+    background: linear-gradient(180deg, #93f2bd, #27a563);
+    box-shadow: 0 0 0.7cqw rgba(46, 230, 168, 0.30);
+    opacity: 0.7;
   }
-
-  /* SVG map art */
-  .uae-land-t  { fill: rgba(39, 165, 99, 0.10); stroke: rgba(146, 255, 205, 0.45); stroke-width: 1.6; stroke-linejoin: round; }
-  .uae-halo-t  { fill: none; stroke: rgba(63, 214, 133, 0.16); stroke-width: 7; stroke-linejoin: round; filter: blur(4px); }
-  .uae-dots-t  { fill: rgba(146, 255, 205, 0.13); }
-  .city-core   { fill: #93f2bd; filter: drop-shadow(0 0 6px rgba(63,214,133,0.9)); }
-  .city-ring   { fill: none; stroke: rgba(147, 242, 189, 0.8); stroke-width: 1.4; transform-box: fill-box; transform-origin: center; animation: ping 3.4s cubic-bezier(0.2, 0.6, 0.4, 1) infinite; }
-  .city-ring.r2 { animation-delay: 1.7s; }
-  @keyframes ping { 0% { transform: scale(0.25); opacity: 0.95; } 75% { transform: scale(2.6); opacity: 0; } 100% { transform: scale(2.6); opacity: 0; } }
-  .arc-t { fill: none; stroke: rgba(147, 242, 189, 0.28); stroke-width: 1.3; stroke-dasharray: 5 7; animation: arc-march 1.6s linear infinite; }
-  @keyframes arc-march { to { stroke-dashoffset: -12; } }
-  @keyframes sweep-spin { to { transform: rotate(360deg); } }
-  .coord { font-family: 'Manrope'; font-size: 9.5px; font-weight: 600; fill: rgba(146, 255, 205, 0.26); letter-spacing: 0.14em; }
-
-  /* hero drop-zone frame */
-  .hero-frame { position: absolute; inset: 3cqw 1.6cqw 0.5cqw; border-radius: 1cqw; pointer-events: none; z-index: 2; }
-  .hero-frame .mod-tag { inset-inline-start: 0.2cqw; top: auto; bottom: 0.15cqw; }
-
-  /* ════════════════════════════════════════════════════════════════
-   *  BOTTOM STRIP — the wide 6th object
-   * ════════════════════════════════════════════════════════════════ */
-  .bottom { position: relative; z-index: 2; height: 8.6cqw; }
-  .bottom .well { height: 100%; }
 </style>
 </head>
 <body>
-<div class="stage" id="stage">
 
-  <canvas id="net"></canvas>
-  <div class="bokeh b-mint k1"></div>
-  <div class="bokeh b-teal k2"></div>
-  <div class="bokeh b-gold k3"></div>
-  <div class="bokeh b-teal k4"></div>
+  <!-- ═══ BACKDROP (identical to background.html) ═══ -->
+  <div class="layer shaft"></div>
 
-  <!-- ═══ HEADER ═══ -->
-  <header class="topbar">
-    <div class="brand">
-      <svg class="brand-shield" viewBox="0 0 48 48" fill="none">
-        <path d="M24 3 L41 9 V22 C41 33.5 33.8 41.6 24 45 C14.2 41.6 7 33.5 7 22 V9 Z" stroke="#3fd685" stroke-width="2.2" fill="rgba(63,214,133,0.08)" stroke-linejoin="round"/>
-        <path d="M24 10 L34 13.6 V22.2 C34 29.4 29.8 34.6 24 37.4 C18.2 34.6 14 29.4 14 22.2 V13.6 Z" fill="rgba(63,214,133,0.16)"/>
-        <path d="M24 16 L26 21 L31 21.2 L27.2 24.4 L28.6 29.4 L24 26.4 L19.4 29.4 L20.8 24.4 L17 21.2 L22 21 Z" fill="#93f2bd"/>
-      </svg>
-      <div class="brand-txt">
-        <div class="ar">شرطة دبي</div>
-        <div class="en">DUBAI&nbsp;POLICE</div>
-      </div>
-    </div>
-    <div class="topbar-div"></div>
-    <div class="center-name">
-      <div class="ar">مركز التحليل والتنبؤ الأمني</div>
-      <div class="en">SECURITY ANALYTICS &amp; FORECAST</div>
-    </div>
+  <svg class="art layer" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <filter id="arcGlow" x="-60%" y="-60%" width="220%" height="220%">
+        <feGaussianBlur stdDeviation="7" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <linearGradient id="arcGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0"   stop-color="rgba(46, 230, 168, 0)"/>
+        <stop offset="0.5" stop-color="rgba(46, 230, 168, 0.85)"/>
+        <stop offset="1"   stop-color="rgba(46, 230, 168, 0)"/>
+      </linearGradient>
+      <linearGradient id="arcGrad2" x1="1" y1="1" x2="0" y2="0">
+        <stop offset="0"   stop-color="rgba(46, 230, 168, 0)"/>
+        <stop offset="0.5" stop-color="rgba(46, 230, 168, 0.35)"/>
+        <stop offset="1"   stop-color="rgba(46, 230, 168, 0)"/>
+      </linearGradient>
+      <pattern id="dots" width="26" height="26" patternUnits="userSpaceOnUse">
+        <circle cx="1.3" cy="1.3" r="1.3" fill="rgba(146, 255, 205, 0.09)"/>
+      </pattern>
+      <radialGradient id="dotFadeTL" cx="0" cy="0" r="1">
+        <stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/>
+      </radialGradient>
+      <radialGradient id="dotFadeBR" cx="1" cy="1" r="1">
+        <stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/>
+      </radialGradient>
+      <mask id="dotMaskTL"><rect x="0" y="0" width="640" height="480" fill="url(#dotFadeTL)"/></mask>
+      <mask id="dotMaskBR"><rect x="1280" y="620" width="640" height="460" fill="url(#dotFadeBR)"/></mask>
+      <linearGradient id="lineFade" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0"    stop-color="rgba(46, 230, 168, 0)"/>
+        <stop offset="0.35" stop-color="rgba(46, 230, 168, 0.10)"/>
+        <stop offset="0.72" stop-color="rgba(46, 230, 168, 0.16)"/>
+        <stop offset="1"    stop-color="rgba(46, 230, 168, 0)"/>
+      </linearGradient>
+      <radialGradient id="haloGrad" cx="0.5" cy="0.5" r="0.5">
+        <stop offset="0"    stop-color="rgba(46, 230, 168, 0.085)"/>
+        <stop offset="0.45" stop-color="rgba(46, 230, 168, 0.042)"/>
+        <stop offset="0.75" stop-color="rgba(46, 230, 168, 0.013)"/>
+        <stop offset="1"    stop-color="rgba(46, 230, 168, 0)"/>
+      </radialGradient>
+      <radialGradient id="glassGrad" cx="0.38" cy="0.30" r="0.9">
+        <stop offset="0"    stop-color="rgba(180, 255, 224, 0.045)"/>
+        <stop offset="0.55" stop-color="rgba(46, 230, 168, 0.018)"/>
+        <stop offset="1"    stop-color="rgba(46, 230, 168, 0)"/>
+      </radialGradient>
+      <linearGradient id="rimGrad" x1="1" y1="0" x2="0" y2="1">
+        <stop offset="0"    stop-color="rgba(160, 255, 216, 0.55)"/>
+        <stop offset="0.45" stop-color="rgba(46, 230, 168, 0.14)"/>
+        <stop offset="1"    stop-color="rgba(46, 230, 168, 0.02)"/>
+      </linearGradient>
+      <linearGradient id="flareGrad" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0"    stop-color="rgba(140, 255, 210, 0)"/>
+        <stop offset="0.42" stop-color="rgba(140, 255, 210, 0.10)"/>
+        <stop offset="0.62" stop-color="rgba(190, 255, 230, 0.42)"/>
+        <stop offset="0.80" stop-color="rgba(140, 255, 210, 0.08)"/>
+        <stop offset="1"    stop-color="rgba(140, 255, 210, 0)"/>
+      </linearGradient>
+      <radialGradient id="flareBloom" cx="0.5" cy="0.5" r="0.5">
+        <stop offset="0"   stop-color="rgba(150, 255, 215, 0.11)"/>
+        <stop offset="0.5" stop-color="rgba(60, 230, 175, 0.04)"/>
+        <stop offset="1"   stop-color="rgba(60, 230, 175, 0)"/>
+      </radialGradient>
+      <linearGradient id="cornerGrad" x1="0" y1="1" x2="1" y2="0">
+        <stop offset="0"   stop-color="rgba(46, 230, 168, 0)"/>
+        <stop offset="0.6" stop-color="rgba(120, 250, 200, 0.22)"/>
+        <stop offset="1"   stop-color="rgba(46, 230, 168, 0.04)"/>
+      </linearGradient>
+    </defs>
 
-    <div class="topbar-spacer"></div>
+    <rect x="0" y="0" width="640" height="480" fill="url(#dots)" mask="url(#dotMaskTL)"/>
+    <rect x="1280" y="620" width="640" height="460" fill="url(#dots)" mask="url(#dotMaskBR)"/>
 
-    <div class="clockbox">
-      <div class="t num" id="clock">—:—</div>
-      <div class="d" id="clockDate">—</div>
-    </div>
-    <div class="topbar-div"></div>
-    <button class="chip-btn"><span class="ai-dot"></span> المساعد الذكي
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.9 5.7L19.6 10l-5.7 1.9L12 17.6l-1.9-5.7L4.4 10l5.7-1.9z" stroke-linejoin="round"/></svg>
-    </button>
-    <button class="chip-btn quiet">الرئيسية
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
-  </header>
+    <g fill="none">
+      <circle cx="1905" cy="-60" r="560" stroke="url(#cornerGrad)" stroke-width="1.2"/>
+      <circle cx="1905" cy="-60" r="640" stroke="rgba(146, 255, 205, 0.06)" stroke-width="1"/>
+      <circle cx="1905" cy="-60" r="710" stroke="rgba(146, 255, 205, 0.035)" stroke-width="1"/>
+      <path d="M 1489 373 A 640 640 0 0 1 1370 219" stroke="url(#arcGrad)" stroke-width="1.8" stroke-linecap="round" filter="url(#arcGlow)"/>
+      <circle cx="1489" cy="373" r="3" fill="rgba(46, 230, 168, 0.8)"/>
+      <circle cx="30" cy="1130" r="480" stroke="rgba(146, 255, 205, 0.05)" stroke-width="1"/>
+      <circle cx="30" cy="1130" r="545" stroke="rgba(146, 255, 205, 0.03)" stroke-width="1"/>
+    </g>
 
-  <!-- ═══ FILTER DOCK · مقيم/مواطن + الجنسية + مصدر اللوحة + نص المخالفة + صنف المركبة ═══ -->
-  <div class="well filter-dock">
-    <div class="hud tr"></div><div class="hud tl"></div><div class="hud br"></div><div class="hud bl"></div>
-    <div class="mod-tag"><span class="tick"></span> الفلاتر</div>
-    <div class="fd-ghosts">
-      <div class="fd-pill"></div><div class="fd-pill"></div><div class="fd-pill"></div><div class="fd-pill"></div><div class="fd-pill"></div>
-    </div>
-  </div>
+    <ellipse cx="1085" cy="540" rx="330" ry="60" fill="url(#flareBloom)"/>
+    <rect x="330" y="539.2" width="1260" height="1.6" fill="url(#flareGrad)"/>
 
-  <!-- ═══ KPI ROW · 3 ═══ -->
-  <div class="kpi-row">
-    <div class="well kpi-well">
-      <div class="hud tr"></div><div class="hud tl"></div><div class="hud br"></div><div class="hud bl"></div>
-      <div class="mod-tag"><span class="tick"></span> عدد المخالفات</div>
-    </div>
-    <div class="well kpi-well">
-      <div class="hud tr"></div><div class="hud tl"></div><div class="hud br"></div><div class="hud bl"></div>
-      <div class="mod-tag"><span class="tick"></span> قيمة المخالفات</div>
-    </div>
-    <div class="well kpi-well">
-      <div class="hud tr"></div><div class="hud tl"></div><div class="hud br"></div><div class="hud bl"></div>
-      <div class="mod-tag"><span class="tick"></span> إجمالي السائقين الخطرين</div>
-    </div>
-  </div>
+    <g fill="none" stroke="url(#lineFade)" stroke-width="1.1">
+      <path d="M -40 852  C 420 800, 760 918, 1150 860  S 1720 792, 1960 838"/>
+      <path d="M -40 886  C 430 836, 770 950, 1160 892  S 1730 826, 1960 872"/>
+      <path d="M -40 921  C 440 873, 780 983, 1170 925  S 1740 861, 1960 907"/>
+      <path d="M -40 957  C 450 911, 790 1017, 1180 959 S 1750 897, 1960 943"/>
+      <path d="M -40 994  C 460 950, 800 1052, 1190 994 S 1760 934, 1960 980"/>
+      <path d="M -40 1032 C 470 990, 810 1088, 1200 1030 S 1770 972, 1960 1018"/>
+    </g>
+    <g fill="none" stroke="url(#lineFade)" stroke-width="1" opacity="0.45">
+      <path d="M -40 118 C 480 168, 900 76, 1300 130 S 1800 186, 1960 152"/>
+      <path d="M -40 84  C 490 132, 910 44,  1310 96  S 1810 150, 1960 118"/>
+    </g>
 
-  <!-- ═══ MAIN · top-violations + donut (right) · map hero · AI + gauge (left) ═══ -->
-  <div class="main">
+    <g>
+      <circle cx="960" cy="540" r="430" fill="url(#haloGrad)"/>
+      <circle cx="960" cy="540" r="150" fill="url(#glassGrad)" stroke="rgba(180, 255, 224, 0.10)" stroke-width="1"/>
+      <g stroke="rgba(146, 255, 205, 0.045)" stroke-width="1">
+        <line x1="960" y1="180" x2="960" y2="900"/>
+        <line x1="600" y1="540" x2="1320" y2="540"/>
+      </g>
+      <circle cx="960" cy="540" r="212" fill="none" stroke="url(#rimGrad)" stroke-width="1.2"/>
+      <circle cx="960" cy="540" r="286" fill="none" stroke="rgba(146, 255, 205, 0.085)" stroke-width="1"/>
+      <circle cx="960" cy="540" r="368" fill="none" stroke="rgba(146, 255, 205, 0.055)" stroke-width="1"/>
+      <circle cx="960" cy="540" r="452" fill="none" stroke="rgba(146, 255, 205, 0.035)" stroke-width="1"/>
+      <circle cx="960" cy="540" r="324" fill="none" stroke="rgba(146, 255, 205, 0.09)" stroke-width="1" stroke-dasharray="2 10"/>
+      <g id="ticks" stroke="rgba(146, 255, 205, 0.10)" stroke-width="1"></g>
+      <path d="M 960 328 A 212 212 0 0 1 1148 431"
+            fill="none" stroke="url(#arcGrad)" stroke-width="2.5" stroke-linecap="round" filter="url(#arcGlow)"/>
+      <path d="M 772 649 A 286 286 0 0 1 700 466"
+            fill="none" stroke="url(#arcGrad2)" stroke-width="2" stroke-linecap="round" filter="url(#arcGlow)"/>
+      <path d="M 1128 815 A 324 324 0 0 0 1244 700"
+            fill="none" stroke="rgba(46, 230, 168, 0.28)" stroke-width="1.6" stroke-linecap="round" filter="url(#arcGlow)"/>
+      <circle cx="1148" cy="431" r="4"   fill="#2ee6a8" filter="url(#arcGlow)"/>
+      <circle cx="1148" cy="431" r="9"   fill="none" stroke="rgba(46, 230, 168, 0.35)" stroke-width="1"/>
+      <circle cx="700"  cy="466" r="3"   fill="rgba(46, 230, 168, 0.75)"/>
+      <circle cx="960"  cy="328" r="2.5" fill="rgba(146, 255, 205, 0.55)"/>
+      <g stroke="rgba(146, 255, 205, 0.22)" stroke-width="1.5">
+        <line x1="960" y1="82"  x2="960" y2="96"/>
+        <line x1="960" y1="984" x2="960" y2="998"/>
+        <line x1="502" y1="540" x2="516" y2="540"/>
+        <line x1="1404" y1="540" x2="1418" y2="540"/>
+      </g>
+    </g>
 
-    <!-- right column (first in RTL) -->
-    <div class="side">
-      <div class="well">
-        <div class="hud tr"></div><div class="hud tl"></div><div class="hud br"></div><div class="hud bl"></div>
-        <div class="mod-tag"><span class="tick"></span> نصوص المخالفات الأعلى تكراراً</div>
-      </div>
-      <div class="well">
-        <div class="hud tr"></div><div class="hud tl"></div><div class="hud br"></div><div class="hud bl"></div>
-        <div class="mod-tag"><span class="tick"></span> تصنيف السائقين حسب الخطورة</div>
-      </div>
-    </div>
+    <g stroke="rgba(146, 255, 205, 0.14)" stroke-width="1">
+      <path d="M 250 260 h 12 M 256 254 v 12"/>
+      <path d="M 1690 210 h 12 M 1696 204 v 12"/>
+      <path d="M 1770 760 h 12 M 1776 754 v 12"/>
+      <path d="M 165 700 h 12 M 171 694 v 12"/>
+      <path d="M 1220 150 h 10 M 1225 145 v 10"/>
+      <path d="M 640 940 h 10 M 645 935 v 10"/>
+    </g>
 
-    <!-- centre hero -->
-    <div class="hero">
-      <div class="orbit"><div class="sat"></div></div>
+    <g>
+      <circle cx="410"  cy="330" r="1.6" fill="rgba(146, 255, 205, 0.28)"/>
+      <circle cx="530"  cy="770" r="1.3" fill="rgba(146, 255, 205, 0.18)"/>
+      <circle cx="705"  cy="205" r="1.8" fill="rgba(146, 255, 205, 0.33)"/>
+      <circle cx="1235" cy="870" r="1.4" fill="rgba(146, 255, 205, 0.20)"/>
+      <circle cx="1330" cy="300" r="1.2" fill="rgba(146, 255, 205, 0.22)"/>
+      <circle cx="1545" cy="620" r="1.7" fill="rgba(146, 255, 205, 0.26)"/>
+      <circle cx="1650" cy="450" r="1.2" fill="rgba(146, 255, 205, 0.16)"/>
+      <circle cx="285"  cy="520" r="1.3" fill="rgba(146, 255, 205, 0.18)"/>
+      <circle cx="860"  cy="130" r="1.2" fill="rgba(146, 255, 205, 0.20)"/>
+      <circle cx="1090" cy="960" r="1.5" fill="rgba(146, 255, 205, 0.18)"/>
+      <circle cx="1795" cy="555" r="2.4" fill="rgba(150, 255, 215, 0.6)" filter="url(#arcGlow)"/>
+      <circle cx="360"  cy="885" r="2.2" fill="rgba(150, 255, 215, 0.5)" filter="url(#arcGlow)"/>
+      <circle cx="565"  cy="405" r="2.0" fill="rgba(150, 255, 215, 0.45)" filter="url(#arcGlow)"/>
+    </g>
 
-      <div class="hero-title">
-        <h1>رادار المخالفات المرورية</h1>
-        <div class="hero-sub">
-          <span class="line"></span>
-          <span>منظومة الرصد والتنبؤ اللحظي</span>
-          <span class="live-pill"><span class="ld"></span> مباشر</span>
-          <span>إدارة المرور — شرطة دبي</span>
-          <span class="line l2"></span>
-        </div>
-      </div>
+    <script type="application/ecmascript"><![CDATA[
+      (function () {
+        var g = document.getElementById('ticks');
+        var NS = 'http://www.w3.org/2000/svg';
+        for (var i = 0; i < 60; i++) {
+          var a = i * Math.PI * 2 / 60;
+          var big = i % 5 === 0;
+          var r0 = 368, r1 = big ? 378 : 374;
+          var l = document.createElementNS(NS, 'line');
+          l.setAttribute('x1', (960 + r0 * Math.cos(a)).toFixed(1));
+          l.setAttribute('y1', (540 + r0 * Math.sin(a)).toFixed(1));
+          l.setAttribute('x2', (960 + r1 * Math.cos(a)).toFixed(1));
+          l.setAttribute('y2', (540 + r1 * Math.sin(a)).toFixed(1));
+          if (big) l.setAttribute('stroke', 'rgba(146, 255, 205, 0.16)');
+          g.appendChild(l);
+        }
+      })();
+    ]]></script>
+  </svg>
 
-      <div class="hero-map">
-        <svg viewBox="0 0 536 400" preserveAspectRatio="xMidYMid meet" style="direction:ltr">
-          <defs>
-            <radialGradient id="landGlow" cx="0.62" cy="0.35" r="0.75">
-              <stop offset="0" stop-color="rgba(63,214,133,0.20)"/>
-              <stop offset="1" stop-color="rgba(63,214,133,0.02)"/>
-            </radialGradient>
-            <linearGradient id="wedge" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stop-color="rgba(63,214,133,0.4)"/>
-              <stop offset="1" stop-color="rgba(63,214,133,0)"/>
-            </linearGradient>
-          </defs>
+  <div class="layer grade"></div>
 
-          <text class="coord" x="16" y="26">25.2048° N</text>
-          <text class="coord" x="16" y="40">55.2708° E</text>
+  <!-- ═══ DASHBOARD SKELETON ═══ -->
+  <div class="board">
 
-          <g id="landG" transform="translate(0 6)">
-            <polygon id="halo" class="uae-halo-t" points=""/>
-            <polygon id="land" class="uae-land-t" points="" fill="url(#landGlow)"/>
-            <g id="dotsG"></g>
-
-            <!-- radar sweep from Dubai -->
-            <g style="transform-origin: 374px 123px; animation: sweep-spin 6s linear infinite;">
-              <path d="M374 123 L374 41 A82 82 0 0 1 412.5 50.6 Z" fill="url(#wedge)" opacity="0.30"/>
-              <line x1="374" y1="123" x2="374" y2="41" stroke="rgba(147,242,189,0.55)" stroke-width="1.2"/>
-            </g>
-            <circle cx="374" cy="123" r="52"  fill="none" stroke="rgba(63,214,133,0.13)" stroke-width="1"/>
-            <circle cx="374" cy="123" r="86"  fill="none" stroke="rgba(63,214,133,0.08)" stroke-width="1"/>
-            <circle cx="374" cy="123" r="120" fill="none" stroke="rgba(63,214,133,0.05)" stroke-width="1"/>
-
-            <g id="arcsG"></g>
-            <g id="citiesG"></g>
-          </g>
+    <header class="topbar">
+      <div class="brand">
+        <svg class="brand-shield" viewBox="0 0 48 48" fill="none">
+          <path d="M24 3 L41 9 V22 C41 33.5 33.8 41.6 24 45 C14.2 41.6 7 33.5 7 22 V9 Z" stroke="#2ee6a8" stroke-width="2.2" fill="rgba(46,230,168,0.08)" stroke-linejoin="round"/>
+          <path d="M24 10 L34 13.6 V22.2 C34 29.4 29.8 34.6 24 37.4 C18.2 34.6 14 29.4 14 22.2 V13.6 Z" fill="rgba(46,230,168,0.16)"/>
+          <path d="M24 16 L26 21 L31 21.2 L27.2 24.4 L28.6 29.4 L24 26.4 L19.4 29.4 L20.8 24.4 L17 21.2 L22 21 Z" fill="#a8f5d4"/>
         </svg>
-
-        <div class="hero-frame">
-          <div class="hud tr"></div><div class="hud tl"></div><div class="hud br"></div><div class="hud bl"></div>
-          <div class="mod-tag"><span class="tick"></span> المخالفات المرورية حسب الإمارة</div>
+        <div class="brand-txt">
+          <div class="ar">شرطة دبي</div>
+          <div class="en">DUBAI&nbsp;POLICE</div>
         </div>
       </div>
+      <div class="tdiv"></div>
+      <div class="center-name">
+        <div class="ar">مركز التحليل والتنبؤ الأمني</div>
+        <div class="en">SECURITY ANALYTICS &amp; FORECAST</div>
+      </div>
+
+      <div class="spacer"></div>
+
+      <div class="clockbox">
+        <div class="t num" id="clock">—:—</div>
+        <div class="d" id="clockDate">—</div>
+      </div>
+      <div class="tdiv"></div>
+      <button class="chip-btn"><span class="ai-dot"></span> المساعد الذكي
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.9 5.7L19.6 10l-5.7 1.9L12 17.6l-1.9-5.7L4.4 10l5.7-1.9z" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="chip-btn quiet">الرئيسية
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </header>
+
+    <div class="filter-rail">
+      <div class="f-tag"><span class="tick"></span> الفلاتر</div>
+      <div class="f-pill seg"></div>
+      <div class="f-pill"></div>
+      <div class="f-pill"></div>
+      <div class="f-pill"></div>
+      <div class="f-pill"></div>
+      <div class="f-note">عناصر التصفية تُسحب هنا</div>
     </div>
 
-    <!-- left column -->
-    <div class="side">
-      <div class="well">
-        <div class="hud tr"></div><div class="hud tl"></div><div class="hud br"></div><div class="hud bl"></div>
-        <div class="mod-tag"><span class="tick"></span> الذكاء الاصطناعي والتنبؤ</div>
-      </div>
-      <div class="well">
-        <div class="hud tr"></div><div class="hud tl"></div><div class="hud br"></div><div class="hud bl"></div>
-        <div class="mod-tag"><span class="tick"></span> متوسط درجة الخطورة</div>
-      </div>
+    <div class="kpi-row">
+      <div class="well"><div class="tag"><span class="tick"></span> عدد المخالفات</div></div>
+      <div class="well"><div class="tag"><span class="tick"></span> قيمة المخالفات</div></div>
+      <div class="well"><div class="tag"><span class="tick"></span> إجمالي السائقين الخطرين</div></div>
     </div>
-  </div>
 
-  <!-- ═══ BOTTOM · sankey ═══ -->
-  <div class="bottom">
-    <div class="well">
-      <div class="hud tr"></div><div class="hud tl"></div><div class="hud br"></div><div class="hud bl"></div>
-      <div class="mod-tag"><span class="tick"></span> معاهد السياقة مقابل فئة الخطورة</div>
+    <div class="row-3">
+      <div class="well"><div class="tag"><span class="tick"></span> نصوص المخالفات الأعلى تكراراً</div></div>
+      <div class="well"><div class="tag"><span class="tick"></span> المخالفات المرورية حسب الإمارة</div></div>
+      <div class="well"><div class="tag"><span class="tick"></span> الذكاء الاصطناعي والتنبؤ</div></div>
+    </div>
+
+    <div class="row-3">
+      <div class="well"><div class="tag"><span class="tick"></span> تصنيف السائقين حسب الخطورة</div></div>
+      <div class="well"><div class="tag"><span class="tick"></span> معاهد السياقة مقابل فئة الخطورة</div></div>
+      <div class="well"><div class="tag"><span class="tick"></span> متوسط درجة الخطورة</div></div>
     </div>
   </div>
-</div>
 
 <script>
 'use strict';
-
-/* ── clock ── */
 function tick() {
   const now = new Date();
   document.getElementById('clock').textContent = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
   document.getElementById('clockDate').textContent = now.toLocaleDateString('ar-AE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 }
 tick(); setInterval(tick, 15000);
-
-/* ── UAE map art ── */
-const OUTLINE = '41,212.9 96.2,242 169.8,225.5 261.8,225.5 303.2,193.5 330.8,157.6 358.4,135.2 384.2,111 409,86.8 441.2,62.5 453.2,36.3 464.2,48 476.2,86.8 479.8,130.4 468.8,154.6 441.2,145 430.2,178.9 425.6,217.7 409,246.8 404.4,295.3 372.2,361.3 243.4,356.4 131.2,339.9 76,287.5';
-document.getElementById('land').setAttribute('points', OUTLINE);
-document.getElementById('halo').setAttribute('points', OUTLINE);
-
-const POLY = OUTLINE.split(' ').map(s => s.split(',').map(Number));
-function inPoly(x, y) {
-  let ins = false;
-  for (let i = 0, j = POLY.length - 1; i < POLY.length; j = i++) {
-    const [xi, yi] = POLY[i], [xj, yj] = POLY[j];
-    if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) ins = !ins;
-  }
-  return ins;
-}
-let dots = '';
-for (let gx = 40; gx < 490; gx += 10) for (let gy = 28; gy < 370; gy += 10) {
-  if (inPoly(gx, gy)) dots += `<circle cx="${gx}" cy="${gy + (Math.floor(gx / 10) % 2) * 5}" r="1.15" class="uae-dots-t"/>`;
-}
-document.getElementById('dotsG').innerHTML = dots;
-
-/* city markers + arcs from Dubai */
-const DXB = [374, 123];
-const CITIES = [
-  { p: [238.8, 247], main: false },  /* أبوظبي */
-  { p: DXB, main: true },            /* دبي */
-  { p: [400, 99],  main: false },    /* الشارقة */
-  { p: [415, 80],  main: false },    /* عجمان */
-  { p: [429, 62],  main: false },    /* أم القيوين */
-  { p: [447, 44],  main: false },    /* رأس الخيمة */
-  { p: [476, 128.5], main: false },  /* الفجيرة */
-];
-let cities = '', arcs = '';
-CITIES.forEach((c, i) => {
-  const [x, y] = c.p;
-  const r = c.main ? 5 : 3.2;
-  cities += `<circle class="city-core" cx="${x}" cy="${y}" r="${r}"/>
-    <circle class="city-ring" cx="${x}" cy="${y}" r="7" style="animation-delay:${(i * 0.45).toFixed(2)}s"/>
-    <circle class="city-ring r2" cx="${x}" cy="${y}" r="7" style="animation-delay:${(i * 0.45 + 1.7).toFixed(2)}s"/>`;
-  if (!c.main) {
-    const mx = (x + DXB[0]) / 2 + (y < DXB[1] ? 14 : -26);
-    const my = (y + DXB[1]) / 2 + (y < DXB[1] ? -20 : -16);
-    const d = `M ${DXB[0]} ${DXB[1]} Q ${mx} ${my} ${x} ${y}`;
-    arcs += `<path class="arc-t" d="${d}"/>
-      <circle r="2.2" fill="#93f2bd" filter="drop-shadow(0 0 4px rgba(63,214,133,0.9))">
-        <animateMotion dur="${(3.2 + i * 0.7).toFixed(1)}s" repeatCount="indefinite" path="${d}"/>
-      </circle>`;
-  }
-});
-document.getElementById('citiesG').innerHTML = cities;
-document.getElementById('arcsG').innerHTML = arcs;
-
-/* ── particle network (quiet) ── */
-const cv = document.getElementById('net'), cx = cv.getContext('2d');
-let W, H, pts;
-function resize() {
-  W = cv.width = innerWidth; H = cv.height = innerHeight;
-  const n = Math.round(Math.min(60, W * H / 38000));
-  pts = Array.from({ length: n }, () => ({
-    x: Math.random() * W, y: Math.random() * H,
-    vx: (Math.random() - 0.5) * 0.2, vy: (Math.random() - 0.5) * 0.2,
-    r: 0.8 + Math.random() * 1.3,
-  }));
-}
-resize(); addEventListener('resize', resize);
-const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-function frame() {
-  cx.clearRect(0, 0, W, H);
-  const LINK = Math.min(140, W / 14);
-  for (const p of pts) {
-    p.x += p.vx; p.y += p.vy;
-    if (p.x < -20) p.x = W + 20; if (p.x > W + 20) p.x = -20;
-    if (p.y < -20) p.y = H + 20; if (p.y > H + 20) p.y = -20;
-  }
-  cx.lineWidth = 1;
-  for (let i = 0; i < pts.length; i++) {
-    for (let j = i + 1; j < pts.length; j++) {
-      const a = pts[i], b = pts[j];
-      const dx = a.x - b.x, dy = a.y - b.y;
-      const d2 = dx * dx + dy * dy;
-      if (d2 < LINK * LINK) {
-        const o = (1 - Math.sqrt(d2) / LINK) * 0.11;
-        cx.strokeStyle = `rgba(147,242,189,${o.toFixed(3)})`;
-        cx.beginPath(); cx.moveTo(a.x, a.y); cx.lineTo(b.x, b.y); cx.stroke();
-      }
-    }
-  }
-  for (const p of pts) {
-    cx.fillStyle = 'rgba(147,242,189,0.32)';
-    cx.beginPath(); cx.arc(p.x, p.y, p.r, 0, 7); cx.fill();
-  }
-  if (!reduced) requestAnimationFrame(frame);
-}
-frame();
 </script>
 </body>
 </html>

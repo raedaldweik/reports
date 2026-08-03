@@ -202,6 +202,41 @@
   .kpi-sub .chip.up { color: #e0836a; }
   .kpi-sub .chip.dn { color: #6fe6b1; }
   .kpi-spark { flex: 0 0 auto; width: 5.8cqw; height: 2.3cqw; }
+
+  /* ════════════════════════════════════════════════════════════════
+   *  MOTION — off unless <body class="motion"> (add ?static to freeze).
+   *  Every animation is slow and loops on existing elements only:
+   *  any paused frame equals the approved static design.
+   * ════════════════════════════════════════════════════════════════ */
+  @keyframes m-orbit     { to { transform: rotate(360deg); } }
+  @keyframes m-orbit-rev { to { transform: rotate(-360deg); } }
+  @keyframes m-breathe   { 0%, 100% { opacity: 0.72; } 50% { opacity: 1; } }
+  @keyframes m-halo      { 0%, 100% { transform: scale(1); opacity: 0.92; } 50% { transform: scale(1.05); opacity: 1; } }
+  @keyframes m-drift     { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(14px); } }
+  @keyframes m-bloom     { 0%, 100% { transform: translateX(0); opacity: 0.85; } 50% { transform: translateX(-46px); opacity: 1; } }
+  @keyframes m-tw        { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+
+  body.motion .orbit-a,
+  body.motion .orbit-b,
+  body.motion .orbit-c,
+  body.motion .dash-ring,
+  body.motion .halo { transform-box: view-box; transform-origin: 960px 540px; }
+  body.motion .orbit-a   { animation: m-orbit 55s linear infinite; }
+  body.motion .orbit-b   { animation: m-orbit-rev 85s linear infinite; }
+  body.motion .orbit-c   { animation: m-orbit 115s linear infinite; }
+  body.motion .dash-ring { animation: m-orbit-rev 150s linear infinite; }
+  body.motion .halo      { animation: m-halo 14s ease-in-out infinite; }
+  body.motion .corner-sweep { transform-box: view-box; transform-origin: 1905px -60px; animation: m-orbit 95s linear infinite; }
+  body.motion .bloom     { transform-box: view-box; animation: m-bloom 34s ease-in-out infinite; }
+  body.motion .flare-ln  { animation: m-breathe 11s ease-in-out infinite; }
+  body.motion .shaft     { animation: m-breathe 17s ease-in-out infinite; }
+  body.motion .contours  { transform-box: view-box; animation: m-drift 30s ease-in-out infinite; }
+  body.motion .contours.c-high { animation-duration: 40s; animation-direction: reverse; }
+  body.motion .dust circle { animation: m-tw 7s ease-in-out infinite; }
+  body.motion .dust circle:nth-child(2n) { animation-delay: 1.7s; }
+  body.motion .dust circle:nth-child(3n) { animation-delay: 3.2s; }
+  body.motion .dust circle:nth-child(5n) { animation-delay: 4.9s; animation-duration: 9.5s; }
+  @media (prefers-reduced-motion: reduce) { body.motion * { animation: none !important; } }
 </style>
 </head>
 <body>
@@ -284,16 +319,18 @@
       <circle cx="1905" cy="-60" r="560" stroke="url(#cornerGrad)" stroke-width="1.2"/>
       <circle cx="1905" cy="-60" r="640" stroke="rgba(146, 255, 205, 0.06)" stroke-width="1"/>
       <circle cx="1905" cy="-60" r="710" stroke="rgba(146, 255, 205, 0.035)" stroke-width="1"/>
-      <path d="M 1489 373 A 640 640 0 0 1 1370 219" stroke="url(#arcGrad)" stroke-width="1.8" stroke-linecap="round" filter="url(#arcGlow)"/>
-      <circle cx="1489" cy="373" r="3" fill="rgba(46, 230, 168, 0.8)"/>
+      <g class="corner-sweep">
+        <path d="M 1489 373 A 640 640 0 0 1 1370 219" stroke="url(#arcGrad)" stroke-width="1.8" stroke-linecap="round" filter="url(#arcGlow)"/>
+        <circle cx="1489" cy="373" r="3" fill="rgba(46, 230, 168, 0.8)"/>
+      </g>
       <circle cx="30" cy="1130" r="480" stroke="rgba(146, 255, 205, 0.05)" stroke-width="1"/>
       <circle cx="30" cy="1130" r="545" stroke="rgba(146, 255, 205, 0.03)" stroke-width="1"/>
     </g>
 
-    <ellipse cx="1085" cy="540" rx="330" ry="60" fill="url(#flareBloom)"/>
-    <rect x="330" y="539.2" width="1260" height="1.6" fill="url(#flareGrad)"/>
+    <ellipse class="bloom" cx="1085" cy="540" rx="330" ry="60" fill="url(#flareBloom)"/>
+    <rect class="flare-ln" x="330" y="539.2" width="1260" height="1.6" fill="url(#flareGrad)"/>
 
-    <g fill="none" stroke="url(#lineFade)" stroke-width="1.1">
+    <g class="contours" fill="none" stroke="url(#lineFade)" stroke-width="1.1">
       <path d="M -40 852  C 420 800, 760 918, 1150 860  S 1720 792, 1960 838"/>
       <path d="M -40 886  C 430 836, 770 950, 1160 892  S 1730 826, 1960 872"/>
       <path d="M -40 921  C 440 873, 780 983, 1170 925  S 1740 861, 1960 907"/>
@@ -301,13 +338,13 @@
       <path d="M -40 994  C 460 950, 800 1052, 1190 994 S 1760 934, 1960 980"/>
       <path d="M -40 1032 C 470 990, 810 1088, 1200 1030 S 1770 972, 1960 1018"/>
     </g>
-    <g fill="none" stroke="url(#lineFade)" stroke-width="1" opacity="0.45">
+    <g class="contours c-high" fill="none" stroke="url(#lineFade)" stroke-width="1" opacity="0.45">
       <path d="M -40 118 C 480 168, 900 76, 1300 130 S 1800 186, 1960 152"/>
       <path d="M -40 84  C 490 132, 910 44,  1310 96  S 1810 150, 1960 118"/>
     </g>
 
     <g>
-      <circle cx="960" cy="540" r="430" fill="url(#haloGrad)"/>
+      <circle class="halo" cx="960" cy="540" r="430" fill="url(#haloGrad)"/>
       <circle cx="960" cy="540" r="150" fill="url(#glassGrad)" stroke="rgba(180, 255, 224, 0.10)" stroke-width="1"/>
       <g stroke="rgba(146, 255, 205, 0.045)" stroke-width="1">
         <line x1="960" y1="180" x2="960" y2="900"/>
@@ -317,18 +354,24 @@
       <circle cx="960" cy="540" r="286" fill="none" stroke="rgba(146, 255, 205, 0.085)" stroke-width="1"/>
       <circle cx="960" cy="540" r="368" fill="none" stroke="rgba(146, 255, 205, 0.055)" stroke-width="1"/>
       <circle cx="960" cy="540" r="452" fill="none" stroke="rgba(146, 255, 205, 0.035)" stroke-width="1"/>
-      <circle cx="960" cy="540" r="324" fill="none" stroke="rgba(146, 255, 205, 0.09)" stroke-width="1" stroke-dasharray="2 10"/>
+      <circle class="dash-ring" cx="960" cy="540" r="324" fill="none" stroke="rgba(146, 255, 205, 0.09)" stroke-width="1" stroke-dasharray="2 10"/>
       <g id="ticks" stroke="rgba(146, 255, 205, 0.10)" stroke-width="1"></g>
-      <path d="M 960 328 A 212 212 0 0 1 1148 431"
-            fill="none" stroke="url(#arcGrad)" stroke-width="2.5" stroke-linecap="round" filter="url(#arcGlow)"/>
-      <path d="M 772 649 A 286 286 0 0 1 700 466"
-            fill="none" stroke="url(#arcGrad2)" stroke-width="2" stroke-linecap="round" filter="url(#arcGlow)"/>
-      <path d="M 1128 815 A 324 324 0 0 0 1244 700"
-            fill="none" stroke="rgba(46, 230, 168, 0.28)" stroke-width="1.6" stroke-linecap="round" filter="url(#arcGlow)"/>
-      <circle cx="1148" cy="431" r="4"   fill="#2ee6a8" filter="url(#arcGlow)"/>
-      <circle cx="1148" cy="431" r="9"   fill="none" stroke="rgba(46, 230, 168, 0.35)" stroke-width="1"/>
-      <circle cx="700"  cy="466" r="3"   fill="rgba(46, 230, 168, 0.75)"/>
-      <circle cx="960"  cy="328" r="2.5" fill="rgba(146, 255, 205, 0.55)"/>
+      <g class="orbit-a">
+        <path d="M 960 328 A 212 212 0 0 1 1148 431"
+              fill="none" stroke="url(#arcGrad)" stroke-width="2.5" stroke-linecap="round" filter="url(#arcGlow)"/>
+        <circle cx="1148" cy="431" r="4" fill="#2ee6a8" filter="url(#arcGlow)"/>
+        <circle cx="1148" cy="431" r="9" fill="none" stroke="rgba(46, 230, 168, 0.35)" stroke-width="1"/>
+        <circle cx="960" cy="328" r="2.5" fill="rgba(146, 255, 205, 0.55)"/>
+      </g>
+      <g class="orbit-b">
+        <path d="M 772 649 A 286 286 0 0 1 700 466"
+              fill="none" stroke="url(#arcGrad2)" stroke-width="2" stroke-linecap="round" filter="url(#arcGlow)"/>
+        <circle cx="700" cy="466" r="3" fill="rgba(46, 230, 168, 0.75)"/>
+      </g>
+      <g class="orbit-c">
+        <path d="M 1128 815 A 324 324 0 0 0 1244 700"
+              fill="none" stroke="rgba(46, 230, 168, 0.28)" stroke-width="1.6" stroke-linecap="round" filter="url(#arcGlow)"/>
+      </g>
       <g stroke="rgba(146, 255, 205, 0.22)" stroke-width="1.5">
         <line x1="960" y1="82"  x2="960" y2="96"/>
         <line x1="960" y1="984" x2="960" y2="998"/>
@@ -346,7 +389,7 @@
       <path d="M 640 940 h 10 M 645 935 v 10"/>
     </g>
 
-    <g>
+    <g class="dust">
       <circle cx="410"  cy="330" r="1.6" fill="rgba(146, 255, 205, 0.28)"/>
       <circle cx="530"  cy="770" r="1.3" fill="rgba(146, 255, 205, 0.18)"/>
       <circle cx="705"  cy="205" r="1.8" fill="rgba(146, 255, 205, 0.33)"/>
@@ -741,5 +784,6 @@ tick(); setInterval(tick, 15000);
   });
 })();
 </script>
+<script>if(!/[?&]static/.test(location.search))document.body.classList.add("motion");</script>
 </body>
 </html>

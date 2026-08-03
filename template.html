@@ -10,16 +10,15 @@
 <style>
   /* ════════════════════════════════════════════════════════════════════
    *  ✦  شرطة دبي · القالب السينمائي  ✦
-   *  Cinematic command-stage template for SAS VA web-content overlay.
-   *  Every "well" is an empty drop zone — drag SAS objects on top of it.
+   *  Poster-stage backdrop for SAS VA web-content overlay.
+   *  Same inventory as the source dashboard: 3 KPIs · 6 objects · filters.
+   *  Every "well" is an empty drop zone labelled with its intended object.
    * ════════════════════════════════════════════════════════════════════ */
   :root {
     --bg-0: #040b07;
-    --bg-1: #071309;
     --glass:        rgba(13, 33, 24, 0.40);
     --glass-strong: rgba(16, 40, 29, 0.66);
     --hairline:      rgba(146, 255, 205, 0.10);
-    --hairline-soft: rgba(146, 255, 205, 0.05);
     --highlight:     rgba(210, 255, 232, 0.09);
 
     --ink-1: #eefff6;
@@ -28,7 +27,6 @@
     --ink-4: #5b7c6b;
     --ink-5: #3d564a;
 
-    --seq-2: #1f7a4b;
     --seq-3: #27a563;
     --seq-4: #3fd685;
     --seq-5: #93f2bd;
@@ -60,12 +58,12 @@
     container-type: inline-size;
     overflow: hidden;
     display: grid;
-    grid-template-rows: auto auto 1fr auto;
-    gap: 0.6cqw;
-    padding: 0.75cqw 1cqw 1.5cqw;
+    grid-template-rows: auto auto auto 1fr auto;
+    gap: 0.65cqw;
+    padding: 0.75cqw 1cqw 0.85cqw;
     background:
-      radial-gradient(ellipse 70% 55% at 50% 118%, rgba(31, 122, 75, 0.30) 0%, transparent 62%),
-      radial-gradient(ellipse 62% 46% at 88% -10%, rgba(24, 92, 60, 0.32)  0%, transparent 60%),
+      radial-gradient(ellipse 70% 55% at 50% 118%, rgba(31, 122, 75, 0.28) 0%, transparent 62%),
+      radial-gradient(ellipse 62% 46% at 88% -10%, rgba(24, 92, 60, 0.30)  0%, transparent 60%),
       radial-gradient(ellipse 40% 34% at 6% 4%,    rgba(216, 180, 90, 0.05) 0%, transparent 60%),
       linear-gradient(158deg, #081611 0%, #050f0a 45%, #030c07 100%);
   }
@@ -75,70 +73,26 @@
     content: '';
     position: absolute; inset: 0; z-index: 0;
     background-image:
-      radial-gradient(circle at 1px 1px, rgba(146, 255, 205, 0.030) 1px, transparent 1px),
-      radial-gradient(circle at 23px 17px, rgba(146, 255, 205, 0.015) 1px, transparent 1px);
+      radial-gradient(circle at 1px 1px, rgba(146, 255, 205, 0.028) 1px, transparent 1px),
+      radial-gradient(circle at 23px 17px, rgba(146, 255, 205, 0.014) 1px, transparent 1px);
     background-size: 32px 32px, 48px 48px;
     pointer-events: none;
   }
 
-  /* perspective floor grid — the cinematic ground plane */
-  .floor {
-    position: absolute; inset: auto 0 0 0; height: 46%;
-    z-index: 0; pointer-events: none;
-    background-image:
-      linear-gradient(rgba(63, 214, 133, 0.14) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(63, 214, 133, 0.14) 1px, transparent 1px);
-    background-size: 3.6cqw 3.2cqw;
-    transform: perspective(60cqw) rotateX(58deg) scale(1.7);
-    transform-origin: 50% 100%;
-    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 55%, rgba(0,0,0,0.55) 100%);
-            mask-image: linear-gradient(180deg, transparent 0%, #000 55%, rgba(0,0,0,0.55) 100%);
-    animation: floor-drift 14s linear infinite;
-  }
-  @keyframes floor-drift { from { background-position: 0 0, 0 0; } to { background-position: 0 3.2cqw, 0 3.2cqw; } }
-
   /* aurora blobs */
   .bokeh { position: absolute; border-radius: 50%; transform: translate(-50%, -50%); aspect-ratio: 1; pointer-events: none; z-index: 0; }
-  .b-mint { background: radial-gradient(circle, rgba(63,214,133,0.14) 0%, rgba(63,214,133,0.03) 40%, transparent 70%); filter: blur(2cqw); }
-  .b-teal { background: radial-gradient(circle, rgba(38,168,138,0.12) 0%, rgba(38,168,138,0.03) 40%, transparent 70%); filter: blur(2.2cqw); }
-  .b-gold { background: radial-gradient(circle, rgba(216,180,90,0.10) 0%, rgba(216,180,90,0.02) 42%, transparent 72%); filter: blur(1.8cqw); }
+  .b-mint { background: radial-gradient(circle, rgba(63,214,133,0.13) 0%, rgba(63,214,133,0.03) 40%, transparent 70%); filter: blur(2cqw); }
+  .b-teal { background: radial-gradient(circle, rgba(38,168,138,0.11) 0%, rgba(38,168,138,0.03) 40%, transparent 70%); filter: blur(2.2cqw); }
+  .b-gold { background: radial-gradient(circle, rgba(216,180,90,0.09) 0%, rgba(216,180,90,0.02) 42%, transparent 72%); filter: blur(1.8cqw); }
   @keyframes breathe { 0%,100% { opacity: 0.55; transform: translate(-50%,-50%) scale(1); } 50% { opacity: 1; transform: translate(-50%,-50%) scale(1.08); } }
   .bokeh { animation: breathe 11s ease-in-out infinite; }
-  .k1 { top: 10%; left: 12%; width: 26cqw; }
-  .k2 { top: 86%; left: 86%; width: 30cqw; animation-delay: 3s; }
-  .k3 { top: 16%; left: 86%; width: 18cqw; animation-delay: 6s; }
-  .k4 { top: 80%; left: 16%; width: 22cqw; animation-delay: 1.6s; }
+  .k1 { top: 10%; left: 12%; width: 24cqw; }
+  .k2 { top: 86%; left: 86%; width: 28cqw; animation-delay: 3s; }
+  .k3 { top: 16%; left: 86%; width: 17cqw; animation-delay: 6s; }
+  .k4 { top: 80%; left: 16%; width: 20cqw; animation-delay: 1.6s; }
 
   /* particle canvas */
   #net { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
-
-  /* travelling scanline */
-  .scanline {
-    position: absolute; inset-inline: 0; top: -12%;
-    height: 10%;
-    z-index: 1; pointer-events: none;
-    background: linear-gradient(180deg, transparent 0%, rgba(63, 214, 133, 0.045) 45%, rgba(147, 242, 189, 0.09) 50%, rgba(63, 214, 133, 0.045) 55%, transparent 100%);
-    animation: scan 13s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-  @keyframes scan { 0% { top: -12%; } 62% { top: 108%; } 100% { top: 108%; } }
-
-  /* shooting light streaks */
-  .streak {
-    position: absolute; z-index: 1; pointer-events: none;
-    width: 16cqw; height: 1.5px;
-    background: linear-gradient(90deg, transparent, rgba(147, 242, 189, 0.7), transparent);
-    filter: drop-shadow(0 0 6px rgba(63, 214, 133, 0.7));
-    opacity: 0;
-    transform: rotate(-24deg);
-    animation: shoot 9s ease-in infinite;
-  }
-  .s1 { top: 16%; left: -18%; animation-delay: 2s; }
-  .s2 { top: 52%; left: -18%; animation-delay: 6.4s; width: 11cqw; }
-  @keyframes shoot {
-    0%, 88% { opacity: 0; transform: translateX(0) rotate(-24deg); }
-    90% { opacity: 0.9; }
-    100% { opacity: 0; transform: translateX(135cqw) rotate(-24deg); }
-  }
 
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: 0.001s !important; animation-iteration-count: 1 !important; transition-duration: 0.001s !important; }
@@ -166,7 +120,6 @@
   .topbar-div { width: 1px; height: 2cqw; background: linear-gradient(180deg, transparent, var(--hairline), transparent); }
   .center-name .ar { font-size: 0.74cqw; font-weight: 600; color: var(--ink-2); }
   .center-name .en { font-size: 0.47cqw; font-weight: 600; color: var(--ink-4); letter-spacing: 0.14em; font-family: 'Manrope'; }
-  .topbar-spacer { flex: 1; }
   .clockbox { text-align: center; }
   .clockbox .t { font-size: 0.9cqw; font-weight: 700; color: var(--ink-1); letter-spacing: 0.04em; }
   .clockbox .d { font-size: 0.48cqw; color: var(--ink-3); font-weight: 500; }
@@ -198,73 +151,72 @@
     backdrop-filter: blur(12px);
     min-height: 0; min-width: 0;
   }
-  /* HUD corner brackets */
-  .well .hud { position: absolute; width: 1.1cqw; height: 1.1cqw; pointer-events: none; opacity: 0.85; }
+  /* quiet HUD corner brackets */
+  .well .hud { position: absolute; width: 0.85cqw; height: 0.85cqw; pointer-events: none; }
   .well .hud::before {
     content: ''; position: absolute; inset: 0;
-    border: 2px solid rgba(63, 214, 133, 0.55);
-    filter: drop-shadow(0 0 4px rgba(63, 214, 133, 0.5));
-    animation: hud-pulse 4s ease-in-out infinite;
+    border: 1.5px solid rgba(63, 214, 133, 0.38);
+    animation: hud-pulse 6s ease-in-out infinite;
   }
-  @keyframes hud-pulse { 0%,100% { opacity: 0.55; } 50% { opacity: 1; } }
-  .hud.tr { top: -2px; inset-inline-start: -2px; } .hud.tr::before { border-inline-end: 0; border-bottom: 0; border-start-start-radius: 0.5cqw; }
-  .hud.tl { top: -2px; inset-inline-end: -2px; } .hud.tl::before { border-inline-start: 0; border-bottom: 0; border-start-end-radius: 0.5cqw; }
-  .hud.br { bottom: -2px; inset-inline-start: -2px; } .hud.br::before { border-inline-end: 0; border-top: 0; border-end-start-radius: 0.5cqw; }
-  .hud.bl { bottom: -2px; inset-inline-end: -2px; } .hud.bl::before { border-inline-start: 0; border-top: 0; border-end-end-radius: 0.5cqw; }
+  @keyframes hud-pulse { 0%,100% { opacity: 0.45; } 50% { opacity: 0.95; } }
+  .hud.tr { top: -1px; inset-inline-start: -1px; } .hud.tr::before { border-inline-end: 0; border-bottom: 0; border-start-start-radius: 0.45cqw; }
+  .hud.tl { top: -1px; inset-inline-end: -1px; } .hud.tl::before { border-inline-start: 0; border-bottom: 0; border-start-end-radius: 0.45cqw; }
+  .hud.br { bottom: -1px; inset-inline-start: -1px; } .hud.br::before { border-inline-end: 0; border-top: 0; border-end-start-radius: 0.45cqw; }
+  .hud.bl { bottom: -1px; inset-inline-end: -1px; } .hud.bl::before { border-inline-start: 0; border-top: 0; border-end-end-radius: 0.45cqw; }
 
-  /* module tag */
+  /* module tag — names the SAS object that belongs in the well */
   .mod-tag {
     position: absolute; top: 0.55cqw; inset-inline-start: 0.7cqw;
-    display: inline-flex; align-items: center; gap: 0.35cqw;
-    font-size: 0.5cqw; font-weight: 700; color: var(--ink-4);
-    letter-spacing: 0.06em;
+    display: inline-flex; align-items: center; gap: 0.38cqw;
+    font-size: 0.6cqw; font-weight: 700; color: var(--ink-3);
     pointer-events: none; z-index: 1;
   }
-  .mod-tag .en { font-family: 'Manrope'; font-size: 0.44cqw; letter-spacing: 0.22em; color: var(--ink-5); }
-  .mod-tag .tick { width: 0.24cqw; height: 0.8cqw; border-radius: 0.2cqw; background: linear-gradient(180deg, var(--seq-5), var(--seq-3)); box-shadow: 0 0 0.4cqw var(--accent-glow); }
-
-  /* ghost hint at well center */
-  .ghost {
-    position: absolute; inset: 0;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5cqw;
-    color: var(--ink-5);
-    pointer-events: none;
-  }
-  .ghost svg { width: 2.2cqw; height: 2.2cqw; opacity: 0.5; }
-  .ghost .g-lbl { font-size: 0.56cqw; font-weight: 600; opacity: 0.8; }
-  .ghost .g-dash {
-    position: absolute; inset: 1.4cqw 0.9cqw 0.9cqw;
-    border: 1.5px dashed rgba(146, 255, 205, 0.10);
-    border-radius: 0.7cqw;
-    animation: dash-glow 5s ease-in-out infinite;
-  }
-  @keyframes dash-glow { 0%,100% { border-color: rgba(146,255,205,0.07); } 50% { border-color: rgba(146,255,205,0.17); } }
+  .mod-tag .tick { width: 0.24cqw; height: 0.85cqw; border-radius: 0.2cqw; background: linear-gradient(180deg, var(--seq-5), var(--seq-3)); box-shadow: 0 0 0.4cqw var(--accent-glow); }
 
   /* ════════════════════════════════════════════════════════════════
    *  FILTER DOCK
    * ════════════════════════════════════════════════════════════════ */
   .filter-dock {
     position: relative; z-index: 3;
-    height: 2.6cqw;
+    height: 2.55cqw;
     display: flex; align-items: center; gap: 0.7cqw;
-    padding: 0 1cqw;
+    padding: 0 0.9cqw;
   }
   .filter-dock .mod-tag { position: static; }
   .fd-ghosts { display: flex; align-items: center; gap: 0.5cqw; flex: 1; }
   .fd-pill {
-    height: 1.5cqw; border-radius: 2cqw;
-    border: 1.5px dashed rgba(146, 255, 205, 0.13);
+    height: 1.45cqw; border-radius: 2cqw;
+    border: 1.5px dashed rgba(146, 255, 205, 0.12);
     flex: 0 0 9cqw;
     animation: dash-glow 5s ease-in-out infinite;
   }
   .fd-pill:nth-child(2) { animation-delay: 0.7s; }
   .fd-pill:nth-child(3) { animation-delay: 1.4s; }
   .fd-pill:nth-child(4) { animation-delay: 2.1s; }
-  .fd-pill:nth-child(5) { animation-delay: 2.8s; flex-basis: 12cqw; }
-  .fd-note { font-size: 0.5cqw; color: var(--ink-5); font-weight: 600; }
+  .fd-pill:nth-child(5) { animation-delay: 2.8s; flex-basis: 6.5cqw; }
+  @keyframes dash-glow { 0%,100% { border-color: rgba(146,255,205,0.08); } 50% { border-color: rgba(146,255,205,0.16); } }
 
   /* ════════════════════════════════════════════════════════════════
-   *  MAIN COMPOSITION — side columns + centre hero
+   *  KPI ROW — the 3 KPIs of the source dashboard
+   * ════════════════════════════════════════════════════════════════ */
+  .kpi-row {
+    position: relative; z-index: 2;
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 0.7cqw;
+    height: 5.6cqw;
+  }
+  .kpi-well .mod-tag { top: 0.6cqw; }
+  .kpi-well::after {
+    content: '';
+    position: absolute; inset-inline-start: 0; top: 18%; bottom: 18%;
+    width: 3px; border-radius: 3px;
+    background: linear-gradient(180deg, var(--seq-5), var(--seq-3));
+    box-shadow: 0 0 0.7cqw var(--accent-glow);
+    opacity: 0.75;
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+   *  MAIN COMPOSITION — 2 side objects each flank the map hero
    * ════════════════════════════════════════════════════════════════ */
   .main {
     position: relative; z-index: 2;
@@ -273,31 +225,25 @@
     gap: 0.7cqw;
     min-height: 0;
   }
-  .side { display: grid; grid-template-rows: 0.62fr 1fr 1fr; gap: 0.7cqw; min-height: 0; }
+  .side { display: grid; grid-template-rows: 1fr 1fr; gap: 0.7cqw; min-height: 0; }
 
   /* ── HERO ── */
-  .hero {
-    position: relative;
-    display: flex; flex-direction: column;
-    min-height: 0;
-    border-radius: 1.2cqw;
-    overflow: hidden;
-  }
-  .hero-title { text-align: center; padding: 0.4cqw 0 0; position: relative; z-index: 3; }
+  .hero { position: relative; display: flex; flex-direction: column; min-height: 0; }
+  .hero-title { text-align: center; padding: 0.25cqw 0 0; position: relative; z-index: 3; }
   .hero-title h1 {
-    font-size: 2.15cqw; font-weight: 700; line-height: 1.25;
+    font-size: 1.95cqw; font-weight: 700; line-height: 1.25;
     background: linear-gradient(100deg, #eefff6 15%, #93f2bd 38%, #d8b45a 52%, #93f2bd 66%, #eefff6 85%);
     background-size: 220% 100%;
     -webkit-background-clip: text; background-clip: text;
     -webkit-text-fill-color: transparent; color: transparent;
-    animation: title-sheen 7s ease-in-out infinite;
-    filter: drop-shadow(0 0 1.6cqw rgba(63, 214, 133, 0.25));
+    animation: title-sheen 8s ease-in-out infinite;
+    filter: drop-shadow(0 0 1.6cqw rgba(63, 214, 133, 0.22));
   }
   @keyframes title-sheen { 0%,100% { background-position: 0% 0; } 50% { background-position: 100% 0; } }
   .hero-sub {
     display: flex; align-items: center; justify-content: center; gap: 0.7cqw;
-    font-size: 0.62cqw; color: var(--ink-3); font-weight: 500;
-    margin-top: 0.15cqw;
+    font-size: 0.6cqw; color: var(--ink-3); font-weight: 500;
+    margin-top: 0.1cqw;
   }
   .hero-sub .line { width: 4cqw; height: 1px; background: linear-gradient(90deg, transparent, rgba(146,255,205,0.35)); }
   .hero-sub .line.l2 { background: linear-gradient(-90deg, transparent, rgba(146,255,205,0.35)); }
@@ -305,7 +251,7 @@
     display: inline-flex; align-items: center; gap: 0.35cqw;
     font-size: 0.52cqw; font-weight: 700; color: var(--seq-5);
     border: 1px solid rgba(63,214,133,0.35); border-radius: 2cqw;
-    padding: 0.18cqw 0.65cqw;
+    padding: 0.16cqw 0.6cqw;
     background: rgba(63,214,133,0.07);
   }
   .live-pill .ld { width: 0.36cqw; height: 0.36cqw; border-radius: 50%; background: var(--seq-4); box-shadow: 0 0 0.45cqw var(--seq-4); animation: pulse-dot 1.8s ease-in-out infinite; }
@@ -313,34 +259,20 @@
   .hero-map { position: relative; flex: 1; min-height: 0; }
   .hero-map svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 
-  /* orbit rings behind the map */
+  /* single slow orbit ring behind the map */
   .orbit {
-    position: absolute; top: 50%; left: 50%;
+    position: absolute; top: 52%; left: 50%;
     transform: translate(-50%, -50%);
-    border-radius: 50%; pointer-events: none;
-  }
-  .orbit.o1 {
-    width: 44cqw; height: 44cqw;
-    border: 1px dashed rgba(146, 255, 205, 0.13);
-    animation: spin 70s linear infinite;
-  }
-  .orbit.o2 {
-    width: 37cqw; height: 37cqw;
-    border: 1px dashed rgba(146, 255, 205, 0.09);
-    animation: spin 50s linear infinite reverse;
-  }
-  .orbit.o3 {
-    width: 50cqw; height: 50cqw;
-    background: conic-gradient(from 0deg, transparent 0deg, rgba(63, 214, 133, 0.07) 24deg, transparent 60deg, transparent 360deg);
-    animation: spin 24s linear infinite;
-    -webkit-mask: radial-gradient(circle, transparent 62%, #000 63%, #000 66%, transparent 67%);
-            mask: radial-gradient(circle, transparent 62%, #000 63%, #000 66%, transparent 67%);
+    width: 41cqw; height: 41cqw;
+    border-radius: 50%;
+    border: 1px dashed rgba(146, 255, 205, 0.11);
+    animation: spin 80s linear infinite;
+    pointer-events: none;
   }
   @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
-  @keyframes sweep-spin { to { transform: rotate(360deg); } }
   .orbit .sat {
-    position: absolute; top: -0.28cqw; left: 50%;
-    width: 0.55cqw; height: 0.55cqw; border-radius: 50%;
+    position: absolute; top: -0.26cqw; left: 50%;
+    width: 0.5cqw; height: 0.5cqw; border-radius: 50%;
     background: var(--seq-5);
     box-shadow: 0 0 0.7cqw var(--seq-4);
   }
@@ -353,67 +285,30 @@
   .city-ring   { fill: none; stroke: rgba(147, 242, 189, 0.8); stroke-width: 1.4; transform-box: fill-box; transform-origin: center; animation: ping 3.4s cubic-bezier(0.2, 0.6, 0.4, 1) infinite; }
   .city-ring.r2 { animation-delay: 1.7s; }
   @keyframes ping { 0% { transform: scale(0.25); opacity: 0.95; } 75% { transform: scale(2.6); opacity: 0; } 100% { transform: scale(2.6); opacity: 0; } }
-  .arc-t { fill: none; stroke: rgba(147, 242, 189, 0.30); stroke-width: 1.3; stroke-dasharray: 5 7; animation: arc-march 1.6s linear infinite; }
+  .arc-t { fill: none; stroke: rgba(147, 242, 189, 0.28); stroke-width: 1.3; stroke-dasharray: 5 7; animation: arc-march 1.6s linear infinite; }
   @keyframes arc-march { to { stroke-dashoffset: -12; } }
-  .radar-wedge { transform-box: fill-box; transform-origin: 0% 0%; animation: none; }
-  .coord { font-family: 'Manrope'; font-size: 9.5px; font-weight: 600; fill: rgba(146, 255, 205, 0.30); letter-spacing: 0.14em; }
+  @keyframes sweep-spin { to { transform: rotate(360deg); } }
+  .coord { font-family: 'Manrope'; font-size: 9.5px; font-weight: 600; fill: rgba(146, 255, 205, 0.26); letter-spacing: 0.14em; }
 
-  /* hero drop-zone frame (subtle, sits over the art) */
-  .hero-frame {
-    position: absolute; inset: 3.4cqw 2cqw 0.6cqw;
-    border-radius: 1cqw;
-    pointer-events: none;
-    z-index: 2;
-  }
-  .hero-frame .mod-tag { inset-inline-start: 0.2cqw; top: 0.1cqw; }
-
-  /* KPI wells inside side columns */
-  .kpi-well .ghost { flex-direction: row; gap: 0.8cqw; }
-  .kpi-well .ghost svg { width: 1.7cqw; height: 1.7cqw; }
-  .kpi-well .g-bars { display: flex; flex-direction: column; gap: 0.3cqw; align-items: flex-start; }
-  .kpi-well .g-bar { height: 0.5cqw; border-radius: 0.3cqw; background: rgba(146, 255, 205, 0.10); animation: g-shimmer 3.2s ease-in-out infinite; }
-  .kpi-well .g-bar.w1 { width: 5cqw; }
-  .kpi-well .g-bar.w2 { width: 3.2cqw; animation-delay: 0.5s; }
-  @keyframes g-shimmer { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+  /* hero drop-zone frame */
+  .hero-frame { position: absolute; inset: 3cqw 1.6cqw 0.5cqw; border-radius: 1cqw; pointer-events: none; z-index: 2; }
+  .hero-frame .mod-tag { inset-inline-start: 0.2cqw; top: auto; bottom: 0.15cqw; }
 
   /* ════════════════════════════════════════════════════════════════
-   *  BOTTOM STRIP + TICKER
+   *  BOTTOM STRIP — the wide 6th object
    * ════════════════════════════════════════════════════════════════ */
-  .bottom { position: relative; z-index: 2; height: 9.2cqw; }
+  .bottom { position: relative; z-index: 2; height: 8.6cqw; }
   .bottom .well { height: 100%; }
-
-  .ticker {
-    position: absolute; bottom: 0.15cqw; inset-inline: 1cqw;
-    height: 1.05cqw;
-    display: flex; align-items: center;
-    overflow: hidden;
-    z-index: 3;
-    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-            mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-  }
-  .ticker-track {
-    display: inline-flex; align-items: center; gap: 2.2cqw;
-    white-space: nowrap;
-    font-size: 0.5cqw; font-weight: 500; color: var(--ink-4);
-    animation: ticker-slide 42s linear infinite;
-  }
-  @keyframes ticker-slide { from { transform: translateX(0); } to { transform: translateX(50%); } }
-  .ticker-track .sep { color: var(--seq-3); }
-  .ticker-track b { color: var(--ink-3); font-weight: 700; }
 </style>
 </head>
 <body>
 <div class="stage" id="stage">
 
   <canvas id="net"></canvas>
-  <div class="floor"></div>
   <div class="bokeh b-mint k1"></div>
   <div class="bokeh b-teal k2"></div>
   <div class="bokeh b-gold k3"></div>
   <div class="bokeh b-teal k4"></div>
-  <div class="scanline"></div>
-  <div class="streak s1"></div>
-  <div class="streak s2"></div>
 
   <!-- ═══ HEADER ═══ -->
   <header class="topbar">
@@ -449,52 +344,49 @@
     </button>
   </header>
 
-  <!-- ═══ FILTER DOCK (drop SAS filter controls here) ═══ -->
+  <!-- ═══ FILTER DOCK · مقيم/مواطن + الجنسية + مصدر اللوحة + نص المخالفة + صنف المركبة ═══ -->
   <div class="well filter-dock">
     <div class="hud tr"></div><div class="hud tl"></div><div class="hud br"></div><div class="hud bl"></div>
-    <div class="mod-tag"><span class="tick"></span> منطقة الفلاتر <span class="en">FILTER&nbsp;DOCK</span></div>
+    <div class="mod-tag"><span class="tick"></span> الفلاتر</div>
     <div class="fd-ghosts">
       <div class="fd-pill"></div><div class="fd-pill"></div><div class="fd-pill"></div><div class="fd-pill"></div><div class="fd-pill"></div>
     </div>
-    <div class="fd-note">اسحب عناصر التصفية إلى هذا الشريط</div>
   </div>
 
-  <!-- ═══ MAIN COMPOSITION ═══ -->
+  <!-- ═══ KPI ROW · 3 ═══ -->
+  <div class="kpi-row">
+    <div class="well kpi-well">
+      <div class="hud tr"></div><div class="hud tl"></div><div class="hud br"></div><div class="hud bl"></div>
+      <div class="mod-tag"><span class="tick"></span> عدد المخالفات</div>
+    </div>
+    <div class="well kpi-well">
+      <div class="hud tr"></div><div class="hud tl"></div><div class="hud br"></div><div class="hud bl"></div>
+      <div class="mod-tag"><span class="tick"></span> قيمة المخالفات</div>
+    </div>
+    <div class="well kpi-well">
+      <div class="hud tr"></div><div class="hud tl"></div><div class="hud br"></div><div class="hud bl"></div>
+      <div class="mod-tag"><span class="tick"></span> إجمالي السائقين الخطرين</div>
+    </div>
+  </div>
+
+  <!-- ═══ MAIN · top-violations + donut (right) · map hero · AI + gauge (left) ═══ -->
   <div class="main">
 
     <!-- right column (first in RTL) -->
     <div class="side">
-      <div class="well kpi-well">
+      <div class="well">
         <div class="hud tr"></div><div class="hud tl"></div><div class="hud br"></div><div class="hud bl"></div>
-        <div class="mod-tag"><span class="tick"></span> مؤشر ٠١ <span class="en">KPI&nbsp;01</span></div>
-        <div class="ghost">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5h16v13H4z" stroke-linejoin="round"/><path d="M7.5 13.5l3-3 2.5 2.5 4-4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <div class="g-bars"><div class="g-bar w1"></div><div class="g-bar w2"></div></div>
-        </div>
+        <div class="mod-tag"><span class="tick"></span> نصوص المخالفات الأعلى تكراراً</div>
       </div>
       <div class="well">
         <div class="hud tr"></div><div class="hud tl"></div><div class="hud br"></div><div class="hud bl"></div>
-        <div class="mod-tag"><span class="tick"></span> وحدة عرض ٠١ <span class="en">MODULE&nbsp;01</span></div>
-        <div class="ghost"><div class="g-dash"></div>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 19V9 M10 19V5 M15 19v-8 M20 19V8" stroke-linecap="round"/></svg>
-          <div class="g-lbl">اسحب الرسم البياني هنا</div>
-        </div>
-      </div>
-      <div class="well">
-        <div class="hud tr"></div><div class="hud tl"></div><div class="hud br"></div><div class="hud bl"></div>
-        <div class="mod-tag"><span class="tick"></span> وحدة عرض ٠٢ <span class="en">MODULE&nbsp;02</span></div>
-        <div class="ghost"><div class="g-dash"></div>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8"/><path d="M12 4v8l5.5 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <div class="g-lbl">اسحب الرسم البياني هنا</div>
-        </div>
+        <div class="mod-tag"><span class="tick"></span> تصنيف السائقين حسب الخطورة</div>
       </div>
     </div>
 
     <!-- centre hero -->
     <div class="hero">
-      <div class="orbit o1"><div class="sat"></div></div>
-      <div class="orbit o2"></div>
-      <div class="orbit o3"></div>
+      <div class="orbit"><div class="sat"></div></div>
 
       <div class="hero-title">
         <h1>رادار المخالفات المرورية</h1>
@@ -520,15 +412,9 @@
             </linearGradient>
           </defs>
 
-          <!-- coordinates / HUD garnish -->
           <text class="coord" x="16" y="26">25.2048° N</text>
           <text class="coord" x="16" y="40">55.2708° E</text>
-          <text class="coord" x="452" y="384">UAE&nbsp;GRID&nbsp;·&nbsp;LIVE</text>
-          <line x1="8" y1="200" x2="26" y2="200" stroke="rgba(146,255,205,0.25)" stroke-width="1"/>
-          <line x1="510" y1="200" x2="528" y2="200" stroke="rgba(146,255,205,0.25)" stroke-width="1"/>
-          <line x1="268" y1="8" x2="268" y2="22" stroke="rgba(146,255,205,0.25)" stroke-width="1"/>
 
-          <!-- land -->
           <g id="landG" transform="translate(0 6)">
             <polygon id="halo" class="uae-halo-t" points=""/>
             <polygon id="land" class="uae-land-t" points="" fill="url(#landGlow)"/>
@@ -539,69 +425,41 @@
               <path d="M374 123 L374 41 A82 82 0 0 1 412.5 50.6 Z" fill="url(#wedge)" opacity="0.30"/>
               <line x1="374" y1="123" x2="374" y2="41" stroke="rgba(147,242,189,0.55)" stroke-width="1.2"/>
             </g>
-            <circle cx="374" cy="123" r="52"  fill="none" stroke="rgba(63,214,133,0.14)" stroke-width="1"/>
-            <circle cx="374" cy="123" r="86"  fill="none" stroke="rgba(63,214,133,0.09)" stroke-width="1"/>
-            <circle cx="374" cy="123" r="120" fill="none" stroke="rgba(63,214,133,0.055)" stroke-width="1"/>
+            <circle cx="374" cy="123" r="52"  fill="none" stroke="rgba(63,214,133,0.13)" stroke-width="1"/>
+            <circle cx="374" cy="123" r="86"  fill="none" stroke="rgba(63,214,133,0.08)" stroke-width="1"/>
+            <circle cx="374" cy="123" r="120" fill="none" stroke="rgba(63,214,133,0.05)" stroke-width="1"/>
 
-            <!-- animated arcs Dubai → emirates -->
             <g id="arcsG"></g>
-            <!-- city markers -->
             <g id="citiesG"></g>
           </g>
         </svg>
 
-        <!-- drop-zone frame over the map -->
         <div class="hero-frame">
           <div class="hud tr"></div><div class="hud tl"></div><div class="hud br"></div><div class="hud bl"></div>
-          <div class="mod-tag"><span class="tick"></span> المسرح الرئيسي · الخريطة <span class="en">MAIN&nbsp;STAGE</span></div>
+          <div class="mod-tag"><span class="tick"></span> المخالفات المرورية حسب الإمارة</div>
         </div>
       </div>
     </div>
 
     <!-- left column -->
     <div class="side">
-      <div class="well kpi-well">
+      <div class="well">
         <div class="hud tr"></div><div class="hud tl"></div><div class="hud br"></div><div class="hud bl"></div>
-        <div class="mod-tag"><span class="tick"></span> مؤشر ٠٢ <span class="en">KPI&nbsp;02</span></div>
-        <div class="ghost">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l7.5 3v5.2c0 4.9-3.2 8.6-7.5 10.3-4.3-1.7-7.5-5.4-7.5-10.3V6z" stroke-linejoin="round"/></svg>
-          <div class="g-bars"><div class="g-bar w1"></div><div class="g-bar w2"></div></div>
-        </div>
+        <div class="mod-tag"><span class="tick"></span> الذكاء الاصطناعي والتنبؤ</div>
       </div>
       <div class="well">
         <div class="hud tr"></div><div class="hud tl"></div><div class="hud br"></div><div class="hud bl"></div>
-        <div class="mod-tag"><span class="tick"></span> وحدة عرض ٠٣ <span class="en">MODULE&nbsp;03</span></div>
-        <div class="ghost"><div class="g-dash"></div>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v8.5l6 6" stroke-linecap="round"/></svg>
-          <div class="g-lbl">اسحب الرسم البياني هنا</div>
-        </div>
-      </div>
-      <div class="well">
-        <div class="hud tr"></div><div class="hud tl"></div><div class="hud br"></div><div class="hud bl"></div>
-        <div class="mod-tag"><span class="tick"></span> وحدة عرض ٠٤ <span class="en">MODULE&nbsp;04</span></div>
-        <div class="ghost"><div class="g-dash"></div>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 18c2.5 0 2.5-5 5-5s2.5 3 5 3 2.5-8 6-8" stroke-linecap="round"/></svg>
-          <div class="g-lbl">اسحب الرسم البياني هنا</div>
-        </div>
+        <div class="mod-tag"><span class="tick"></span> متوسط درجة الخطورة</div>
       </div>
     </div>
   </div>
 
-  <!-- ═══ BOTTOM STRIP ═══ -->
+  <!-- ═══ BOTTOM · sankey ═══ -->
   <div class="bottom">
     <div class="well">
       <div class="hud tr"></div><div class="hud tl"></div><div class="hud br"></div><div class="hud bl"></div>
-      <div class="mod-tag"><span class="tick"></span> الخط الزمني · وحدة عرض ٠٥ <span class="en">TIMELINE&nbsp;·&nbsp;MODULE&nbsp;05</span></div>
-      <div class="ghost">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="width:1.8cqw;height:1.8cqw;"><path d="M3 17l4-6 3.5 3 4-7 3.5 4.5 3-2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <div class="g-lbl">اسحب المخطط الزمني هنا — بعرض كامل</div>
-      </div>
+      <div class="mod-tag"><span class="tick"></span> معاهد السياقة مقابل فئة الخطورة</div>
     </div>
-  </div>
-
-  <!-- ═══ TELEMETRY TICKER ═══ -->
-  <div class="ticker">
-    <div class="ticker-track" id="tickerTrack"></div>
   </div>
 </div>
 
@@ -667,23 +525,23 @@ CITIES.forEach((c, i) => {
 document.getElementById('citiesG').innerHTML = cities;
 document.getElementById('arcsG').innerHTML = arcs;
 
-/* ── particle network ── */
+/* ── particle network (quiet) ── */
 const cv = document.getElementById('net'), cx = cv.getContext('2d');
 let W, H, pts;
 function resize() {
   W = cv.width = innerWidth; H = cv.height = innerHeight;
-  const n = Math.round(Math.min(90, W * H / 26000));
+  const n = Math.round(Math.min(60, W * H / 38000));
   pts = Array.from({ length: n }, () => ({
     x: Math.random() * W, y: Math.random() * H,
-    vx: (Math.random() - 0.5) * 0.22, vy: (Math.random() - 0.5) * 0.22,
-    r: 0.8 + Math.random() * 1.4,
+    vx: (Math.random() - 0.5) * 0.2, vy: (Math.random() - 0.5) * 0.2,
+    r: 0.8 + Math.random() * 1.3,
   }));
 }
 resize(); addEventListener('resize', resize);
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 function frame() {
   cx.clearRect(0, 0, W, H);
-  const LINK = Math.min(150, W / 13);
+  const LINK = Math.min(140, W / 14);
   for (const p of pts) {
     p.x += p.vx; p.y += p.vy;
     if (p.x < -20) p.x = W + 20; if (p.x > W + 20) p.x = -20;
@@ -696,29 +554,19 @@ function frame() {
       const dx = a.x - b.x, dy = a.y - b.y;
       const d2 = dx * dx + dy * dy;
       if (d2 < LINK * LINK) {
-        const o = (1 - Math.sqrt(d2) / LINK) * 0.16;
+        const o = (1 - Math.sqrt(d2) / LINK) * 0.11;
         cx.strokeStyle = `rgba(147,242,189,${o.toFixed(3)})`;
         cx.beginPath(); cx.moveTo(a.x, a.y); cx.lineTo(b.x, b.y); cx.stroke();
       }
     }
   }
   for (const p of pts) {
-    cx.fillStyle = 'rgba(147,242,189,0.45)';
+    cx.fillStyle = 'rgba(147,242,189,0.32)';
     cx.beginPath(); cx.arc(p.x, p.y, p.r, 0, 7); cx.fill();
   }
   if (!reduced) requestAnimationFrame(frame);
 }
 frame();
-
-/* ── telemetry ticker ── */
-const MSGS = [
-  'جاهزية المنظومة <b class="num">99.2%</b>', 'آخر مزامنة مع منظومة المخالفات قبل <b class="num">14</b> ثانية',
-  'وحدات الرصد النشطة <b class="num">312</b>', 'نموذج التنبؤ v4.2 — ثقة <b class="num">95%</b>',
-  'تغطية الشبكة <b class="num">7/7</b> إمارات', 'زمن الاستجابة <b class="num">0.8</b> ثانية',
-  'تحديث البيانات كل <b class="num">60</b> ثانية', 'الحالة التشغيلية: مستقرة',
-];
-const seq = MSGS.map(m => `<span>${m}</span><span class="sep">◆</span>`).join('');
-document.getElementById('tickerTrack').innerHTML = seq + seq; /* doubled for seamless loop */
 </script>
 </body>
 </html>

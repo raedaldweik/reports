@@ -172,8 +172,8 @@
         <stop offset="1"    stop-color="rgba(140, 255, 210, 0)"/>
       </linearGradient>
       <radialGradient id="flareBloom" cx="0.5" cy="0.5" r="0.5">
-        <stop offset="0"   stop-color="rgba(150, 255, 215, 0.11)"/>
-        <stop offset="0.5" stop-color="rgba(60, 230, 175, 0.04)"/>
+        <stop offset="0"   stop-color="rgba(150, 255, 215, 0.06)"/>
+        <stop offset="0.5" stop-color="rgba(60, 230, 175, 0.022)"/>
         <stop offset="1"   stop-color="rgba(60, 230, 175, 0)"/>
       </radialGradient>
       <!-- corner echo arc stroke -->
@@ -205,7 +205,6 @@
 
     <!-- ── lens-flare horizon behind the centrepiece ─────────────── -->
     <ellipse class="bloom" cx="1085" cy="540" rx="330" ry="60" fill="url(#flareBloom)"/>
-    <rect class="flare-ln" x="330" y="539.2" width="1260" height="1.6" fill="url(#flareGrad)"/>
 
     <!-- ── flowing contour lines, sweeping the lower stage ───────── -->
     <g class="contours" fill="none" stroke="url(#lineFade)" stroke-width="1.1">
@@ -229,10 +228,6 @@
 
       <!-- glass disc + hairline crosshair, for depth -->
       <circle cx="960" cy="540" r="150" fill="url(#glassGrad)" stroke="rgba(180, 255, 224, 0.10)" stroke-width="1"/>
-      <g stroke="rgba(146, 255, 205, 0.045)" stroke-width="1">
-        <line x1="960" y1="180" x2="960" y2="900"/>
-        <line x1="600" y1="540" x2="1320" y2="540"/>
-      </g>
 
       <!-- concentric hairlines -->
       <circle cx="960" cy="540" r="212" fill="none" stroke="url(#rimGrad)" stroke-width="1.2"/>

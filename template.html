@@ -133,12 +133,22 @@
   }
   .f-tag { display: inline-flex; align-items: center; gap: 0.38cqw; font-size: 0.58cqw; font-weight: 700; color: var(--ink-3); }
   .f-tag .tick { width: 0.22cqw; height: 0.85cqw; border-radius: 0.2cqw; background: linear-gradient(180deg, #93f2bd, #27a563); box-shadow: 0 0 0.4cqw rgba(46, 230, 168, 0.35); }
-  .f-pill {
-    height: 1.4cqw; border-radius: 2cqw;
-    border: 1px dashed rgba(146, 255, 205, 0.14);
-    flex: 0 0 8.5cqw;
+  .f-seg {
+    display: inline-flex;
+    background: rgba(210, 255, 232, 0.05);
+    border: 1px solid var(--hairline);
+    border-radius: 2cqw; padding: 0.12cqw;
   }
-  .f-pill.seg { flex-basis: 6cqw; }
+  .f-seg span { font-size: 0.58cqw; font-weight: 600; color: var(--ink-3); padding: 0.24cqw 0.8cqw; border-radius: 1.8cqw; }
+  .f-seg span.on { background: linear-gradient(180deg, rgba(46, 230, 168, 0.22), rgba(46, 230, 168, 0.09)); color: var(--ink-1); }
+  .f-chip {
+    display: inline-flex; align-items: center; gap: 0.45cqw;
+    font-size: 0.58cqw; font-weight: 600; color: var(--ink-2);
+    border: 1px solid var(--hairline);
+    background: rgba(210, 255, 232, 0.045);
+    border-radius: 2cqw; padding: 0.3cqw 0.85cqw;
+  }
+  .f-chip svg { width: 0.55cqw; height: 0.55cqw; color: var(--ink-4); flex: 0 0 auto; }
   .f-note { margin-inline-start: auto; font-size: 0.5cqw; font-weight: 600; color: var(--ink-4); }
 
   /* ── wells ── */
@@ -301,8 +311,8 @@
         <stop offset="1"    stop-color="rgba(140, 255, 210, 0)"/>
       </linearGradient>
       <radialGradient id="flareBloom" cx="0.5" cy="0.5" r="0.5">
-        <stop offset="0"   stop-color="rgba(150, 255, 215, 0.11)"/>
-        <stop offset="0.5" stop-color="rgba(60, 230, 175, 0.04)"/>
+        <stop offset="0"   stop-color="rgba(150, 255, 215, 0.06)"/>
+        <stop offset="0.5" stop-color="rgba(60, 230, 175, 0.022)"/>
         <stop offset="1"   stop-color="rgba(60, 230, 175, 0)"/>
       </radialGradient>
       <linearGradient id="cornerGrad" x1="0" y1="1" x2="1" y2="0">
@@ -328,7 +338,6 @@
     </g>
 
     <ellipse class="bloom" cx="1085" cy="540" rx="330" ry="60" fill="url(#flareBloom)"/>
-    <rect class="flare-ln" x="330" y="539.2" width="1260" height="1.6" fill="url(#flareGrad)"/>
 
     <g class="contours" fill="none" stroke="url(#lineFade)" stroke-width="1.1">
       <path d="M -40 852  C 420 800, 760 918, 1150 860  S 1720 792, 1960 838"/>
@@ -346,10 +355,6 @@
     <g>
       <circle class="halo" cx="960" cy="540" r="430" fill="url(#haloGrad)"/>
       <circle cx="960" cy="540" r="150" fill="url(#glassGrad)" stroke="rgba(180, 255, 224, 0.10)" stroke-width="1"/>
-      <g stroke="rgba(146, 255, 205, 0.045)" stroke-width="1">
-        <line x1="960" y1="180" x2="960" y2="900"/>
-        <line x1="600" y1="540" x2="1320" y2="540"/>
-      </g>
       <circle cx="960" cy="540" r="212" fill="none" stroke="url(#rimGrad)" stroke-width="1.2"/>
       <circle cx="960" cy="540" r="286" fill="none" stroke="rgba(146, 255, 205, 0.085)" stroke-width="1"/>
       <circle cx="960" cy="540" r="368" fill="none" stroke="rgba(146, 255, 205, 0.055)" stroke-width="1"/>
@@ -465,12 +470,12 @@
 
     <div class="filter-rail">
       <div class="f-tag"><span class="tick"></span> الفلاتر</div>
-      <div class="f-pill seg"></div>
-      <div class="f-pill"></div>
-      <div class="f-pill"></div>
-      <div class="f-pill"></div>
-      <div class="f-pill"></div>
-      <div class="f-note">عناصر التصفية تُسحب هنا</div>
+      <div class="f-seg"><span class="on">الكل</span><span>مواطن</span><span>مقيم</span></div>
+      <div class="f-chip">الجنسية · الكل <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="f-chip">مصدر اللوحة · الكل <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="f-chip">نص المخالفة · الكل <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="f-chip">صنف المركبة · الكل <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="f-note">تحديث تلقائي كل 60 ثانية</div>
     </div>
 
     <div class="kpi-row">
@@ -611,10 +616,12 @@
               <text x="478" y="204" text-anchor="middle" font-family="IBM Plex Sans Arabic" font-size="13" font-weight="600" fill="#c2dccf">الفجيرة</text>
               <text x="478" y="220" text-anchor="middle" font-family="Manrope" font-size="12" font-weight="700" fill="#85a795">222</text>
             </g>
-            <g style="direction:rtl">
-              <text class="lg-t" x="316" y="292">أعلى (717)</text>
+            <g style="direction:ltr">
+              <text class="lg-t" x="138" y="292" text-anchor="end">(107)</text>
+              <text class="lg-t" x="166" y="292" text-anchor="end">أقل</text>
               <rect x="176" y="284" width="66" height="7" rx="3.5" fill="url(#mapLeg)"/>
-              <text class="lg-t" x="166" y="292" text-anchor="end">أقل (107)</text>
+              <text class="lg-t" x="252" y="292">أعلى</text>
+              <text class="lg-t" x="288" y="292">(717)</text>
             </g>
             <defs>
               <linearGradient id="mapLeg" x1="1" y1="0" x2="0" y2="0">
@@ -627,7 +634,7 @@
 
       <!-- AI narrative + forecast line -->
       <div class="well">
-        <div class="tag"><span class="tick" style="background:linear-gradient(180deg,#d8b45a,#27a563);"></span> الذكاء الاصطناعي والتنبؤ</div>
+        <div class="tag"><span class="tick"></span> الذكاء الاصطناعي والتنبؤ</div>
         <div class="pal">ثقة النموذج <b>95%</b></div>
         <div class="cbody" style="display:flex;flex-direction:column;gap:0.35cqw;">
           <div style="font-size:0.62cqw;line-height:1.7;color:var(--ink-2);font-weight:400;">
@@ -637,7 +644,7 @@
             يشير النموذج التنبؤي إلى تراجع المؤشر نحو <b class="num" style="color:#6fe6b1;">100</b> بحلول 2026.
           </div>
           <div style="height:1px;background:linear-gradient(90deg,transparent,var(--hairline),transparent);"></div>
-          <svg viewBox="0 0 420 152" preserveAspectRatio="none" style="flex:1;direction:ltr;">
+          <svg viewBox="0 0 420 152" preserveAspectRatio="xMidYMid meet" style="flex:1;direction:ltr;">
             <defs>
               <linearGradient id="fcA" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0" stop-color="rgba(46,230,168,0.22)"/><stop offset="1" stop-color="rgba(46,230,168,0)"/>
@@ -670,20 +677,20 @@
         <div class="tag"><span class="tick"></span> متوسط درجة الخطورة</div>
         <div class="cbody">
           <svg viewBox="0 0 420 260" preserveAspectRatio="xMidYMid meet" style="direction:ltr">
-            <g fill="none" stroke-width="18">
+            <g fill="none" stroke-width="18" transform="translate(210 150) scale(1.1) translate(-210 -150)">
               <path d="M 112.3 171.5 A 100 100 0 0 1 171.2 57.9" stroke="#34d17b" opacity="0.85"/>
               <path d="M 177.6 55.4 A 100 100 0 0 1 242.4 55.4" stroke="#f6b73c" opacity="0.85"/>
               <path d="M 248.9 57.9 A 100 100 0 0 1 297.2 101.0" stroke="#ec835a" opacity="0.85"/>
               <path d="M 300.4 107.2 A 100 100 0 0 1 307.7 171.5" stroke="#d0433b" opacity="0.85"/>
             </g>
-            <g font-family="Manrope" font-size="11.5" font-weight="700" fill="#5b7c6b" text-anchor="middle">
+            <g font-family="Manrope" font-size="11.5" font-weight="700" fill="#5b7c6b" text-anchor="middle" transform="translate(210 150) scale(1.1) translate(-210 -150)">
               <text x="92" y="185">0</text>
               <text x="99" y="92">0.25</text>
               <text x="210" y="25">0.5</text>
               <text x="298" y="60">0.75</text>
               <text x="328" y="185">1</text>
             </g>
-            <path d="M 214.8 151.3 L 228.2 80.3 L 205.2 148.7 Z" fill="#eefff6" filter="url(#mGlow2)"/>
+            <path d="M 214.8 151.3 L 228.2 80.3 L 205.2 148.7 Z" fill="#eefff6" filter="url(#mGlow2)" transform="translate(210 150) scale(1.1) translate(-210 -150)"/>
             <defs><filter id="mGlow2" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#eefff6" flood-opacity="0.4"/></filter></defs>
             <circle cx="210" cy="150" r="8" fill="#06130c" stroke="#eefff6" stroke-width="2.4"/>
             <text x="210" y="208" text-anchor="middle" font-family="Manrope" font-size="38" font-weight="800" fill="#eefff6">0.57</text>
@@ -701,7 +708,7 @@
         <div class="tag"><span class="tick"></span> تصنيف السائقين حسب الخطورة</div>
         <div class="cbody">
           <svg viewBox="0 0 420 260" preserveAspectRatio="xMidYMid meet" style="direction:ltr">
-            <g transform="translate(210 104)">
+            <g transform="translate(210 104) scale(1.08)">
               <circle r="72" fill="none" stroke="rgba(146,255,205,0.05)" stroke-width="26"/>
               <circle r="72" fill="none" stroke="#34d17b" stroke-width="26" stroke-dasharray="142 310.4" stroke-dashoffset="0" transform="rotate(-90)"/>
               <circle r="72" fill="none" stroke="#f6b73c" stroke-width="26" stroke-dasharray="123 329.4" stroke-dashoffset="-148" transform="rotate(-90)"/>

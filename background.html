@@ -24,15 +24,15 @@
     /* base: near-black with deep emerald pooling, like the reference heroes */
     background:
       /* main light — soft mint-cyan bloom upper centre-right (duotone warm side) */
-      radial-gradient(ellipse 52% 44% at 68% 22%, rgba(38, 195, 158, 0.13) 0%, transparent 65%),
+      radial-gradient(ellipse 52% 44% at 68% 22%, rgba(38, 195, 158, 0.20) 0%, transparent 65%),
       /* counter light — lower left, dimmer, deeper emerald */
-      radial-gradient(ellipse 46% 40% at 12% 88%, rgba(28, 150, 100, 0.10) 0%, transparent 62%),
+      radial-gradient(ellipse 46% 40% at 12% 88%, rgba(28, 150, 100, 0.15) 0%, transparent 62%),
       /* centre stage glow — barely there, keeps overlaid objects lifted */
-      radial-gradient(ellipse 36% 32% at 50% 52%, rgba(40, 200, 145, 0.06) 0%, transparent 70%),
+      radial-gradient(ellipse 36% 32% at 50% 52%, rgba(40, 200, 145, 0.09) 0%, transparent 70%),
       /* floor sheen under the contour lines */
-      radial-gradient(ellipse 60% 18% at 50% 101%, rgba(40, 190, 140, 0.08) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 18% at 50% 101%, rgba(40, 190, 140, 0.12) 0%, transparent 70%),
       /* deep vertical grade */
-      linear-gradient(178deg, #0b100e 0%, #070b09 38%, #040706 74%, #030404 100%);
+      linear-gradient(178deg, #122e21 0%, #0a2015 38%, #061510 74%, #040e09 100%);
   }
 
   .layer { position: fixed; inset: 0; }
@@ -46,6 +46,11 @@
   }
 
   /* svg artwork: rings, ticks, contour lines, dot fields */
+
+  /* silk light ribbons crossing the frame (poster language) */
+  .ribbon { pointer-events: none; }
+  .ribbon.r1 { background: linear-gradient(115deg, transparent 32%, rgba(140,255,205,0.045) 45%, rgba(190,255,225,0.085) 50%, rgba(140,255,205,0.05) 56%, transparent 70%); filter: blur(10px); }
+  .ribbon.r2 { background: linear-gradient(115deg, transparent 40%, rgba(140,255,205,0.03) 49%, rgba(180,250,218,0.055) 52%, rgba(140,255,205,0.03) 55%, transparent 64%); filter: blur(8px); transform: translateY(-12%); }
   svg.art { width: 100%; height: 100%; display: block; }
 
   /* vignette + hairline top highlight — the cinematic frame */
@@ -99,12 +104,20 @@
   body.motion .dust circle:nth-child(2n) { animation-delay: 1.7s; }
   body.motion .dust circle:nth-child(3n) { animation-delay: 3.2s; }
   body.motion .dust circle:nth-child(5n) { animation-delay: 4.9s; animation-duration: 9.5s; }
+  body.motion .mosaic { transform-box: view-box; transform-origin: 960px 540px; animation: m-orbit 280s linear infinite; }
+  body.motion .uae-net { animation: m-breathe 22s ease-in-out infinite; }
+  body.motion .bokeh-l circle { animation: m-tw 8s ease-in-out infinite; }
+  body.motion .bokeh-l circle:nth-child(2n) { animation-delay: 2.1s; }
+  body.motion .bokeh-l circle:nth-child(3n) { animation-delay: 4.4s; }
+  body.motion .ribbon.r1 { animation: m-drift 44s ease-in-out infinite; }
   @media (prefers-reduced-motion: reduce) { body.motion * { animation: none !important; } }
 </style>
 </head>
 <body>
 
   <div class="layer shaft"></div>
+  <div class="layer ribbon r1"></div>
+  <div class="layer ribbon r2"></div>
 
   <svg class="art layer" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
     <defs>
@@ -182,9 +195,18 @@
         <stop offset="0.6" stop-color="rgba(120, 250, 200, 0.22)"/>
         <stop offset="1"   stop-color="rgba(46, 230, 168, 0.04)"/>
       </linearGradient>
+      <pattern id="gridPlus" width="64" height="64" patternUnits="userSpaceOnUse">
+        <path d="M 0 63.5 H 64 M 63.5 0 V 64" stroke="rgba(140, 225, 180, 0.05)" stroke-width="1" fill="none"/>
+        <path d="M 28 32 H 36 M 32 28 V 36" stroke="rgba(190, 245, 215, 0.11)" stroke-width="1" fill="none"/>
+      </pattern>
     </defs>
 
     <!-- ── corner dot fields ─────────────────────────────────────── -->
+    <rect x="0" y="0" width="1920" height="1080" fill="url(#gridPlus)"/>
+    <g id="mosaic" class="mosaic"></g>
+    <g id="uaeNet" class="uae-net" transform="translate(426 133) scale(2.05)" style="filter: blur(1.8px); opacity: 0.55;"></g>
+    <g id="bokehL" class="bokeh-l" style="filter: blur(2.2px);"></g>
+    <g id="sparks"></g>
     <rect x="0" y="0" width="640" height="480" fill="url(#dots)" mask="url(#dotMaskTL)"/>
     <rect x="1280" y="620" width="640" height="460" fill="url(#dots)" mask="url(#dotMaskBR)"/>
 
@@ -321,6 +343,86 @@
 
   <div class="layer grade"></div>
 
-<script>if(!/[?&]static/.test(location.search))document.body.classList.add("motion");</script>
+<script>
+/* poster texture layers — deterministic, generated once */
+(function () {
+  var NS = 'http://www.w3.org/2000/svg';
+  function lcg(seed) { var x = seed >>> 0; return function () { x = (1664525 * x + 1013904223) >>> 0; return x / 4294967296; }; }
+  function el(g, n, at) { var e = document.createElementNS(NS, n); for (var k in at) e.setAttribute(k, at[k]); g.appendChild(e); return e; }
+
+  /* 1 · pixel-mosaic vortex around the centre (Police-Eye language) */
+  var g = document.getElementById('mosaic'), r = lcg(77);
+  for (var R = 210; R <= 960; R += 34) {
+    var n = Math.max(10, Math.floor(2 * Math.PI * R / 34));
+    for (var i = 0; i < n; i++) {
+      if (r() < 0.45) continue;
+      var a = i * 2 * Math.PI / n + (R % 68 === 0 ? Math.PI / n : 0);
+      var x = 960 + R * Math.cos(a), y = 540 + R * Math.sin(a);
+      if (y < -20 || y > 1100 || x < -20 || x > 1940) continue;
+      var w = 9 + r() * 16, h = 7 + r() * 9;
+      var bright = r() > 0.94;
+      var o = (0.028 + r() * 0.075) * (R < 330 ? 0.55 : 1);
+      el(g, 'rect', {
+        x: (-w / 2).toFixed(1), y: (-h / 2).toFixed(1), width: w.toFixed(1), height: h.toFixed(1), rx: 1.5,
+        transform: 'translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ') rotate(' + (a * 180 / Math.PI + 90).toFixed(1) + ')',
+        fill: bright ? 'rgba(110, 240, 185, ' + (0.10 + r() * 0.09).toFixed(3) + ')' : 'rgba(70, 190, 140, ' + o.toFixed(3) + ')'
+      });
+    }
+  }
+
+  /* 2 · UAE particle constellation (Innovation-Month language) */
+  var P = '41,212.9 96.2,242 169.8,225.5 261.8,225.5 303.2,193.5 330.8,157.6 358.4,135.2 384.2,111 409,86.8 441.2,62.5 453.2,36.3 464.2,48 476.2,86.8 479.8,130.4 468.8,154.6 441.2,145 430.2,178.9 425.6,217.7 409,246.8 404.4,295.3 372.2,361.3 243.4,356.4 131.2,339.9 76,287.5'
+    .split(' ').map(function (s) { return s.split(',').map(Number); });
+  function inPoly(x, y) {
+    var ins = false;
+    for (var i = 0, j = P.length - 1; i < P.length; j = i++) {
+      if ((P[i][1] > y) !== (P[j][1] > y) && x < (P[j][0] - P[i][0]) * (y - P[i][1]) / (P[j][1] - P[i][1]) + P[i][0]) ins = !ins;
+    }
+    return ins;
+  }
+  var net = document.getElementById('uaeNet'), r2 = lcg(313);
+  var nodes = P.slice();
+  [[374, 123], [238, 247], [400, 99], [415, 80], [429, 62], [447, 44], [476, 128]].forEach(function (c) { nodes.push(c); });
+  var tries = 0;
+  while (nodes.length < 46 && tries < 900) {
+    tries++;
+    var nx = 40 + r2() * 445, ny = 30 + r2() * 335;
+    if (inPoly(nx, ny)) nodes.push([nx, ny]);
+  }
+  el(net, 'polygon', { points: P.map(function (p) { return p.join(','); }).join(' '), fill: 'none', stroke: 'rgba(150, 245, 200, 0.42)', 'stroke-width': 0.9, 'stroke-linejoin': 'round' });
+  nodes.forEach(function (a, i) {
+    var d1 = 1e9, d2 = 1e9, k1 = -1, k2 = -1;
+    nodes.forEach(function (b, j) {
+      if (i === j) return;
+      var d = (a[0] - b[0]) * (a[0] - b[0]) + (a[1] - b[1]) * (a[1] - b[1]);
+      if (d < d1) { d2 = d1; k2 = k1; d1 = d; k1 = j; } else if (d < d2) { d2 = d; k2 = j; }
+    });
+    [k1, k2].forEach(function (k) {
+      if (k > i) el(net, 'line', { x1: a[0].toFixed(1), y1: a[1].toFixed(1), x2: nodes[k][0].toFixed(1), y2: nodes[k][1].toFixed(1), stroke: 'rgba(120, 235, 180, 0.30)', 'stroke-width': 0.45 });
+    });
+  });
+  nodes.forEach(function (a) {
+    var big = r2() > 0.82;
+    el(net, 'circle', { cx: a[0].toFixed(1), cy: a[1].toFixed(1), r: big ? 1.9 : 1.1, fill: 'rgba(170, 250, 210, ' + (big ? 0.65 : 0.45) + ')' });
+  });
+
+  /* 3 · bokeh glow dots + sharp sparks (Behance-grid language) */
+  var bg = document.getElementById('bokehL'), sg = document.getElementById('sparks'), r3 = lcg(929);
+  for (var b = 0; b < 26; b++) {
+    el(bg, 'circle', {
+      cx: (30 + r3() * 1860).toFixed(0), cy: (30 + r3() * 1020).toFixed(0),
+      r: (2.5 + r3() * 5).toFixed(1),
+      fill: 'rgba(' + (r3() > 0.7 ? '210, 255, 235' : '110, 235, 180') + ', ' + (0.10 + r3() * 0.16).toFixed(3) + ')'
+    });
+  }
+  for (var s = 0; s < 16; s++) {
+    el(sg, 'circle', {
+      cx: (20 + r3() * 1880).toFixed(0), cy: (20 + r3() * 1040).toFixed(0),
+      r: (0.9 + r3() * 0.9).toFixed(1),
+      fill: 'rgba(235, 255, 246, ' + (0.22 + r3() * 0.30).toFixed(3) + ')'
+    });
+  }
+})();
+if(!/[?&]static/.test(location.search))document.body.classList.add("motion");</script>
 </body>
 </html>

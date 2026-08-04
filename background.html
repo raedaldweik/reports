@@ -24,15 +24,15 @@
     /* base: near-black with deep emerald pooling, like the reference heroes */
     background:
       /* main light — soft mint-cyan bloom upper centre-right (duotone warm side) */
-      radial-gradient(ellipse 52% 44% at 68% 22%, rgba(38, 195, 158, 0.17) 0%, transparent 65%),
+      radial-gradient(ellipse 52% 44% at 68% 22%, rgba(38, 195, 158, 0.13) 0%, transparent 65%),
       /* counter light — lower left, dimmer, deeper emerald */
-      radial-gradient(ellipse 46% 40% at 12% 88%, rgba(28, 150, 100, 0.13) 0%, transparent 62%),
+      radial-gradient(ellipse 46% 40% at 12% 88%, rgba(28, 150, 100, 0.10) 0%, transparent 62%),
       /* centre stage glow — barely there, keeps overlaid objects lifted */
-      radial-gradient(ellipse 36% 32% at 50% 52%, rgba(40, 200, 145, 0.08) 0%, transparent 70%),
+      radial-gradient(ellipse 36% 32% at 50% 52%, rgba(40, 200, 145, 0.06) 0%, transparent 70%),
       /* floor sheen under the contour lines */
-      radial-gradient(ellipse 60% 18% at 50% 101%, rgba(40, 190, 140, 0.10) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 18% at 50% 101%, rgba(40, 190, 140, 0.08) 0%, transparent 70%),
       /* deep vertical grade */
-      linear-gradient(178deg, #071510 0%, #04100b 38%, #020a07 74%, #020805 100%);
+      linear-gradient(178deg, #0b100e 0%, #070b09 38%, #040706 74%, #030404 100%);
   }
 
   .layer { position: fixed; inset: 0; }
@@ -53,7 +53,7 @@
     content: '';
     position: absolute; inset: 0;
     background:
-      linear-gradient(180deg, rgba(210, 255, 236, 0.05) 0%, transparent 1.5px),
+      linear-gradient(180deg, rgba(240, 245, 242, 0.05) 0%, transparent 1.5px),
       radial-gradient(ellipse 92% 84% at 50% 46%, transparent 58%, rgba(1, 5, 3, 0.62) 100%);
   }
   /* film grain — static, whisper-quiet */
@@ -61,8 +61,8 @@
     content: '';
     position: absolute; inset: 0;
     background-image:
-      radial-gradient(circle at 1px 1px, rgba(210, 255, 236, 0.030) 1px, transparent 1px),
-      radial-gradient(circle at 19px 13px, rgba(210, 255, 236, 0.016) 1px, transparent 1px);
+      radial-gradient(circle at 1px 1px, rgba(240, 245, 242, 0.028) 1px, transparent 1px),
+      radial-gradient(circle at 19px 13px, rgba(240, 245, 242, 0.015) 1px, transparent 1px);
     background-size: 30px 30px, 47px 47px;
   }
 
@@ -125,7 +125,7 @@
       </linearGradient>
       <!-- dot field pattern -->
       <pattern id="dots" width="26" height="26" patternUnits="userSpaceOnUse">
-        <circle cx="1.3" cy="1.3" r="1.3" fill="rgba(146, 255, 205, 0.09)"/>
+        <circle cx="1.3" cy="1.3" r="1.3" fill="rgba(205, 222, 214, 0.065)"/>
       </pattern>
       <radialGradient id="dotFadeTL" cx="0" cy="0" r="1">
         <stop offset="0"   stop-color="#fff"/>
@@ -141,7 +141,7 @@
       <linearGradient id="lineFade" x1="0" y1="0" x2="1" y2="0">
         <stop offset="0"    stop-color="rgba(46, 230, 168, 0)"/>
         <stop offset="0.35" stop-color="rgba(46, 230, 168, 0.10)"/>
-        <stop offset="0.72" stop-color="rgba(46, 230, 168, 0.16)"/>
+        <stop offset="0.72" stop-color="rgba(46, 230, 168, 0.13)"/>
         <stop offset="1"    stop-color="rgba(46, 230, 168, 0)"/>
       </linearGradient>
       <!-- smooth centre halo — no hard edges -->
@@ -192,7 +192,7 @@
     <g fill="none">
       <circle cx="1905" cy="-60" r="560" stroke="url(#cornerGrad)" stroke-width="1.2"/>
       <circle cx="1905" cy="-60" r="640" stroke="rgba(146, 255, 205, 0.06)" stroke-width="1"/>
-      <circle cx="1905" cy="-60" r="710" stroke="rgba(146, 255, 205, 0.035)" stroke-width="1"/>
+      <circle cx="1905" cy="-60" r="710" stroke="rgba(195, 226, 210, 0.032)" stroke-width="1"/>
       <!-- bright segment on the middle echo + node -->
       <g class="corner-sweep">
         <path d="M 1489 373 A 640 640 0 0 1 1370 219" stroke="url(#arcGrad)" stroke-width="1.8" stroke-linecap="round" filter="url(#arcGlow)"/>
@@ -231,14 +231,14 @@
 
       <!-- concentric hairlines -->
       <circle cx="960" cy="540" r="212" fill="none" stroke="url(#rimGrad)" stroke-width="1.2"/>
-      <circle cx="960" cy="540" r="286" fill="none" stroke="rgba(146, 255, 205, 0.085)" stroke-width="1"/>
-      <circle cx="960" cy="540" r="368" fill="none" stroke="rgba(146, 255, 205, 0.055)" stroke-width="1"/>
-      <circle cx="960" cy="540" r="452" fill="none" stroke="rgba(146, 255, 205, 0.035)" stroke-width="1"/>
+      <circle cx="960" cy="540" r="286" fill="none" stroke="rgba(195, 226, 210, 0.075)" stroke-width="1"/>
+      <circle cx="960" cy="540" r="368" fill="none" stroke="rgba(195, 226, 210, 0.05)" stroke-width="1"/>
+      <circle cx="960" cy="540" r="452" fill="none" stroke="rgba(195, 226, 210, 0.032)" stroke-width="1"/>
       <!-- dashed orbit -->
-      <circle class="dash-ring" cx="960" cy="540" r="324" fill="none" stroke="rgba(146, 255, 205, 0.09)" stroke-width="1" stroke-dasharray="2 10"/>
+      <circle class="dash-ring" cx="960" cy="540" r="324" fill="none" stroke="rgba(195, 226, 210, 0.08)" stroke-width="1" stroke-dasharray="2 10"/>
 
       <!-- tick ring: 60 fine ticks on r=368 -->
-      <g id="ticks" stroke="rgba(146, 255, 205, 0.10)" stroke-width="1"></g>
+      <g id="ticks" stroke="rgba(195, 226, 210, 0.09)" stroke-width="1"></g>
 
       <!-- the bright arc — top-right, like the reference lock badge -->
       <g class="orbit-a">
@@ -263,7 +263,7 @@
       <!-- nodes where the arcs end -->
 
       <!-- four cardinal micro-marks on the outer ring -->
-      <g stroke="rgba(146, 255, 205, 0.22)" stroke-width="1.5">
+      <g stroke="rgba(195, 226, 210, 0.20)" stroke-width="1.5">
         <line x1="960" y1="82"  x2="960" y2="96"/>
         <line x1="960" y1="984" x2="960" y2="998"/>
         <line x1="502" y1="540" x2="516" y2="540"/>
@@ -272,7 +272,7 @@
     </g>
 
     <!-- ── sparse "+" field marks — designed emptiness ───────────── -->
-    <g stroke="rgba(146, 255, 205, 0.14)" stroke-width="1">
+    <g stroke="rgba(200, 224, 212, 0.12)" stroke-width="1">
       <path d="M 250 260 h 12 M 256 254 v 12"/>
       <path d="M 1690 210 h 12 M 1696 204 v 12"/>
       <path d="M 1770 760 h 12 M 1776 754 v 12"/>
@@ -312,7 +312,7 @@
           l.setAttribute('y1', (540 + r0 * Math.sin(a)).toFixed(1));
           l.setAttribute('x2', (960 + r1 * Math.cos(a)).toFixed(1));
           l.setAttribute('y2', (540 + r1 * Math.sin(a)).toFixed(1));
-          if (big) l.setAttribute('stroke', 'rgba(146, 255, 205, 0.16)');
+          if (big) l.setAttribute('stroke', 'rgba(195, 226, 210, 0.15)');
           g.appendChild(l);
         }
       })();
